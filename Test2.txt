@@ -1,0 +1,1 @@
+Zum Testen von git aus Aptana heraus.
