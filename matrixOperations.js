@@ -1,3 +1,5 @@
+//leicht veraendert
+
 /** sucht pivot-Elemente der Matrix a
  * @param{Array} A Matrix des spaeter zu loesendem Systems
  * @return{Array} pivot Vektor mit Indices der zu waehlenden Zeilen
