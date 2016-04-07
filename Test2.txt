@@ -1,2 +1,0 @@
-Test: Does commiting work with the right user name
-out of Aptana? Second try.

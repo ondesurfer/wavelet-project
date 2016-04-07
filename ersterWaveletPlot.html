@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+<!-- Date: 2016-31-01 -->
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>ersterWaveletPlot</title>
+        <meta name="author" content="Simon" />
+        <meta name="author" content="Andreas">
+        <!--Einbinden der Scripte und Bibliotheken-->
+        <script src="d3.js"></script>
+        <script src="math.js"></script>
+        <script src="matrixOperations.js"></script>
+        <script src="Punktauswertung.js"></script>
+        <script src="https://wzrd.in/standalone/function-plot@1.14.0">
+        </script>
+        <script src="gauss.js"></script>
+
+
+        <style>
+            input[type=text] {
+                width: 300px;
+            }
+            input {
+                padding: 6px;
+            }
+            body, html, input {
+                font-family: sans-serif;
+                font-size: 11pt;
+
+            }
+            form {
+                margin: 20px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <form id="form">
+            <label for="eq">Enter Daubechies Number:</label>
+            <input type="text" id="eq" value="3" />
+            <input type="submit" value="Draw" />
+        </form>
+
+        <div id="plot"></div>
+
+        <p>
+            Plot library: <a href="https://github.com/maurizzzio/function-plot">
+                https://github.com/maurizzzio/function-plot</a>
+        </p>
+
+        <script>
+                    //Daubechies-Koeffizienten (aus wikipedia):
+                    var d = new Array();
+                    d[2] = [(1 + Math.sqrt(3)) / 4, ((3 + Math.sqrt(3)) / 4), (3 - Math.sqrt(3)) / 4,
+                        (1 - Math.sqrt(3)) / 4];
+                    d[3] = [0.47046721, 1.14111692, 0.650365, -0.19093442, -0.12083221,
+                        0.0498175];
+                    d[4] = [0.32580343, 1.01094572, 0.8922014, -0.03967503, -0.26450717,
+                        0.0436163, 0.0465036, -0.01498699];
+                    d[5] = [0.22641898, 0.85394354, 1.02432694, 0.19576696, -0.34265671,
+                        -0.04560113, -0.10970265, -0.00882680, -0.01779187, 0.00471742793];
+
+                    function draw() {
+                        if (!testCoeffs(d[document.getElementById('eq').value], 5)) {
+                            alert("ungueltige Koeffizienten");
+                        } else {
+                            try {
+                                functionPlot({
+                                    target: '#plot',
+                                    data: [{
+                                            points: iterativePunktauswertung(d[document.getElementById('eq').value], 11),
+                                            fnType: 'points',
+                                            graphType: 'polyline',
+                                        }]
+                                });
+                            } catch (err) {
+                                console.log(err);
+                                alert(err);
+                            }
+                        }
+                    }
+
+                    document.getElementById('form').onsubmit = function (event) {
+                        event.preventDefault();
+                        draw();
+                    };
+                    //draw();
+        </script>
+
+    </body>
+</html>
+
