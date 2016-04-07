@@ -1,4 +1,4 @@
-//leicht veraendert
+
 
 /** sucht pivot-Elemente der Matrix a
  * @param{Array} A Matrix des spaeter zu loesendem Systems
