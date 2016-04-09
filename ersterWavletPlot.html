@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+		<!-- Date: 2016-03-01 -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>ersterWavletPlot</title>
+		<meta name="author" content="Simon" />
+		<!--Einbinden der Scripte und Bibliotheken-->
+		<script src="d3.js"></script>
+		<script src="math.js"></script>
+		<script src="matrixOperations.js"></script>
+		<script src="Punktauswertung.js"></script>
+		<script src="https://wzrd.in/standalone/function-plot@1.14.0"></script>
+		<script src="gauss.js"></script>
+
+		
+		<style>
+		    input[type=text] {
+		      width: 300px;
+		    }
+		    input {
+		      padding: 6px;
+		    }
+		    body, html, input {
+		      font-family: sans-serif;
+		      font-size: 11pt;
+		
+		    }
+		    form {
+		      margin: 20px 0;
+		    }
+ 		</style>
+	</head>
+	<body>
+	<form id="form">
+  		<label for="eq">Enter Daubechies Number:</label>
+  		<input type="text" id="eq" value="3" />
+  		<input type="submit" value="Draw" />
+	</form>
+
+	<div id="plot"></div>
+
+	<p>
+	  Plot library: <a href="https://github.com/maurizzzio/function-plot">https://github.com/maurizzzio/function-plot</a>
+	</p>
+
+	<script>
+	//Daubechies-Koeffizienten (aus wikipedia):
+	var d = new Array();
+	d[2]= [(1+Math.sqrt(3))/4,((3 + Math.sqrt(3))/4),(3-Math.sqrt(3))/4, (1-Math.sqrt(3))/4];
+    d[3]= [0.47046721,1.14111692,0.650365,-0.19093442,-0.12083221,0.0498175];
+	//es scheint, als ob d[4] irgendwo ein bisschen falsch ist!
+    d[4]= [0.32580343,1.01094572,0.8922014,-0.03967503,-0.26450717,0.0436163,0.0465036,-0.01498699];
+	d[5] = [0.22641898,0.85394354,1.02432694,0.19576696,-0.34265671,-0.04560113,0.10970265,-0.0088268,-0.01779187,0.0047174279];
+	d[6]= [0.1577424300000,0.6995038100000,1.0622637600000,0.4458313200000,-0.3199866000000,-0.1835180600000,0.1378880900000,
+		0.0389232100000, -0.0446637500000, 0.0007832511520, 0.0067560623600, -0.0015235338100];
+		
+	d[7]= [0.1100994300000,0.5607912800000,1.0311484900000,0.6643724800000,-0.2035138200000,-0.3168350100000,0.1008467000000,
+		0.1140034500000, -0.0537824500000,-0.0234399400000,0.0177497900000,0.0006075149950,-0.0025479047200,0.0005002268530];
+		
+	d[8]= [0.0769556200000, 0.4424672500000,0.9554861500000,0.8278165300000,-0.0223857400000,-0.4016586300000,0.0006681940920,
+		0.1820763600000, -0.0245639000000,-0.0623502100000,0.0197721600000,0.0123688400000,-0.0068877192600,-0.0005540045490,
+		0.0009552297110,-0.0001661372610];	
+		
+		
+	  function draw() {
+	  	if(!testCoeffs(d[document.getElementById('eq').value],3)){
+			alert("ungueltige Koeffizienten");
+		}
+		else{
+		    try {
+		      functionPlot({
+				  target: '#plot',
+				  data: [{
+				    points: iterativePunktauswertung(d[document.getElementById('eq').value],11),
+				    fnType: 'points',
+				    graphType: 'polyline',
+				    
+				  }]
+			});
+			}
+		    catch (err) {
+		      console.log(err);
+		      alert(err);
+		    }
+		  }
+		}
+	
+	  document.getElementById('form').onsubmit = function (event) {
+	    event.preventDefault();
+	    draw();
+	  };
+	//draw();
+	</script>
+
+</body>
+</html>
+

@@ -1,4 +1,4 @@
-
+//leicht veraendert
 
 /** sucht pivot-Elemente der Matrix a
  * @param{Array} A Matrix des spaeter zu loesendem Systems
@@ -167,37 +167,38 @@ function createArray(length1, length2){
 
 /** Funktion zum ueberpruefen ob die Koeffizienten ein Daubechies-Wavelet erzeugen koennten
 * Prueft ob die Summe 2 ergibt, die Summe der Quadrate 2 ergibt und ob sum(a(l)*a(l-2k))=0 fuer festes k.
-* *	(Letzte Änderung: 3.3.16 Simon)
+* *	(Letzte Änderung: 9.4.16 Simon)
 *	@param{Array} a zu ueberpruefendeKoeffizienten
-* 	@param{int} n Anzahl der Stellen die bei der Ueberpruefung stimmen sollen 
+* 	@param{int} n 10 hoch(-n) gibt die Fehlertoleranz an.
 * 	@return{Array} boolean
 */ 
 function testCoeffs(a,n){
 	
-	var fa=Math.pow(10,n); 
+	var fehlertoleranz=Math.pow(10,-n); 
 	
-	sum2=0; //Summe der Koeffizienten soll 2 sein
-	sum3=0; //Summe der Quadrate der Koeffizienten soll 2 sein
+	var sum1=0; //Summe der Koeffizienten soll 2 sein
+	var sum2=0; //Summe der Quadrate der Koeffizienten soll 2 sein
 	for(var i=0;i<a.length;i++){
-		sum2+=a[i];
-		sum3+=(a[i]*a[i]);
+		sum1+=a[i];
+		sum2+=(a[i]*a[i]);
 	}
 	
-	console.log(Math.round(sum2*fa));
-	console.log(Math.round(sum3*fa));
-	
-	//if(Math.round(sum2*fa)/fa!=2.0 || Math.round(sum3*fa)/fa!=2.0){return false;}
+	//console.log(sum1);
+	//console.log(sum2);
+	if(Math.abs(sum1-2.0)>fehlertoleranz){return false;}
+	if(Math.abs(sum2-2.0)>fehlertoleranz){return false;}
 	
 	//Summe ueber a_l*a_(l-2k) soll 0 sein fuer alle k!=0
-	for(var k=1;k<(a.length+1)/2;k++){
-		var sum1=0;
+	var sum3;
+	for(var k=1;k<=(a.length-1)/2;k++){
+		sum3=0;
 		for(var l=0;l<a.length;l++){
 			if((l-2*k)>=0){
-				sum1+=a[l]*a[l-2*k];
+				sum3+=a[l]*a[l-2*k];
 			}
 		}
-		console.log(Math.round(fa*sum1)/fa);
-		//if(Math.round(fa*sum1)/fa!=0){return false;}
+		//console.log(sum3);
+		if(Math.abs(sum3)>fehlertoleranz){return false;}
 	}
 	return true;
 }
