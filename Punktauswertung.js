@@ -1,6 +1,6 @@
 /** Datei mit Funktionen zur Punktauswertung von Wavelets anhand ihrer Koeffizienten und vorgegebener Gitterweite
  *
- *	(Letzte Änderung: 1.4.16 Andreas)
+ *	(Letzte Änderung: 12.4.16 Andreas)
  */
 
 //Achtung: die calculateIntegerPointValues-Funktion liefert fuer den letzten ganzzahl-Wert derzeit nicht null, was sie aber sollte.
@@ -114,16 +114,16 @@ function rekursivePunktauswertung(ak, N) {
 
 /** Funktion zur iterativen Punktauswertung
  *
- *	(Letzte Änderung: 22.3.16 Simon)
+ *	(Letzte Änderung: 12.4.16 Andreas)
  *	@param{Array} a Waveletkoeffizienten
  * 	@param{int} n 2hochN aequidistante Stuetzstellen
  *
  * 	@return{Array} values Array einzelner Punkte in der Form [x,y]
  */
 
-function iterativePunktauswertung(a, n) {
+function iterativePunktauswertung(a, N) {
 	var sol = calculateIntegerPointValues(a);
-	var step = Math.pow(2, n);
+	var step = Math.pow(2, N);
 	//wird hier einmal berechnet, da staendig benoetigt
 	var width = a.length - 1;
 	//breite
@@ -136,13 +136,13 @@ function iterativePunktauswertung(a, n) {
 	}
 
 	//belege restliche Felder
-	for (var j = 1; j < n + 1; j++) {
+	for (var j = 1; j < N + 1; j++) {
 
 		//printMatrix(values);
 		for (var l = 1; l < width * Math.pow(2, j); l += 2) {
 			var k = 0;
 			//index des ersten ak, welches benoetigt wird
-			var index = Math.pow(2, n - j) * l;
+			var index = Math.pow(2, N - j) * l;
 			//dort kommt der neue Wert rein
 			var index2 = index * 2;
 			// das erste hintere Index aus dem die Werte fuer summe gebraucht werden
