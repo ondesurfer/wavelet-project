@@ -62,21 +62,28 @@
 	d[8]= [0.0769556200000, 0.4424672500000,0.9554861500000,0.8278165300000,-0.0223857400000,-0.4016586300000,0.0006681940920,
 		0.1820763600000, -0.0245639000000,-0.0623502100000,0.0197721600000,0.0123688400000,-0.0068877192600,-0.0005540045490,
 		0.0009552297110,-0.0001661372610];	
-		
+	
+	//Global gespeichert - aktuelle aks und dazu berechnete Werte
+	var values;	
+	var ak;
 		
 	  function draw() {
-	  	if(!testCoeffs(d[document.getElementById('eq').value],3)){
+	  	ak=d[document.getElementById('eq').value];
+	  	if(!testCoeffs(ak,3)){
 			alert("ungueltige Koeffizienten");
 		}
 		else{
-		    try {
-		      functionPlot({
-				  target: '#plot',
-				  data: [{
-				    points: iterativePunktauswertung(d[document.getElementById('eq').value],11),
-				    fnType: 'points',
-				    graphType: 'polyline',
-				    
+		    try {		    	
+
+		    	formatGanzzahlWerte=formatIntegerPointValues(calculateIntegerPointValues(ak));
+		    	values=rekursivePunktauswertung2(ak,0,ak.length-1,formatGanzzahlWerte)[0];
+		    	
+		      	var instance = functionPlot({
+					target: '#plot',
+				  	data: [{
+				    	points: values,
+				    	fnType: 'points',
+				    	graphType: 'polyline',				    
 				  }]
 			});
 			}
@@ -84,14 +91,41 @@
 		      console.log(err);
 		      alert(err);
 		    }
-		  }
-		}
+			xDomain=instance.options.xDomain;
+		//gibt den Funktionsplot als Objekt zurueck
+		  return instance;
+		}	  
+	}
 	
-	  document.getElementById('form').onsubmit = function (event) {
-	    event.preventDefault();
-	    draw();
-	  };
-	//draw();
+	//fuegt dem draw-Button die draw-Funktion zu	
+	document.getElementById('form').onsubmit = function (event) {
+	  	event.preventDefault();
+	  	//fuehrt das zeichnen einmal aus und speichert den Graph als Objekt
+		var instance = draw();
+		//fuegt ein zoomEvent hinzu
+    	instance.on("before:draw", sayHello);
+    	//instance.on("all:zoom", sayHello);
+	};
+
+
+	function sayHello() {
+		//"this" ist die Instanz die die Funktion aufruft (muss eine Instanz von FunctionPlot sein)
+		//xDomain ist der Bereich der x-Werte , points sind die genutzten Werte vom vorherigen Plot
+		var xDomain=this.options.xDomain;
+		
+         
+        //es werden die neuen Werte berechnet... !!!Achtung!!!fuer die x-Grenzen vor dem Zoom
+        var result=rekursivePunktauswertung2(ak,xDomain[0],xDomain[1],values);
+        //...und global gespeichert:
+        values=result[0];
+        console.log("Die neuen Wert:",result[1]);
+        //values=[[1,1],[2,1],[3,1],[4,1]];
+        //es werden die neuen Punkte dem Plot uebergeben:
+        this.options.data[0].points=result[1];
+        
+     		
+   	}
+	
 	</script>
 
 </body>

@@ -112,6 +112,103 @@ function rekursivePunktauswertung(ak, N) {
 	return values;
 }
 
+/** Funktion zur rekursiven Punktauswertung an den Punkten, an denen das Wavelet nicht verschwindet.
+ *
+ *	(Letzte Änderung: 19.4.16 Simon)
+ *	@param{Array} ak Waveletkoeffizienten
+ * @param{Array} valuesOld bereits berechnete Funktionswerte, die weiter verfeinert bzw vergroebert werden sollen (Das Array muss das entsprechende Format haben!)
+ * 	@param{real} linkerXwert, rechterXwert  Bereich, der berechnet bzw. geplottet werden soll.
+ * 	@return{Array} values Array einzelner Punkte in der Form [x,y]
+ */
+function rekursivePunktauswertung2(ak, linkerXwert, rechterXwert, valuesOld) {
+	//Traegerbreite
+	var width = ak.length - 1;
+	
+	//Abstand zwischen den Stuetzstellen
+	var delta=(rechterXwert-linkerXwert)/300;
+	
+	//neues N, step und werteArray fuer die neue Ebene
+	var Nnew=Math.ceil(Math.log(1/delta)/Math.LN2);
+	var stepNew = Math.pow(2, Nnew);
+	var valuesNew = createArray(stepNew * width + 1, 2);
+	// berechne altes N und altes step aus dem uebergebenen Array
+	var stepOld=(valuesOld.length-1)/width;
+
+	
+	//falls verfeinert wird, d.h Nnew>Nold bzw. stepNew>stepOld
+	if(stepNew>=stepOld){
+		//kopiere alle Werte aus dem alten Array in das neue Array:
+		var indexNew;
+		for(var indexOld=0;indexOld<valuesOld.length;indexOld++){
+			indexNew=stepNew*indexOld/stepOld; //sollte ganzzahlig sein...
+			valuesNew[indexNew][0]=valuesOld[indexOld][0];
+			valuesNew[indexNew][1]=valuesOld[indexOld][1];
+		}
+	}//falls vergroebert wird:
+	else{
+		var indexOld;
+		for(var indexNew=0;indexNew<valuesNew.length;indexNew++){
+			indexOld=stepOld*indexNew/stepNew; //sollte ganzzahlig sein...
+			valuesNew[indexNew][0]=valuesOld[indexOld][0];
+			valuesNew[indexNew][1]=valuesOld[indexOld][1];
+		}
+	}
+		
+
+	function phi(j, l) {//gibt phi an der Stelle l/2^j zurueck
+
+		//Folgende Zeilen kuerzen den Bruch l/2^j so lange, bis er echt ist, denn eigentlich soll l ungerade sein.
+		while (l % 2 == 0 && j > 0) {
+			l = l / 2;
+			j = j - 1;
+		}
+		//der tatsaechliche x-Wert
+		var x = Math.pow(2, -j) * l;
+		//der Index in dem der x-Wert und gleich der zugehoerige Funktionswert gespeichert wird		
+		var index = stepNew * x;
+		//wenn der x-Wert links vom kompakten Traeger liegt
+		if (x < 0) {
+			return 0;
+		}//wenn der x-WERt rechts vom kompakten Traeger liegt
+		else if (x > width) {
+			return 0;
+		}//wenn der Funktionswert bereits berechnet wurde und im Array liegt
+		else if (valuesNew[index][0] != undefined) { 
+			return valuesNew[index][1];
+		}//Ansonsten rekursiver Funktionsaufruf 
+		else {
+			var sum = 0;
+			for (var k = 0; k < ak.length; k++) {
+				sum += ak[k] * phi(j - 1, l - Math.pow(2, j - 1) * k);
+			}
+			valuesNew[index][0] = x;
+			valuesNew[index][1] = sum;
+			return sum;
+		}
+	}
+	// der index, ab dem die Werte fuer den (gezoomten) Plot benoetigt werden.
+	//jeweils mit if-Abfrage, falls die Werte ausserhalb des kompakten Traegers liegen.
+	var indexNewLinks = Math.floor(linkerXwert*stepNew);
+	if(indexNewLinks<0){indexNewLinks=0;}
+	
+	var indexNewRechts = Math.ceil(rechterXwert*stepNew);
+	if(indexNewRechts>=valuesNew.length){indexNewRechts=valuesNew.length-1;}
+	
+	//Berechnung der benoetigten Funktionswerte 
+	for (var i = indexNewLinks; i <= indexNewRechts; i++) {
+		//rufe phi auf, falls der Eintrag im neuen Array noch nicht besetzt ist.
+		if(valuesNew[i][1]==undefined){	phi(Nnew, i);}
+	}
+	
+	
+	//das Array zurechtgeschnitten auf die benoetigten Werte
+	var valuesNecessary=valuesNew.slice(indexNewLinks,indexNewRechts);
+	
+	//rueckgabe der neu berechneten Werte (meist einige Eintraege undefined), sowie der benoetigten Werte
+	var result=[valuesNew,valuesNecessary];
+	return result;
+}
+
 /** Funktion zur iterativen Punktauswertung
  *
  *	(Letzte Änderung: 12.4.16 Andreas)
