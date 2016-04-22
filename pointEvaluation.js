@@ -175,7 +175,6 @@ function recursivePointEvaluation2(a, leftXValue, rightXValue, valuesOld) {
 	}
 
 	function phi(j, l) {
-
 		//cancel the fraction l/2^j until l becomes odd
 		while (l % 2 == 0 && j > 0) {
 			l = l / 2;
@@ -208,7 +207,7 @@ function recursivePointEvaluation2(a, leftXValue, rightXValue, valuesOld) {
 		}
 	}
 
-	//index from which forward the values of the (zoomed) plot are required
+	//index from which the values of the (zoomed) plot are required
 	//the task of the if-statement is to check whether one is in the
 	//compact support or not
 	var indexNewLinks = Math.floor(leftXValue * stepNew);
@@ -231,7 +230,7 @@ function recursivePointEvaluation2(a, leftXValue, rightXValue, valuesOld) {
 	//trim the values to the nessecary ones
 	var valuesNecessary = valuesNew.slice(indexNewLinks, indexNewRechts);
 
-	//return of the new values (usually are a lot of entries undefined),
+	//return of the new values (usually a lot of entries are undefined),
 	//and the necessary values
 	var result = [valuesNew, valuesNecessary];
 	return result;
