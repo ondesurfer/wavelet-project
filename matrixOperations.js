@@ -1,8 +1,13 @@
-//leicht veraendert
+/** This file contains functions for matrix manipulations
+ *
+ *	(last modification: 22.4.16 Andreas)
+ */
 
-/** sucht pivot-Elemente der Matrix a
- * @param{Array} A Matrix des spaeter zu loesendem Systems
- * @return{Array} pivot Vektor mit Indices der zu waehlenden Zeilen
+/**Search pivot-elements of a matrix.
+ * 
+ * @param{Array} 	matrix	the matrix of the linear system to be solved.
+ * 
+ * @return{Array} 	pivotA 	vector with the indices of the row to be choosen.
  */
 function pivot(matrix) {
 	var A = deepCopyMatrix(matrix);
@@ -81,7 +86,8 @@ function deepCopyVector(vector) {
 	return newVector;
 }
 
-/** Funktion um die Koeffizienten a_k eines Wavelets in die Matrix einzusortieren
+/** Funktion um die Koeffizienten a_k eines Wavelets in die Matrix  
+ *	einzusortieren
  * @param{Array} a Koeffizienten im Array
  * @return{Array} mat Matrix mit einsortierten Koeffizienten
  */
@@ -92,8 +98,10 @@ function coeffsToMatrix(akk) {
 		a[i] = akk[i];
 	}
 	N = a.length;
-	//Anzahl der Koeffizienten die Randkoeffizienten müssen  von 0 verschieden sein - ggf. Abfrage noch notwendig
-	//haenge N-4 Nullen vorne und hinten an den Koeffizientenvektor - macht es später einfacher!
+	//Anzahl der Koeffizienten die Randkoeffizienten müssen  von 0 verschieden
+	//sein - ggf. Abfrage noch notwendig
+	//haenge N-4 Nullen vorne und hinten an den Koeffizientenvektor - macht es 
+	//später einfacher!
 	for ( i = 0; i < N - 4; i++) {
 		a.push(0);
 	}
@@ -102,7 +110,8 @@ function coeffsToMatrix(akk) {
 	}
 
 	mat = createArray(N - 2, N - 2);
-	//first Index ist der Index, ab dem (von rechts nach links gelaufen) die Elemente in die Zeile aufgenommen werden;
+	//first Index ist der Index, ab dem (von rechts nach links gelaufen) die
+	//Elemente in die Zeile aufgenommen werden;
 	firstIndex = 1 + N - 4;
 	for ( z = 0; z < N - 2; z++) {
 		marker = firstIndex;
@@ -139,7 +148,8 @@ function printMatrix(Mat) {
 }
 
 /** Funktion zum Erstellen von Arrays beliebiger Dimension
- *     (z.B.: (2,3)-erstellt eine 2x3 Matrix; (2,2,2) erstellt eine 3 dimensionale 2x2x2 'Matrix')
+ *     (z.B.: (2,3)-erstellt eine 2x3 Matrix; (2,2,2) erstellt eine 3
+ * 		dimensionale 2x2x2 'Matrix')
  *	(Letzte Änderung: 28.2.16 Simon)
  *	@param{int,int..} length.
  * 	@return{Array} arr
@@ -166,9 +176,10 @@ function createArray(length1, length2) {
 	return array;
 }
 
-/** Funktion zum ueberpruefen ob die Koeffizienten ein Daubechies-Wavelet erzeugen koennten
- * Prueft ob die Summe 2 ergibt, die Summe der Quadrate 2 ergibt und ob sum(a(l)*a(l-2k))=0 fuer festes k.
- * *	(Letzte Änderung: 11.4.16 Andreas)
+/** Funktion zum ueberpruefen ob die Koeffizienten ein Daubechies-Wavelet
+ * 	erzeugen koennten Prueft ob die Summe 2 ergibt, die Summe der Quadrate 2 
+ * 	ergibt und ob sum(a(l)*a(l-2k))=0 fuer festes k.
+ * 	(Letzte Änderung: 11.4.16 Andreas)
  *	@param{Array} a zu ueberpruefendeKoeffizienten
  * 	@param{int} n 10 hoch(-n) gibt die Fehlertoleranz an.
  * 	@return{Array} boolean
