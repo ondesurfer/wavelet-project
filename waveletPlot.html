@@ -11,7 +11,7 @@
 		<script src="d3.js"></script>
 		<script src="math.js"></script>
 		<script src="matrixOperations.js"></script>
-		<script src="waveletPlot.js"></script>
+		<script src="pointEvaluation.js"></script>
 		<script src="function-plot.js"></script>
 		<script src="gauss.js"></script>
 
@@ -92,8 +92,7 @@
 				} else {
 					try {
 						//Where is formatIntegerPointValues defined? 
-						intPointValues = formatIntegerPointValues(
-							calculateIntegerPointValues(c));
+						intPointValues = calculateIntegerPointValues(c);
 						values = iterativePointEvaluation(
 							c,0,c.length-1,intPointValues)[0];
 
@@ -125,6 +124,29 @@
 				plot.on("before:draw", sayHello);
 				//instance.on("all:zoom", sayHello);
 			};
+			
+			// function draw() {
+			  	// if(!testCoeffs(a[document.getElementById('eq').value],3)){
+					// alert("invalid coefficients");
+				// }
+				// else{
+				    // try {
+				      // functionPlot({
+						  // target: '#plot',
+						  // data: [{
+						    // points: iterativePointEvaluation(a[document.getElementById('eq').value],11),
+						    // fnType: 'points',
+						    // graphType: 'polyline',
+// 						    
+						  // }]
+					// });
+					// }
+				    // catch (err) {
+				      // console.log(err);
+				      // alert(err);
+				    // }
+				// }
+			// }
 
 			function sayHello() {
 				//"this" has to be an instance of functionPlot
@@ -135,7 +157,7 @@
 				//compute the new values... 
 				//!!!Attention!!! take care of the x-boundery-values
 				//before zooming
-				var result = rekursivePunktauswertung2(ak, xDomain[0],
+				var result = recursivePointEvaluation2(c, xDomain[0],
 					xDomain[1], values);
 				//...and save globally:
 				values = result[0];
@@ -144,6 +166,12 @@
 				//give the new values to the plot-object:
 				this.options.data[0].points = result[1];
 			}
+			
+			// document.getElementById('form').onsubmit = function (event) {
+	    		// event.preventDefault();
+	    		// draw();
+	   		// };
+		
 		</script>
 	</body>
 </html>

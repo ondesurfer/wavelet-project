@@ -17,7 +17,7 @@
 <script src="d3.js"></script>
 <script src="math.js"></script>
 <script src="matrixOperations.js"></script>
-<script src="Punktauswertung.js"></script>
+<script src="pointEvaluation.js"></script>
 <script src="gauss.js"></script>
 <!-- load http://maurizzzio.github.io/function-plot/ -->
 <script src="function-plot.js"></script>
@@ -31,10 +31,7 @@
 
 	function compareMethods(method1, method2, a, N) {
 		var values = new Array(6);
-		var t_start1,
-		    t_end1,
-		    t_start2,
-		    t_end2;
+		var t_start1, t_end1, t_start2, t_end2;
 		//take the time of the first variant and save it in values[0]
 		t_start1 = new Date().getTime();
 		var rek = method1(a, N);
@@ -71,21 +68,20 @@
 	}
 
 	var values = compareMethods(recursivePointEvaluation, 
-		iterativePointEvaluation, d4, 20);
+		iterativePointEvaluation, d4, 19);
 	console.log("comparison of both methods: time of the first method:", 
 		values[0], "time of the second method:", values[1], 
 		"difference-vector of both methods:", values[2], 
 		"sum of the absolute values of the difference:", values[3]);
 
 	function runningTime(variant) {
-		var t_start,
-		    t_end;
+		var t_start, t_end;
 		t_start = new Date().getTime();
 		console.log(d2);
 		console.log(testCoeffs(d2, 5));
 		console.log(coeffsToMatrix(d2));
 		console.log(calculateIntegerPointValues(d2));
-		console.log(iterativePunktauswertung(d2, 20, variant));
+		console.log(iterativePointEvaluation(d2, 20, variant));
 		t_end = new Date().getTime();
 		console.log("at variant", variant, "running time", t_end - t_start);
 	}

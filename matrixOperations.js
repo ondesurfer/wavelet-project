@@ -100,17 +100,17 @@ function coeffsToMatrix(a) {
 	for (var i = 0; i < a.length; i++) {
 		c[i] = a[i];
 	}
-	N = a.length;
+	N = c.length;
 	//number of coefficients
 	
 	//the boundary-coefficients have to be different from 0
 	//check this if necessary
 	//attach N-4 zeros in front of and behind the coefficient vector
 	for ( i = 0; i < N - 4; i++) {
-		a.push(0);
+		c.push(0);
 	}
 	for ( i = 0; i < N - 4; i++) {
-		a.unshift(0);
+		c.unshift(0);
 	}
 
 	mat = createArray(N - 2, N - 2);
@@ -121,7 +121,7 @@ function coeffsToMatrix(a) {
 	for ( z = 0; z < N - 2; z++) {
 		marker = firstIndex;
 		for ( s = 0; s < N - 2; s++) {
-			mat[z][s] = a[marker];
+			mat[z][s] = c[marker];
 			marker--;
 		}
 		firstIndex += 2;

@@ -15,6 +15,7 @@ width -> supportWidth
 werte -> values
 iterativePunktauswertung -> iterativePointEvaluation
 fehlertoleranz -> faultTolerance
+letzteZeile -> lastRow
 
 Wuerde gerne N -> j machen; geht aber nicht,
 wegen der inneren Funktion phi(j,l)

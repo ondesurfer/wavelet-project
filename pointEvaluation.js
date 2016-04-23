@@ -70,7 +70,6 @@ function naiveRecursivePointEvaluation(a, N) {
  */
 function recursivePointEvaluation(a, N) {
 	var solu = calculateIntegerPointValues(a);
-
 	var supportWidth = a.length - 1;
 	var step = Math.pow(2, N);
 	var values = createArray(step * supportWidth + 1, 2);
@@ -79,7 +78,7 @@ function recursivePointEvaluation(a, N) {
 		values[i*step][0] = i;
 		values[i*step][1] = solu[i];
 	}
-
+	
 	function phi(j, l) {
 		//cancel the fraction l/2^j until l becomes odd
 		while (l % 2 == 0 && j > 0) {
@@ -100,16 +99,16 @@ function recursivePointEvaluation(a, N) {
 		else if (x > supportWidth) {
 			return 0;
 		}//if the y-value was already computed
-		else if (valuesNew[index][0] != undefined) {
-			return valuesNew[index][1];
+		else if (values[index][0] != undefined) {
+			return values[index][1];
 		}//recursive function call
 		else {
 			var sum = 0;
 			for (var k = 0; k < a.length; k++) {
 				sum += a[k] * phi(j - 1, l - Math.pow(2, j - 1) * k);
 			}
-			valuesNew[index][0] = x;
-			valuesNew[index][1] = sum;
+			values[index][0] = x;
+			values[index][1] = sum;
 			return sum;
 		}
 	}
@@ -283,7 +282,7 @@ function iterativePointEvaluation(a, N) {
 			values[index][0] = index / step;
 			//x-value
 
-			//if index2 < 0 then the y-values become zero
+			//if index2 < 0 then the y-values becomes zero
 			for (k; k < a.length && index2 >= 0; k++) {
 				values[index][1] += a[k] * values[index2][1];
 				index2 -= step;
