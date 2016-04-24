@@ -92,21 +92,22 @@ function coeffsToMatrix(akk) {
 		a[i] = akk[i];
 	}
 	N = a.length;
-	//Anzahl der Koeffizienten die Randkoeffizienten müssen  von 0 verschieden sein - ggf. Abfrage noch notwendig
+	//Anzahl der Koeffizienten die Randkoeffizienten muessen  von 0 verschieden sein - ggf. Abfrage noch notwendig
 	//haenge N-4 Nullen vorne und hinten an den Koeffizientenvektor - macht es später einfacher!
-	for ( i = 0; i < N - 4; i++) {
+	for (var i = 0; i < N - 4; i++) {
 		a.push(0);
 	}
-	for ( i = 0; i < N - 4; i++) {
+	for (var i = 0; i < N - 4; i++) {
 		a.unshift(0);
 	}
 
-	mat = createArray(N - 2, N - 2);
+	var mat = createArray(N - 2, N - 2);
 	//first Index ist der Index, ab dem (von rechts nach links gelaufen) die Elemente in die Zeile aufgenommen werden;
-	firstIndex = 1 + N - 4;
-	for ( z = 0; z < N - 2; z++) {
+	var firstIndex = 1 + N - 4;
+	var marker;
+	for (var z = 0; z < N - 2; z++) {
 		marker = firstIndex;
-		for ( s = 0; s < N - 2; s++) {
+		for (var s = 0; s < N - 2; s++) {
 			mat[z][s] = a[marker];
 			marker--;
 		}
@@ -117,6 +118,46 @@ function coeffsToMatrix(akk) {
 		mat[i][i] = mat [i][i] - 1;
 	}
 	return mat;
+}
+
+/** Funktion um die Koeffizienten a_k eines Wavelets in die Matrix einzusortieren
+ * @param{Array} a Koeffizienten im Array
+ * @return{Array} mat Matrix mit einsortierten Koeffizienten
+ */
+function coeffsToMatrix2(akk) {
+
+	var N = akk.length;
+	//Anzahl der Koeffizienten die Randkoeffizienten muessen  von 0 verschieden sein - ggf. Abfrage noch notwendig
+	console.log("N",N);
+	var mat2 = createArray(N - 2, N - 2);
+	
+	//belege alle Eintraege mit 0
+	for ( var z = 0; z < N - 2; z++) {
+		for ( var s = 0; s < N - 2; s++) {
+			mat2[z][s] = 0;
+		}
+	}
+	console.log(akk);
+	//belege entsprechende Felder mit ak's
+	for(var k=0; k < N-2;k++){
+		console.log("k",k,"N-2",N-2);
+		for(var l= Math.max(0,2*k-(N-1)+1); l<=Math.min(N-3,2*k+1);l++){
+			index=2*k-l+1;
+			console.log("k",k,"l",l,"index",index);
+
+			mat2[k][l]=akk[2*k-l+1];
+		}
+	}
+	
+	
+	
+	//ziehe je 1 auf den Diagonalen ab (denn spaeter 0=(A-Id)v)
+	for (var i = 0; i < N - 2; i++) {
+		mat2[i][i] = mat2 [i][i] - 1;
+	}
+	console.log("mat2");
+	printMatrix(mat2);
+	return mat2;
 }
 
 /** Funktion zur Konsolen-Ausgabe eines zweidimensionalen nxm Arrays
@@ -218,19 +259,30 @@ function testCoeffs(a, n) {
 }
 
 /** berechnet die Funktionswerte des Wavelets an den ganzzahligen Stellen durch Aufstellen und Lösen eines LGS
+ * Dabei sind a die Wavelet-Koeffizienten. Der Traeger muss dann 0-a.length sein. Es werden die Funktionswerte an den Stellen 
+ * 0,...,a.length-1 zurueckgegeben.
+ * 
  *	(Letzte Änderung: 1.3.16 Simon)
  *	@param{Array} a Wavelet-Koeffizienten.
  * 	@return{Array} sol Funktionswerte an den ganzzahligen Stellen inklusive 0 und dem "Ende des kompakten Traegers".
  */
 function calculateIntegerPointValues(a) {
-	var mat = coeffsToMatrix(a);
-	//document.write("die Matrix fuer das LGS: ");
-	//document.write(mat);
-	//console.log("die Matrix fuer das LGS:");
-	//printMatrix(mat);
-	//fuegt die letzte Zeile aus Einsen an die Matrix an ('Normierungsbedingung')
-	var s = mat[0].length;
+	
+	//faengt das Haar-Wavelet ab
+	//eventuell ist es sinnvoller das Haar-Wavelet bereits frueher abzufangen, da es dann nicht verfeinert wird.
+	if(a.length==2){
+		var mat3=new Array(2);
+		mat3[0]=1;
+		mat3[1]=0;
+		return mat3;
+	}
+	
+	var mat = coeffsToMatrix2(a);
+	
 	//s steht hier für Anzahl der spalten
+	var s = mat[0].length;
+	
+	//fuegt die letzte Zeile aus Einsen an die Matrix an ('Normierungsbedingung')
 	var letzteZeile = new Array(s);
 	for (var i = 0; i < s; i++) {
 		letzteZeile[i] = 1;
@@ -239,15 +291,16 @@ function calculateIntegerPointValues(a) {
 
 	//fuegt eine letzte Spalte aus Nullen an die Matrix an (bzw. an jede Zeile ein weiteres Glied)
 	//Achtung evtl. kann sich eine mehrdeutige lösbarkeit ergeben?!
-	for (var i = 0; i < mat.length; i++) {
-		mat[i].push(0);
+	for (var j = 0; j < mat.length; j++) {
+		mat[j].push(4);
 	}
-	mat[0][mat.length - 1] = 1;
+	//mat[0][mat.length - 1] = 1;
+	printMatrix(mat);
 
 	//erstelle b Vektor
 	var z = mat.length;
 	//z steht hier fuer Anzahl der Zeilen
-	var bb = new Array(s);
+	var bb = new Array(z);
 	for (var i = 0; i < z - 1; i++) {
 		bb[i] = 0;
 	}
@@ -256,7 +309,16 @@ function calculateIntegerPointValues(a) {
 	var sol = gaus(mat, bb);
 	//sol[sol.length-1]=0;
 	sol.unshift(0);
-	//console.log("phi an Ganzzahlwerten:",sol);
+	console.log("phi an Ganzzahlwerten:",sol);
 	return sol;
+}
+
+function formatIntegerPointValues(sol){
+	var values=createArray(sol.length,2);
+	for(var i=0;i<sol.length;i++){
+		values[i][0]=i;
+		values[i][1]=sol[i];
+	}	
+	return values;
 }
 

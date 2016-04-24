@@ -202,7 +202,7 @@ function rekursivePunktauswertung2(ak, linkerXwert, rechterXwert, valuesOld) {
 	
 	
 	//das Array zurechtgeschnitten auf die benoetigten Werte
-	var valuesNecessary=valuesNew.slice(indexNewLinks,indexNewRechts);
+	var valuesNecessary=valuesNew.slice(indexNewLinks,indexNewRechts+1); 
 	
 	//rueckgabe der neu berechneten Werte (meist einige Eintraege undefined), sowie der benoetigten Werte
 	var result=[valuesNew,valuesNecessary];
@@ -244,7 +244,7 @@ function iterativePunktauswertung(a, N) {
 			var index2 = index * 2;
 			// das erste hintere Index aus dem die Werte fuer summe gebraucht werden
 
-			//berechne den ersten index2 innerhalb des komp. Traegers
+			//berechne den ersten index2 innerhalb des komp. Traegers //
 			if (index2 > step * width) {
 				ft = Math.ceil(index2 / step) - width;
 				index2 = index2 - ft * step;

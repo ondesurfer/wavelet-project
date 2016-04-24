@@ -48,6 +48,7 @@
 	<script>
 	//Daubechies-Koeffizienten (aus wikipedia):
 	var d = new Array();
+	d[1]=[1,1];
 	d[2]= [(1+Math.sqrt(3))/4,((3 + Math.sqrt(3))/4),(3-Math.sqrt(3))/4, (1-Math.sqrt(3))/4];
     d[3]= [0.47046721,1.14111692,0.650365,-0.19093442,-0.12083221,0.0498175];
 	//es scheint, als ob d[4] irgendwo ein bisschen falsch ist!
@@ -62,22 +63,22 @@
 	d[8]= [0.0769556200000, 0.4424672500000,0.9554861500000,0.8278165300000,-0.0223857400000,-0.4016586300000,0.0006681940920,
 		0.1820763600000, -0.0245639000000,-0.0623502100000,0.0197721600000,0.0123688400000,-0.0068877192600,-0.0005540045490,
 		0.0009552297110,-0.0001661372610];	
-	
+	d[9]=[0.5,1,0.5];
+	d[10]=[0.25,0.75,0.75,0.25];
 	//Global gespeichert - aktuelle aks und dazu berechnete Werte
 	var values;	
 	var ak;
 		
 	  function draw() {
 	  	ak=d[document.getElementById('eq').value];
-	  	if(!testCoeffs(ak,3)){
+	  	/*if(!testCoeffs(ak,3)){
 			alert("ungueltige Koeffizienten");
 		}
-		else{
+		else*/{
 		    try {		    	
-
 		    	formatGanzzahlWerte=formatIntegerPointValues(calculateIntegerPointValues(ak));
 		    	values=rekursivePunktauswertung2(ak,0,ak.length-1,formatGanzzahlWerte)[0];
-		    	
+		    	//values=iterativePunktauswertung(ak,5);
 		      	var instance = functionPlot({
 					target: '#plot',
 				  	data: [{
@@ -119,6 +120,7 @@
         //...und global gespeichert:
         values=result[0];
         console.log("Die neuen Wert:",result[1]);
+        console.log("Alle bereits berechnteten Werte:",result[0]);
         //values=[[1,1],[2,1],[3,1],[4,1]];
         //es werden die neuen Punkte dem Plot uebergeben:
         this.options.data[0].points=result[1];
