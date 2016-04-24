@@ -48,8 +48,9 @@
 		</p>
 
 		<script>
-			//Daubechies-coefficients (from wikipedia):
+			//Wavelet-coefficients (from wikipedia):
 			var a = new Array();
+			a[1]=[1,1];
 			a[2] = [(1 + Math.sqrt(3)) / 4, ((3 + Math.sqrt(3)) / 4), 
 				(3 - Math.sqrt(3)) / 4, (1 - Math.sqrt(3)) / 4];
 			a[3] = [0.47046721, 1.14111692, 0.650365, -0.19093442, 
@@ -78,6 +79,8 @@
 				-0.0623502100000, 0.0197721600000, 0.0123688400000, 
 				-0.0068877192600, -0.0005540045490, 0.0009552297110, 
 				-0.0001661372610];
+			a[9]=[0.5,1,0.5];
+			a[10]=[0.25,0.75,0.75,0.25];
 
 			//save the following globally:
 			//    c			the temporary used Daubechies-coefficients
@@ -87,13 +90,12 @@
 			
 			function draw() {
 				c = a[document.getElementById('eq').value];
-				if (!testCoeffs(c, 3)) {
+				/*if (!testCoeffs(c, 3)) {
 					alert("invalid coefficients");
-				} else {
-					try {
-						//Where is formatIntegerPointValues defined? 
+				} else*/ {
+					try { 
 						intPointValues = calculateIntegerPointValues(c);
-						values = iterativePointEvaluation(
+						values = recursivePointEvaluation2(
 							c,0,c.length-1,intPointValues)[0];
 
 						var plot = functionPlot({

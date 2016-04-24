@@ -227,7 +227,8 @@ function recursivePointEvaluation2(a, leftXValue, rightXValue, valuesOld) {
 	}
 
 	//trim the values to the nessecary ones
-	var valuesNecessary = valuesNew.slice(indexNewLinks, indexNewRechts);
+	//!changed: indexNewRechts+1 because the slice Method cuts one index before
+	var valuesNecessary = valuesNew.slice(indexNewLinks, indexNewRechts+1);
 
 	//return of the new values (usually a lot of entries are undefined),
 	//and the necessary values

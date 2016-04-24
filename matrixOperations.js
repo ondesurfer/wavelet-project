@@ -44,9 +44,9 @@ function pivot(matrix) {
  * @return{Array} x the solution vector.
  */
 function solve(Matr, Vect) {
-	A = deepCopyMatrix(Matr);
-	b = deepCopyVector(Vect);
-	B = A;
+	var A = deepCopyMatrix(Matr);
+	var b = deepCopyVector(Vect);
+	var B = A;
 	//originally A.clone
 	x = b;
 	//originally b.clone
@@ -89,6 +89,7 @@ function deepCopyVector(vector) {
 }
 
 /** Sort the coefficients of a wavelet into a matrix.
+ *  Only works for more than 3 coefficients!!!
  * 
  * @param{Array} a refinement coefficients
  * 
@@ -100,7 +101,7 @@ function coeffsToMatrix(a) {
 	for (var i = 0; i < a.length; i++) {
 		c[i] = a[i];
 	}
-	N = c.length;
+	var N = c.length;
 	//number of coefficients
 	
 	//the boundary-coefficients have to be different from 0
@@ -113,13 +114,13 @@ function coeffsToMatrix(a) {
 		c.unshift(0);
 	}
 
-	mat = createArray(N - 2, N - 2);
+	var mat = createArray(N - 2, N - 2);
 	
 	//firstIndex is the index from which (going right to left) the
 	//elements get included in the row;
-	firstIndex = 1 + N - 4;
+	var firstIndex = 1 + N - 4;
 	for ( z = 0; z < N - 2; z++) {
-		marker = firstIndex;
+		var marker = firstIndex;
 		for ( s = 0; s < N - 2; s++) {
 			mat[z][s] = c[marker];
 			marker--;
@@ -134,6 +135,42 @@ function coeffsToMatrix(a) {
 	return mat;
 }
 
+/** Second possibility to sort the coefficients of a wavelet into a matrix. 
+ *  (Also works for wavelets with only 3 coefficients! e.g. hat-function)
+ * 
+ * @param{Array} a refinement coefficients
+ * 
+ * @return{Array} mat the matrix with the sorted coefficients
+ */
+function coeffsToMatrix2(akk) {
+
+	var N = akk.length;
+	
+	var mat2 = createArray(N - 2, N - 2);
+	
+	//fill all entries by 0 
+	for ( var z = 0; z < N - 2; z++) {
+		for ( var s = 0; s < N - 2; s++) {
+			mat2[z][s] = 0;
+		}
+	}
+
+	//fill up the right values of the matrix by the wavelet coefficients ak
+	for(var k=0; k < N-2;k++){
+		for(var l= Math.max(0,2*k-(N-1)+1); l<=Math.min(N-3,2*k+1);l++){
+			index=2*k-l+1;
+			mat2[k][l]=akk[2*k-l+1];
+		}
+	}
+	
+	//sub 1 at the diagonals because we will solve 0=(A-Id)v)
+	for (var i = 0; i < N - 2; i++) {
+		mat2[i][i] = mat2 [i][i] - 1;
+	}
+	//printMatrix(mat2);
+	return mat2;
+}
+
 /** Display a 2dim mxn array on the console.
  * (last modification: 28.2.16 Simon)
  * 
@@ -143,7 +180,7 @@ function coeffsToMatrix(a) {
  */
 function printMatrix(Mat) {
 	for ( z = 0; z < Mat.length; z++) {
-		asString = new String(" ");
+		var asString = new String(" ");
 		//attach all numbers of a row to one string
 		for ( s = 0; s < Mat[0].length; s++) {
 			asString = asString + " " + Mat[z][s];
@@ -252,11 +289,18 @@ function testCoeffs(a, n) {
  *  	and the "end of the compact support".
  */
 function calculateIntegerPointValues(a) {
-	var mat = coeffsToMatrix(a);
-	//document.write("the matrix for the linear system: ");
-	//document.write(mat);
-	//console.log("the matrix for the linear system:");
-	//printMatrix(mat);
+	
+	
+	//tests if the Wavelet is the Haar-Wavelet and then returns the y values 0 and 1
+	//eventuell ist es sinnvoller das Haar-Wavelet bereits frueher abzufangen, da es dann nicht verfeinert wird.
+	if(a.length==2){
+		var mat3=new Array(2);
+		mat3[0]=1;
+		mat3[1]=0;
+		return formatIntegerPointValues(mat3);
+	}
+	
+	var mat = coeffsToMatrix2(a);
 	//append a last row vector of ones to the matrix
 	//('norm condition')
 	var s = mat[0].length;
@@ -288,6 +332,25 @@ function calculateIntegerPointValues(a) {
 	//sol[sol.length-1]=0;
 	sol.unshift(0);
 	//console.log("phi at integer points:",sol);
-	return sol;
+	return formatIntegerPointValues(sol);
+}
+
+
+/** Brings the integer-point values to the form as calculated in the point evaluation methods:
+ *  [[x-value0,y-value0],[x-value1,y-value1],...]
+ *  (last modification: 24.4.16 Simon)
+ * 
+ *	@param{Array} sol y-values at the integer points with 0
+ *  	and the "end of the compact support".
+ * 
+ * 	@return{Array} values x-and y values in the format described before
+ */
+function formatIntegerPointValues(sol){
+	var values=createArray(sol.length,2);
+	for(var i=0;i<sol.length;i++){
+		values[i][0]=i;
+		values[i][1]=sol[i];
+	}	
+	return values;
 }
 
