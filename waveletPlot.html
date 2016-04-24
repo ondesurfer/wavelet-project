@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<!-- Date: 2016-04-20 -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Wavelet Plot</title>
+		<meta name="author" content="Simon" />
+		<meta name="author" content="Andreas" />
+		<!--include scripts and libraries-->
+		<script src="d3.js"></script>
+		<script src="math.js"></script>
+		<script src="matrixOperations.js"></script>
+		<script src="pointEvaluation.js"></script>
+		<script src="function-plot.js"></script>
+		<script src="gauss.js"></script>
+
+		<style>
+			input[type=text] {
+				width: 300px;
+			}
+			input {
+				padding: 6px;
+			}
+			body, html, input {
+				font-family: sans-serif;
+				font-size: 11pt;
+			}
+			form {
+				margin: 20px 0;
+			}
+		</style>
+	</head>
+	<body>
+		<form id="form">
+			<label for="eq">Enter Daubechies Number:</label>
+			<input type="text" id="eq" value="3" />
+			<input type="submit" value="Draw" />
+		</form>
+		
+		<div id="plot"></div>
+		
+		<p>
+			Plot library:
+			<a href="https://github.com/maurizzzio/function-plot">
+				https://github.com/maurizzzio/function-plot
+			</a>
+		</p>
+
+		<script>
+			//Daubechies-coefficients (from wikipedia):
+			var a = new Array();
+			a[2] = [(1 + Math.sqrt(3)) / 4, ((3 + Math.sqrt(3)) / 4), 
+				(3 - Math.sqrt(3)) / 4, (1 - Math.sqrt(3)) / 4];
+			a[3] = [0.47046721, 1.14111692, 0.650365, -0.19093442, 
+				-0.12083221, 0.0498175];
+
+			//it seems that a[4] is a little bit wrong!
+			a[4] = [0.32580343, 1.01094572, 0.8922014, -0.03967503, 
+				-0.26450717, 0.0436163, 0.0465036, -0.01498699];
+			a[5] = [0.22641898, 0.85394354, 1.02432694, 0.19576696, 
+				-0.34265671, -0.04560113, 0.10970265, -0.0088268, -0.01779187, 
+					0.0047174279];
+			a[6] = [0.1577424300000, 0.6995038100000, 1.0622637600000, 
+				0.4458313200000, -0.3199866000000, -0.1835180600000, 
+				0.1378880900000, 0.0389232100000, -0.0446637500000, 
+				0.0007832511520, 0.0067560623600, -0.0015235338100];
+
+			a[7] = [0.1100994300000, 0.5607912800000, 1.0311484900000, 
+				0.6643724800000, -0.2035138200000, -0.3168350100000, 
+				0.1008467000000, 0.1140034500000, -0.0537824500000, 
+				-0.0234399400000, 0.0177497900000, 0.0006075149950, 
+				-0.0025479047200, 0.0005002268530];
+
+			a[8] = [0.0769556200000, 0.4424672500000, 0.9554861500000, 
+				0.8278165300000, -0.0223857400000, -0.4016586300000, 
+				0.0006681940920, 0.1820763600000, -0.0245639000000, 
+				-0.0623502100000, 0.0197721600000, 0.0123688400000, 
+				-0.0068877192600, -0.0005540045490, 0.0009552297110, 
+				-0.0001661372610];
+
+			//save the following globally:
+			//    c			the temporary used Daubechies-coefficients
+			//    values 	the corresponding computed wavelet values
+			var c;
+			var values;
+			
+			function draw() {
+				c = a[document.getElementById('eq').value];
+				if (!testCoeffs(c, 3)) {
+					alert("invalid coefficients");
+				} else {
+					try {
+						//Where is formatIntegerPointValues defined? 
+						intPointValues = calculateIntegerPointValues(c);
+						values = iterativePointEvaluation(
+							c,0,c.length-1,intPointValues)[0];
+
+						var plot = functionPlot({
+							target : '#plot',
+							data : [{
+								points : values,
+								fnType : 'points',
+								graphType : 'polyline',
+							}]
+						});
+					} catch (err) {
+						console.log(err);
+						alert(err);
+					}
+					xDomain = plot.options.xDomain;
+					//return the wavelet plot as object
+					return plot;
+				}
+			}
+
+			//add the draw-function to the draw-button
+			document.getElementById('form').onsubmit = function(event) {
+				event.preventDefault();
+				//draw once and save the graph as object
+				var plot = draw();
+				//attach the test-funtion sayHello as listener to the 
+				//zoom-event 
+				plot.on("before:draw", sayHello);
+				//instance.on("all:zoom", sayHello);
+			};
+			
+			// function draw() {
+			  	// if(!testCoeffs(a[document.getElementById('eq').value],3)){
+					// alert("invalid coefficients");
+				// }
+				// else{
+				    // try {
+				      // functionPlot({
+						  // target: '#plot',
+						  // data: [{
+						    // points: iterativePointEvaluation(a[document.getElementById('eq').value],11),
+						    // fnType: 'points',
+						    // graphType: 'polyline',
+// 						    
+						  // }]
+					// });
+					// }
+				    // catch (err) {
+				      // console.log(err);
+				      // alert(err);
+				    // }
+				// }
+			// }
+
+			function sayHello() {
+				//"this" has to be an instance of functionPlot
+				//xDomain : domain of the x-values ,
+				//points: the used points from the previous plot
+				var xDomain = this.options.xDomain;
+
+				//compute the new values... 
+				//!!!Attention!!! take care of the x-boundery-values
+				//before zooming
+				var result = recursivePointEvaluation2(c, xDomain[0],
+					xDomain[1], values);
+				//...and save globally:
+				values = result[0];
+				console.log("the new values:", result[1]);
+				//values=[[1,1],[2,1],[3,1],[4,1]];
+				//give the new values to the plot-object:
+				this.options.data[0].points = result[1];
+			}
+			
+			// document.getElementById('form').onsubmit = function (event) {
+	    		// event.preventDefault();
+	    		// draw();
+	   		// };
+		
+		</script>
+	</body>
+</html>
+

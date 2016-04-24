@@ -1,8 +1,13 @@
-//leicht veraendert
+/** This file contains functions for matrix manipulations
+ *
+ *	(last modification: 22.4.16 Andreas)
+ */
 
-/** sucht pivot-Elemente der Matrix a
- * @param{Array} A Matrix des spaeter zu loesendem Systems
- * @return{Array} pivot Vektor mit Indices der zu waehlenden Zeilen
+/**Search pivot-elements of a matrix.
+ * 
+ * @param{Array} 	matrix	the matrix of the linear system to be solved.
+ * 
+ * @return{Array} 	pivotA 	vector with the indices of the row to be choosen.
  */
 function pivot(matrix) {
 	var A = deepCopyMatrix(matrix);
@@ -31,18 +36,20 @@ function pivot(matrix) {
 	return pivotA;
 }
 
-/** Funktion zum Loesen eines quadratischen LGS mit Pivotelementsuche
- * @param{Array} A Matrix des LGS Ax=b
- * @param{Array} b Vektor des LGS Ax=b
- * @return{Array} x Loesungsvektor
+/** Solve a quadratic linear system of equations with pivot search.
+ * 
+ * @param{Array} A the matrix of the linear system Ax=b.
+ * @param{Array} b the vector of the linear system Ax=b.
+ * 
+ * @return{Array} x the solution vector.
  */
 function solve(Matr, Vect) {
 	A = deepCopyMatrix(Matr);
 	b = deepCopyVector(Vect);
 	B = A;
-	//urspr. A.clone
+	//originally A.clone
 	x = b;
-	//urspr. b.clone
+	//originally b.clone
 	var pivotA = pivot(B);
 	n = B.length;
 	for ( i = 0; i < n - 1; i++) {
@@ -81,109 +88,81 @@ function deepCopyVector(vector) {
 	return newVector;
 }
 
-/** Funktion um die Koeffizienten a_k eines Wavelets in die Matrix einzusortieren
- * @param{Array} a Koeffizienten im Array
- * @return{Array} mat Matrix mit einsortierten Koeffizienten
+/** Sort the coefficients of a wavelet into a matrix.
+ * 
+ * @param{Array} a refinement coefficients
+ * 
+ * @return{Array} mat the matrix with the sorted coefficients
  */
-function coeffsToMatrix(akk) {
-	var a = new Array();
-	//kopiere akk zu a, da  wir sonst akk zerstoeren
-	for (var i = 0; i < akk.length; i++) {
-		a[i] = akk[i];
+function coeffsToMatrix(a) {
+	var c = new Array();
+	//copy a to c
+	for (var i = 0; i < a.length; i++) {
+		c[i] = a[i];
 	}
-	N = a.length;
-	//Anzahl der Koeffizienten die Randkoeffizienten muessen  von 0 verschieden sein - ggf. Abfrage noch notwendig
-	//haenge N-4 Nullen vorne und hinten an den Koeffizientenvektor - macht es später einfacher!
-	for (var i = 0; i < N - 4; i++) {
-		a.push(0);
+	N = c.length;
+	//number of coefficients
+	
+	//the boundary-coefficients have to be different from 0
+	//check this if necessary
+	//attach N-4 zeros in front of and behind the coefficient vector
+	for ( i = 0; i < N - 4; i++) {
+		c.push(0);
 	}
-	for (var i = 0; i < N - 4; i++) {
-		a.unshift(0);
+	for ( i = 0; i < N - 4; i++) {
+		c.unshift(0);
 	}
 
-	var mat = createArray(N - 2, N - 2);
-	//first Index ist der Index, ab dem (von rechts nach links gelaufen) die Elemente in die Zeile aufgenommen werden;
-	var firstIndex = 1 + N - 4;
-	var marker;
-	for (var z = 0; z < N - 2; z++) {
+	mat = createArray(N - 2, N - 2);
+	
+	//firstIndex is the index from which (going right to left) the
+	//elements get included in the row;
+	firstIndex = 1 + N - 4;
+	for ( z = 0; z < N - 2; z++) {
 		marker = firstIndex;
-		for (var s = 0; s < N - 2; s++) {
-			mat[z][s] = a[marker];
+		for ( s = 0; s < N - 2; s++) {
+			mat[z][s] = c[marker];
 			marker--;
 		}
 		firstIndex += 2;
 	}
-	//ziehe je 1 auf den Diagonalen ab (denn spaeter 0=(A-Id)v)
+	
+	//subtract 1 from the diagonal
 	for (var i = 0; i < N - 2; i++) {
 		mat[i][i] = mat [i][i] - 1;
 	}
 	return mat;
 }
 
-/** Funktion um die Koeffizienten a_k eines Wavelets in die Matrix einzusortieren
- * @param{Array} a Koeffizienten im Array
- * @return{Array} mat Matrix mit einsortierten Koeffizienten
- */
-function coeffsToMatrix2(akk) {
-
-	var N = akk.length;
-	//Anzahl der Koeffizienten die Randkoeffizienten muessen  von 0 verschieden sein - ggf. Abfrage noch notwendig
-	console.log("N",N);
-	var mat2 = createArray(N - 2, N - 2);
-	
-	//belege alle Eintraege mit 0
-	for ( var z = 0; z < N - 2; z++) {
-		for ( var s = 0; s < N - 2; s++) {
-			mat2[z][s] = 0;
-		}
-	}
-	console.log(akk);
-	//belege entsprechende Felder mit ak's
-	for(var k=0; k < N-2;k++){
-		console.log("k",k,"N-2",N-2);
-		for(var l= Math.max(0,2*k-(N-1)+1); l<=Math.min(N-3,2*k+1);l++){
-			index=2*k-l+1;
-			console.log("k",k,"l",l,"index",index);
-
-			mat2[k][l]=akk[2*k-l+1];
-		}
-	}
-	
-	
-	
-	//ziehe je 1 auf den Diagonalen ab (denn spaeter 0=(A-Id)v)
-	for (var i = 0; i < N - 2; i++) {
-		mat2[i][i] = mat2 [i][i] - 1;
-	}
-	console.log("mat2");
-	printMatrix(mat2);
-	return mat2;
-}
-
-/** Funktion zur Konsolen-Ausgabe eines zweidimensionalen nxm Arrays
- * (Letzte Änderung: 28.2.16 Simon)
- * @param{Array} Mat Matrix die Ausgegeben werden soll.
+/** Display a 2dim mxn array on the console.
+ * (last modification: 28.2.16 Simon)
+ * 
+ * @param{Array} Mat matrix to be displayed.
+ * 
  * @return{undefined}
  */
 function printMatrix(Mat) {
 	for ( z = 0; z < Mat.length; z++) {
 		asString = new String(" ");
-		//haengt alle Zahlen einer Zeile zum String zusammen
+		//attach all numbers of a row to one string
 		for ( s = 0; s < Mat[0].length; s++) {
 			asString = asString + " " + Mat[z][s];
 		}
-		//gibt den zusammengehaengten String aus und eine weitere Leerzeile
+		//return the string together with a blank
 		console.log(asString);
 		console.log(" ");
 	}
 
 }
 
-/** Funktion zum Erstellen von Arrays beliebiger Dimension
- *     (z.B.: (2,3)-erstellt eine 2x3 Matrix; (2,2,2) erstellt eine 3 dimensionale 2x2x2 'Matrix')
- *	(Letzte Änderung: 28.2.16 Simon)
+/** Create an array of any dimension
+ *     (f.e.: (2,3)-creates a 2x3 matrix; (2,2,2) creates a 3
+ * 		dim 2x2x2 'matrix')
+ *	(last modification: 28.2.16 Simon)
+ * 
  *	@param{int,int..} length.
- * 	@return{Array} arr
+ * 
+ * 	@return{Array} arr.
  */
 /*function createArray(length) {
  var arrr = new Array(length || 0),
@@ -207,21 +186,25 @@ function createArray(length1, length2) {
 	return array;
 }
 
-/** Funktion zum ueberpruefen ob die Koeffizienten ein Daubechies-Wavelet erzeugen koennten
- * Prueft ob die Summe 2 ergibt, die Summe der Quadrate 2 ergibt und ob sum(a(l)*a(l-2k))=0 fuer festes k.
- * *	(Letzte Änderung: 11.4.16 Andreas)
- *	@param{Array} a zu ueberpruefendeKoeffizienten
- * 	@param{int} n 10 hoch(-n) gibt die Fehlertoleranz an.
- * 	@return{Array} boolean
+/** Test the coefficients for being Daubechies-Wavelet-coefficients:
+ * 	- their sum should be 2,
+ *  - the sum over their squares should be also 2 and
+ *  - sum(a(l) * a(l - 2k)) = 0 for fixed k.
+ * 	(last modification: 11.4.16 Andreas)
+ * 
+ *	@param{Array} a 	coefficients to be checked.
+ * 	@param{int} n 		10^(-n) is the fault tolerance.
+ * 
+ * 	@return{boolean} true iff the coefficients pass the test.
  */
 function testCoeffs(a, n) {
 
-	var fehlertoleranz = Math.pow(10, -n);
+	var faultTolerance = Math.pow(10, -n);
 
 	var sum1 = 0;
-	//Summe der Koeffizienten soll 2 sein
+	//sum of the coefficients should be 2
 	var sum2 = 0;
-	//Summe der Quadrate der Koeffizienten soll 2 sein
+	//sum over the squares of the coefficients should be 2
 	for (var i = 0; i < a.length; i++) {
 		sum1 += a[i];
 		sum2 += (a[i] * a[i]);
@@ -229,20 +212,21 @@ function testCoeffs(a, n) {
 
 	//console.log(sum1);
 	//console.log(sum2);
-	if (Math.abs(sum1 - 2.0) > fehlertoleranz) {
+	if (Math.abs(sum1 - 2.0) > faultTolerance) {
 		return false;
 	}
-	if (Math.abs(sum2 - 2.0) > fehlertoleranz) {
+	if (Math.abs(sum2 - 2.0) > faultTolerance) {
 		return false;
 	}
 
-	//Summe ueber a_l*a_(l-2k) soll 0 sein fuer alle k!=0
+	//sum over a_l*a_(l-2k) should be 0 for all k!=0
 	var sum3;
 	
-	//weil supp(phi) in [0, N] liegt, ist der Summand a_l*a_(l-2k) != 0,
-	//falls 0 <= l < a.length
-	//und 0 <= l - 2*k < a.length, also k <= l/2 sind
-	//(man beachte, dass JavaScript fuer die Indizierung bei 0 anfaengt)
+	//the summand a_l*a_(l-2k) is != 0,
+	//if 0 <= l < a.length
+	//and 0 <= l - 2*k < a.length, thus k <= l/2,
+	//because supp(phi) lies completely in [0, N]
+	//(note that JavaScript starts at 0 for indexing)
 	for (var k = 1; k < a.length / 2; k++) {
 		sum3 = 0;
 		for (var l = 0; l < a.length; l++) {
@@ -251,56 +235,50 @@ function testCoeffs(a, n) {
 			}
 		}
 		//console.log(sum3);
-		if (Math.abs(sum3) > fehlertoleranz) {
+		if (Math.abs(sum3) > faultTolerance) {
 			return false;
 		}
 	}
 	return true;
 }
 
-/** berechnet die Funktionswerte des Wavelets an den ganzzahligen Stellen durch Aufstellen und Lösen eines LGS
- * Dabei sind a die Wavelet-Koeffizienten. Der Traeger muss dann 0-a.length sein. Es werden die Funktionswerte an den Stellen 
- * 0,...,a.length-1 zurueckgegeben.
+/** Compute the values of the wavelet at integer points by solving a linear
+ *  system.
+ *  (last modification: 1.3.16 Simon)
  * 
- *	(Letzte Änderung: 1.3.16 Simon)
- *	@param{Array} a Wavelet-Koeffizienten.
- * 	@return{Array} sol Funktionswerte an den ganzzahligen Stellen inklusive 0 und dem "Ende des kompakten Traegers".
+ *	@param{Array} a the Wavelet-coefficients.
+ * 
+ * 	@return{Array} sol y-values at the integer points with 0
+ *  	and the "end of the compact support".
  */
 function calculateIntegerPointValues(a) {
-	
-	//faengt das Haar-Wavelet ab
-	//eventuell ist es sinnvoller das Haar-Wavelet bereits frueher abzufangen, da es dann nicht verfeinert wird.
-	if(a.length==2){
-		var mat3=new Array(2);
-		mat3[0]=1;
-		mat3[1]=0;
-		return mat3;
-	}
-	
-	var mat = coeffsToMatrix2(a);
-	
-	//s steht hier für Anzahl der spalten
+	var mat = coeffsToMatrix(a);
+	//document.write("the matrix for the linear system: ");
+	//document.write(mat);
+	//console.log("the matrix for the linear system:");
+	//printMatrix(mat);
+	//append a last row vector of ones to the matrix
+	//('norm condition')
 	var s = mat[0].length;
-	
-	//fuegt die letzte Zeile aus Einsen an die Matrix an ('Normierungsbedingung')
-	var letzteZeile = new Array(s);
+	//s number of columns
+	var lastRow = new Array(s);
 	for (var i = 0; i < s; i++) {
-		letzteZeile[i] = 1;
+		lastRow[i] = 1;
 	}
-	mat.push(letzteZeile);
+	mat.push(lastRow);
 
-	//fuegt eine letzte Spalte aus Nullen an die Matrix an (bzw. an jede Zeile ein weiteres Glied)
-	//Achtung evtl. kann sich eine mehrdeutige lösbarkeit ergeben?!
-	for (var j = 0; j < mat.length; j++) {
-		mat[j].push(4);
+	//append a last column of zeros to the matrix
+	//Attention: eventually multiple solutions become possible?!
+	for (var i = 0; i < mat.length; i++) {
+		mat[i].push(0);
 	}
-	//mat[0][mat.length - 1] = 1;
-	printMatrix(mat);
+	mat[0][mat.length - 1] = 1;
 
-	//erstelle b Vektor
+	//create the vector b
 	var z = mat.length;
-	//z steht hier fuer Anzahl der Zeilen
-	var bb = new Array(z);
+	
+	//z stands for the number of rows
+	var bb = new Array(s);
 	for (var i = 0; i < z - 1; i++) {
 		bb[i] = 0;
 	}
@@ -309,16 +287,7 @@ function calculateIntegerPointValues(a) {
 	var sol = gaus(mat, bb);
 	//sol[sol.length-1]=0;
 	sol.unshift(0);
-	console.log("phi an Ganzzahlwerten:",sol);
+	//console.log("phi at integer points:",sol);
 	return sol;
-}
-
-function formatIntegerPointValues(sol){
-	var values=createArray(sol.length,2);
-	for(var i=0;i<sol.length;i++){
-		values[i][0]=i;
-		values[i][1]=sol[i];
-	}	
-	return values;
 }
 

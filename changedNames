@@ -1,0 +1,21 @@
+This files contains a list of changed file-, variable- or method-names
+from the version 34a569c 2016-04-19
+
+ersterWaveletPlot -> waveletPlot
+Daubechies-coefficients d -> a
+ak (waveletPlot) -> c (for used coefficients)
+Punktauswertung -> pointEvaluation
+instance -> plot
+ak (pointEvaluation) -> a
+naiveRekursivePunktauswetung -> naiveRecursivePointEvaluation
+rekursivePunktauswertung -> recursivePointEvaluation
+linkerXwert, rechterXWert -> leftXValue, rightXValue
+rekursivePunktauswertung2 -> recursivePointEvaluation2
+width -> supportWidth
+werte -> values
+iterativePunktauswertung -> iterativePointEvaluation
+fehlertoleranz -> faultTolerance
+letzteZeile -> lastRow
+
+Wuerde gerne N -> j machen; geht aber nicht,
+wegen der inneren Funktion phi(j,l)
