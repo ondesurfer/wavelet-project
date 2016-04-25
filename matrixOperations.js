@@ -281,7 +281,7 @@ function testCoeffs(a, n) {
 
 /** Compute the values of the wavelet at integer points by solving a linear
  *  system.
- *  (last modification: 1.3.16 Simon)
+ *  (last modification: 25.4.16 Simon)
  * 
  *	@param{Array} a the Wavelet-coefficients.
  * 
@@ -311,26 +311,33 @@ function calculateIntegerPointValues(a) {
 	}
 	mat.push(lastRow);
 
+	/* not necessary anymore because of new gauss-Algorithm
+	 * 
 	//append a last column of zeros to the matrix
 	//Attention: eventually multiple solutions become possible?!
 	for (var i = 0; i < mat.length; i++) {
 		mat[i].push(0);
 	}
-	mat[0][mat.length - 1] = 1;
+	mat[0][mat.length - 1] = 1;*/
 
-	//create the vector b
-	var z = mat.length;
 	
 	//z stands for the number of rows
-	var bb = new Array(s);
+	var z = mat.length;
+	
+	//create the vector b
+	var b = new Array(s);
 	for (var i = 0; i < z - 1; i++) {
-		bb[i] = 0;
+		b[i] = 0;
 	}
-	bb[z - 1] = 1;
-	//console.log(mat,bb);
-	var sol = gaus(mat, bb);
-	//sol[sol.length-1]=0;
+	b[z - 1] = 1;
+	//console.log(mat,b);
+	var sol = gaus2(mat, b);
+	
+	//adds zero at the end and the beginning of the solution Vektor 
+	//because phi(0)=0 and phi(a.length)=0  
+	sol.push(0);
 	sol.unshift(0);
+	
 	//console.log("phi at integer points:",sol);
 	return formatIntegerPointValues(sol);
 }
