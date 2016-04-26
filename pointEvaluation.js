@@ -1,7 +1,7 @@
 /** This file contains functions for point evaluations of wavelets with given
  *  refinement coefficients and step size of the x-lattice
  *
- *	(last modification: 22.4.16 Andreas)
+ *	(last modification: 25.4.16 Andreas)
  */
 
 //Attention: calculateIntegerPointValues doesn't return the right last value
@@ -120,38 +120,54 @@ function recursivePointEvaluation(a, N) {
 	return values;
 }
 
+/** Get the N for the step size 1/2^N for a fixed number M
+ *  of equidistant x-lattice-points in the selected zoom-area
+ *  [leftXValue, RightXValue]
+ * 	
+ * (last modification: 25.4.16 Andreas)
+ * 	@param{int} 	M			number of equidistant x-lattice-points in the
+ * 								plot-area.		
+ * 	@param{real} 	leftXValue	left end of the plotting-/computing-area.
+ *  @param{real}	RightXValue right end of the plotting-/computing-area.
+ * 
+ *  @return{int}	N			the exponent of the step size 1/2^N.
+ */
+
+function getN(leftXValue, rightXValue, M) {
+	//step size
+	var delta = (rightXValue - leftXValue) / M;
+
+	//new N, step and values-array for the new j-level
+	var N = Math.ceil(Math.log(1 / delta) / Math.LN2);
+	return N;
+}
+
 /** Evaluate recursively the wavelet at points where it is not vanishing with
  *  memory of already computed values.
  *
- *	(last modification: 22.4.16 Andreas)
+ *	(last modification: 25.4.16 Andreas)
  *	@param{Array} 	a 			the refinement coefficients.
  *  @param{Array} 	valuesOld 	already computed values of the wavelet which
  * 								should be refined or coarsened
  * 								(adapt the size of the array!).
  * 	@param{real} 	leftXValue	left end of the plotting-/computing-area.
  *  @param{real}	RightXValue right end of the plotting-/computing-area.
- *
+ *  @param{int} 	N			the exponent of the step size 1/2^N.		
+ *  
  * 	@return{Array} 	values  	the array of x-lattice-points and the
  * 								corresponding wavelet-values at these points
  * 								in the form [x,y].
  */
-function recursivePointEvaluation2(a, leftXValue, rightXValue, valuesOld) {
+function recursivePointEvaluation2(a, leftXValue, rightXValue, valuesOld, N) {
 	var supportWidth = a.length - 1;
-
-	//number of equidistant x-lattice-points in the plot-area
-	var M = 300;
-
-	//step size
-	var delta = (rightXValue - leftXValue) / M;
-
-	//new N, step and values-array for the new j-level
-	var Nnew = Math.ceil(Math.log(1 / delta) / Math.LN2);
-	var stepNew = Math.pow(2, Nnew);
+	var stepNew = Math.pow(2, N);
 	var valuesNew = createArray(stepNew * supportWidth + 1, 2);
 
 	//compute the old N and the old step from valuesOld
 	var stepOld = (valuesOld.length - 1) / supportWidth;
 
+	console.log(Math.log2(stepOld));
+	console.log(N);
 	//in the case of refinement
 	if (stepNew >= stepOld) {
 		//copy all old values in the new array valuesNew
@@ -222,7 +238,7 @@ function recursivePointEvaluation2(a, leftXValue, rightXValue, valuesOld) {
 	//computation of needed y-values
 	for (var i = indexNewLinks; i <= indexNewRechts; i++) {
 		if (valuesNew[i][1] == undefined) {
-			phi(Nnew, i);
+			phi(N, i);
 		}
 	}
 

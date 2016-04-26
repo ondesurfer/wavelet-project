@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
-<!-- Date: 2016-04-20 -->
+<!-- Date: 2016-04-26 -->
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -85,8 +85,15 @@
 			//save the following globally:
 			//    c			the temporary used Daubechies-coefficients
 			//    values 	the corresponding computed wavelet values
+			//	  N_max		the maximal 1/2^N-step-size of the x-lattice
+			//	  M			the number of equidistant x-lattice-points in the
+ 			//				plot-area
+ 			//	  plot		the plot instance
 			var c;
 			var values;
+			N_max = 17;
+			var M = 300;
+			var plot;
 			
 			function draw() {
 				c = a[document.getElementById('eq').value];
@@ -95,10 +102,11 @@
 				} else*/ {
 					try { 
 						intPointValues = calculateIntegerPointValues(c);
+						N = getN(0, c.length-1, M);
 						values = recursivePointEvaluation2(
-							c,0,c.length-1,intPointValues)[0];
+							c,0,c.length-1,intPointValues, N)[0];
 
-						var plot = functionPlot({
+						var plotInstance = functionPlot({
 							target : '#plot',
 							data : [{
 								points : values,
@@ -110,9 +118,10 @@
 						console.log(err);
 						alert(err);
 					}
-					xDomain = plot.options.xDomain;
+					
+					xDomain = plotInstance.options.xDomain;
 					//return the wavelet plot as object
-					return plot;
+					return plotInstance;
 				}
 			}
 
@@ -120,10 +129,10 @@
 			document.getElementById('form').onsubmit = function(event) {
 				event.preventDefault();
 				//draw once and save the graph as object
-				var plot = draw();
+				plot = draw();
 				//attach the test-funtion sayHello as listener to the 
 				//zoom-event 
-				plot.on("before:draw", sayHello);
+				plot.on("before:draw", zoomAdaption);
 				//instance.on("all:zoom", sayHello);
 			};
 			
@@ -150,7 +159,7 @@
 				// }
 			// }
 
-			function sayHello() {
+			function zoomAdaption() {
 				//"this" has to be an instance of functionPlot
 				//xDomain : domain of the x-values ,
 				//points: the used points from the previous plot
@@ -159,14 +168,23 @@
 				//compute the new values... 
 				//!!!Attention!!! take care of the x-boundery-values
 				//before zooming
-				var result = recursivePointEvaluation2(c, xDomain[0],
-					xDomain[1], values);
-				//...and save globally:
-				values = result[0];
-				console.log("the new values:", result[1]);
-				//values=[[1,1],[2,1],[3,1],[4,1]];
-				//give the new values to the plot-object:
-				this.options.data[0].points = result[1];
+				var N = getN(xDomain[0], xDomain[1], M);
+				
+				if(N > N_max){
+					console.log("from this level onwards the results become incorrect");
+					//plot.options.disableZoom = true;
+				}
+				else{
+					//plot.options.disableZoom = false;
+					var result = recursivePointEvaluation2(c, xDomain[0],
+						xDomain[1], values, N);
+					//...and save globally:
+					values = result[0];
+					//console.log("the new values:", result[1]);
+					//values=[[1,1],[2,1],[3,1],[4,1]];
+					//give the new values to the plot-object:
+					this.options.data[0].points = result[1];
+				}
 			}
 			
 			// document.getElementById('form').onsubmit = function (event) {
