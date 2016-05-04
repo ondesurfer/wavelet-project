@@ -1,6 +1,6 @@
 /** This file contains functions for matrix manipulations
  *
- *	(last modification: 22.4.16 Andreas)
+ *	(last modification: 3.5.16 Andreas)
  */
 
 /**Search pivot-elements of a matrix.
@@ -139,13 +139,14 @@ function coeffsToMatrix(a) {
  *  (Also works for wavelets with only 3 coefficients! e.g. hat-function)
  * 
  * @param{Array} a refinement coefficients
+ * @param{int}	  mu the derivation-order	
  * 
  * @return{Array} mat the matrix with the sorted coefficients
  */
-function coeffsToMatrix2(akk) {
+function coeffsToMatrix2(akk, mu) {
 
 	var N = akk.length;
-	
+	var pow2_minus_mu = Math.pow(2, -mu);
 	var mat2 = createArray(N - 2, N - 2);
 	
 	//fill all entries by 0 
@@ -163,9 +164,9 @@ function coeffsToMatrix2(akk) {
 		}
 	}
 	
-	//sub 1 at the diagonals because we will solve 0=(A-Id)v)
+	//sub 2^(-mu) at the diagonals because we will solve 0=(A-(2^(-mu))Id)v)
 	for (var i = 0; i < N - 2; i++) {
-		mat2[i][i] = mat2 [i][i] - 1;
+		mat2[i][i] = mat2 [i][i] - pow2_minus_mu;
 	}
 	//printMatrix(mat2);
 	return mat2;
@@ -189,7 +190,6 @@ function printMatrix(Mat) {
 		console.log(asString);
 		console.log(" ");
 	}
-
 }
 
 /** Create an array of any dimension
@@ -281,64 +281,74 @@ function testCoeffs(a, n) {
 
 /** Compute the values of the wavelet at integer points by solving a linear
  *  system.
- *  (last modification: 25.4.16 Simon)
+ *  (last modification: 3.5.16 Andreas)
  * 
  *	@param{Array} a the Wavelet-coefficients.
+ *  @param{int}	  mu the derivation-order	
  * 
  * 	@return{Array} sol y-values at the integer points with 0
  *  	and the "end of the compact support".
  */
-function calculateIntegerPointValues(a) {
-	
-	
+
+function calculateIntegerPointValues(a, mu) {
+	var N = a.length - 1;
 	//tests if the Wavelet is the Haar-Wavelet and then returns the y values 0 and 1
-	//eventuell ist es sinnvoller das Haar-Wavelet bereits frueher abzufangen, da es dann nicht verfeinert wird.
-	if(a.length==2){
-		var mat3=new Array(2);
-		mat3[0]=1;
-		mat3[1]=0;
-		return formatIntegerPointValues(mat3);
-	}
+	//eventuell ist es sinnvoller das Haar-Wavelet bereits frueher abzufangen, 
+	//da es dann nicht verfeinert wird.
+	//gilt das auch noch fuer mu > 0 ? Ja und das wird schon in der Auswertung abgefangen
+	// if(a.length==2){
+		// var mat3=new Array(2);
+		// mat3[0]=1;
+		// mat3[1]=0;
+		// return formatIntegerPointValues(mat3);
+	// }
 	
-	var mat = coeffsToMatrix2(a);
-	//append a last row vector of ones to the matrix
-	//('norm condition')
-	var s = mat[0].length;
-	//s number of columns
-	var lastRow = new Array(s);
-	for (var i = 0; i < s; i++) {
-		lastRow[i] = 1;
-	}
-	mat.push(lastRow);
-
-	/* not necessary anymore because of new gauss-Algorithm
-	 * 
-	//append a last column of zeros to the matrix
-	//Attention: eventually multiple solutions become possible?!
-	for (var i = 0; i < mat.length; i++) {
-		mat[i].push(0);
-	}
-	mat[0][mat.length - 1] = 1;*/
-
+	//sparsify if possible
+	var mat = coeffsToMatrix2(a, mu);
 	
-	//z stands for the number of rows
-	var z = mat.length;
+	var m1 = Math.max(N - 1, mu + 1);
+	console.log("m1",m1);
+	var V = vander90(onetwothree(m1));
+	printMatrix(V);
+	V = numeric.getBlock(V, [0,0], [mu, N-2]);
+	printMatrix(V);
+	
+	
+	//append the matrix V row-wise
+	mat = mat.concat(V);
 	
 	//create the vector b
-	var b = new Array(s);
-	for (var i = 0; i < z - 1; i++) {
+	var b = new Array((N - 1) + mu + 1);
+	//console.log("N",N,"mu",mu);
+	//console.log(typeof(mu));
+	//console.log((N-1)+mu);
+	for (var i = 0; i<(N-1)+mu; i++) {
+		console.log("i",i);
 		b[i] = 0;
 	}
-	b[z - 1] = 1;
+	
+	b[(N - 1) + mu] = Math.pow((-1), mu) * factorial(mu);
+	console.log("b",b);
+	
+	
 	//console.log(mat,b);
+	
 	var sol = gaus2(mat, b);
+	
+	//console.log(sol);
 	
 	//adds zero at the end and the beginning of the solution Vektor 
 	//because phi(0)=0 and phi(a.length)=0  
-	sol.push(0);
-	sol.unshift(0);
 	
-	//console.log("phi at integer points:",sol);
+	//printMatrix(mat);
+	
+	//console.log(sol);
+	
+	//fuer Haar-Wavelet rausnehmen?	
+	 sol.push(0);
+	 sol.unshift(0);
+	
+	console.log("phi at integer points:",sol);
 	return formatIntegerPointValues(sol);
 }
 
@@ -359,5 +369,111 @@ function formatIntegerPointValues(sol){
 		values[i][1]=sol[i];
 	}	
 	return values;
+}
+
+/** Returns the sum of all entries of an 1D-array.
+ *  (last modification: 27.4.16 Andreas)
+ * 
+ * 	@param{Array} a 1D-array of real numbers.
+ * 
+ *  @return{real} sum the sum of all entries.
+ */
+function sum(a) {
+	var result = 0;
+	for(var i=0; i < a.length; i++){
+		result += a[i];
+	}
+	return result;
+}
+
+/** Create a nxn-Matrix with all entries = 1.
+ * (last modification 3.5.16 Andreas) 
+ * 
+ *  @param{int} n size of the array.
+ * 
+ * 	@return{Array} A the matrix.
+ */
+function ones(n) {
+	var A = new Array(n);
+	for (var i = 0; i < n; i++) {
+		A[i] = new Array(n);
+		for(var j = 0; j < n; j++) {
+			A[i][j] = 1;
+		}
+	}
+
+	return A;
+}
+
+/** Create the Vandermonde-matrix of size n.
+ *	(last modification 3.5.16 Andreas)
+ * 
+ *  @param{Array} x entries x_1, x_2, ..., x_n of the second column.
+ * 
+ *  @return{Array} A the Vandermonde-matrix. 
+ */
+
+//Achtung stimmt nicht mit wikipedia ueberein
+function vander90(x) {
+	var n = x.length;
+	var A = createArray(n,n);
+	for (var i = 0; i < n; i++) {
+		for(var j = 0; j < n; j++) {
+			A[j][i] = Math.pow(x[i],j);
+		}
+	}
+
+	return A;
+}
+
+/** Rotate a nxn-matrix 90 degrees counterclockwise
+ *  (last modification 3.5.16 Andreas)
+ * 
+ *  @param{Array} A a quadratic array.
+ * 
+ *  @return{Array} B the rotated array.
+ */
+function rot90(A) {
+	var n = A.length;
+	var B = new Array(n);
+	for(var i = 0; i < n; i++) {
+		B[i] = new Array(n);
+		for(var j = 0; j < n; j++) {
+			B[i][j] = A[j][n - i - 1];
+		}
+	}
+	return B;
+}
+
+/** Computes the factorial of an integer.
+ *  (last modification 3.5.16 Andreas)
+ * 
+ *   @param{int} n.
+ * 
+ *   @return{int} result n!.
+ */
+function factorial(n) {
+	if(n==0){return 1;}
+	var result = n;
+	for(var i = n - 1; i > 1; i--) {
+		result = result * i;
+	}
+	return result;
+}
+
+/** Creates an array of integers from 1 to n.
+ *  (last modification 3.5.16 Andreas)
+ * 
+ *   @param{int} n the size of the array.
+ * 
+ *   @return{Array} A = [1,2, ..., n].
+ */
+function onetwothree(n){
+	console.log(n);
+	var A = new Array(n);
+	for(i = 0; i < n; i++){
+		A[i] = i + 1;
+	}
+	return A;
 }
 

@@ -13,6 +13,7 @@
 		<script src="matrixOperations.js"></script>
 		<script src="pointEvaluation.js"></script>
 		<script src="function-plot.js"></script>
+		<script src="numeric-1.2.6.js"></script>
 		<script src="gauss2.js"></script>
 
 		<style>
@@ -26,16 +27,29 @@
 				font-family: sans-serif;
 				font-size: 11pt;
 			}
-			form {
+			daub_field {
 				margin: 20px 0;
 			}
 		</style>
 	</head>
 	<body>
-		<form id="form">
-			<label for="eq">Enter Daubechies Number:</label>
-			<input type="text" id="eq" value="3" />
+		
+		<select id="selection1" size="5"> 
+    	 	<option value="1">Box Function</option> 
+    	 	<option value="9">Hat Function</option> 
+    	 	<option value ="10">Quadratic B-Spline</option> 
+    	 	<option value="DG" selected>Daubechies-2N-Generator</option>  
+    	 </select>
+    	 
+    	 <form id="mu_field">
+			<label for="eq1">Enter Derivation Order:</label>
+			<input type="text" id="eq1" value="0" />
 			<input type="submit" value="Draw" />
+		</form>		
+	
+		<form id="daub_field">
+			<label for="eq">Enter Daubechies Number N:</label>
+			<input type="text" id="eq" value="3" />
 		</form>
 		
 		<div id="plot"></div>
@@ -50,7 +64,9 @@
 		<script>
 			//Wavelet-coefficients (from wikipedia):
 			var a = new Array();
+			//Coefficients of the box function
 			a[1]=[1,1];
+			
 			a[2] = [(1 + Math.sqrt(3)) / 4, ((3 + Math.sqrt(3)) / 4), 
 				(3 - Math.sqrt(3)) / 4, (1 - Math.sqrt(3)) / 4];
 			a[3] = [0.47046721, 1.14111692, 0.650365, -0.19093442, 
@@ -79,33 +95,59 @@
 				-0.0623502100000, 0.0197721600000, 0.0123688400000, 
 				-0.0068877192600, -0.0005540045490, 0.0009552297110, 
 				-0.0001661372610];
+				
+			//Coefficients of the hat function
 			a[9]=[0.5,1,0.5];
+			
+			//Quadratic B-Spline
 			a[10]=[0.25,0.75,0.75,0.25];
-
+			
+			//Coefficients of the box function
+			//bf = [1, 1];
+			
+			//Coefficients of the hat function
+			//hf = [1, 1/2, 1];
+			
 			//save the following globally:
-			//    c			the temporary used Daubechies-coefficients
+			//    c			the temporary used refinement-coefficients
 			//    values 	the corresponding computed wavelet values
 			//	  N_max		the maximal 1/2^N-step-size of the x-lattice
+			//	  N_0		the 1/2^N-step-size for iteration
 			//	  M			the number of equidistant x-lattice-points in the
  			//				plot-area
  			//	  plot		the plot instance
 			var c;
+			var mu;
 			var values;
-			N_max = 17;
+			var N_0 = 8;
+			var N_max = 17;
 			var M = 300;
 			var plot;
+			var type_nr;
+			//sollten den plot loeschen, wenn sich das global aendert.
 			
 			function draw() {
-				c = a[document.getElementById('eq').value];
 				/*if (!testCoeffs(c, 3)) {
 					alert("invalid coefficients");
 				} else*/ {
-					try { 
-						intPointValues = calculateIntegerPointValues(c);
-						N = getN(0, c.length-1, M);
-						values = recursivePointEvaluation2(
-							c,0,c.length-1,intPointValues, N)[0];
-
+					//try
+					 { 
+						var type_nr = document.getElementById('selection1').value;
+						mu = parseInt(document.getElementById('eq1').value);
+						
+						//Extra-request for Daubechies-wavelets
+						if(type_nr == "DG"){
+							c = a[document.getElementById('eq').value];	
+						}
+						else{
+							c = a[type_nr];
+						}
+						console.log("Derivation-order: " + mu);
+						console.log("Coefficients: " + c);
+						
+						values = iterativePointEvaluation2(c, N_0, mu);
+						//printMatrix(values);
+						
 						var plotInstance = functionPlot({
 							target : '#plot',
 							data : [{
@@ -114,26 +156,39 @@
 								graphType : 'polyline',
 							}]
 						});
-					} catch (err) {
+					} /*catch (err) {
 						console.log(err);
 						alert(err);
-					}
+					}*/
 					
 					xDomain = plotInstance.options.xDomain;
 					//return the wavelet plot as object
 					return plotInstance;
 				}
 			}
-
+			
+			//add the selection of the function to plot
+			document.getElementById('selection1').onchange = function(event) {
+				event.preventDefault();
+				// type_nr = document.getElementById('selection1').value;
+				// var daub_field2 = document.getElementById('daub_field2');
+				if(type_nr == "DG"){
+					 daub_field.style.visibility = "visible";
+				}
+				else{
+					daub_field.style.visibility = "hidden";
+				}
+			};
+			
 			//add the draw-function to the draw-button
-			document.getElementById('form').onsubmit = function(event) {
+			document.getElementById('mu_field').onsubmit = function(event) {
 				event.preventDefault();
 				//draw once and save the graph as object
 				plot = draw();
 				//attach the test-funtion sayHello as listener to the 
 				//zoom-event 
-				plot.on("before:draw", zoomAdaption);
-				//instance.on("all:zoom", sayHello);
+				//plot.on("before:draw", zoomAdaption);
+				//instance.on("all:zoom", zoomAdaption);
 			};
 			
 			// function draw() {
@@ -187,7 +242,7 @@
 				}
 			}
 			
-			// document.getElementById('form').onsubmit = function (event) {
+			// document.getElementById('daub_field').onsubmit = function (event) {
 	    		// event.preventDefault();
 	    		// draw();
 	   		// };

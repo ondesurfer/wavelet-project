@@ -1,7 +1,7 @@
 /** This file contains functions for point evaluations of wavelets with given
  *  refinement coefficients and step size of the x-lattice
  *
- *	(last modification: 25.4.16 Andreas)
+ *	(last modification: 27.4.16 Andreas)
  */
 
 //Attention: calculateIntegerPointValues doesn't return the right last value
@@ -68,15 +68,22 @@ function naiveRecursivePointEvaluation(a, N) {
  * 	@return{Array} 	values  the array of x-lattice-points and the corresponding
  * 							wavelet-values at these points in the form [x,y].
  */
-function recursivePointEvaluation(a, N) {
-	var solu = calculateIntegerPointValues(a);
-	var supportWidth = a.length - 1;
+//Achtung, funktioniert noch nicht richtig fuer Ableitungen
+function recursivePointEvaluation(c, N, mu) {
+	var solu = calculateIntegerPointValues(c, mu);
+	var supportWidth = c.length - 1;
 	var step = Math.pow(2, N);
 	var values = createArray(step * supportWidth + 1, 2);
+	
+	var a = new Array(c.length);
+	for(var i=0; i<c.length; i++){
+		a[i]=Math.pow(2,mu)*c[i];
+	}
+	
 	//fill in the known values at the integer points
 	for (var i = 0; i < supportWidth + 1; i++) {
-		values[i*step][0] = i;
-		values[i*step][1] = solu[i];
+		values[i*step][0] = solu[i][0];
+		values[i*step][1] = solu[i][1];
 	}
 	
 	function phi(j, l) {
@@ -257,6 +264,7 @@ function recursivePointEvaluation2(a, leftXValue, rightXValue, valuesOld, N) {
  *	(last modification: 12.4.16 Andreas)
  *	@param{Array} 	a 		the refinement coefficients.
  * 	@param{int} 	N 		1/2^N is the step size of the x-lattice.
+ * 
  * 	@return{Array} 	values  the array of x-lattice-points and the corresponding
  * 							wavelet-values at these points in the form [x,y].
  */
@@ -308,4 +316,100 @@ function iterativePointEvaluation(a, N) {
 	}
 	//console.log("The (iteratively computed) function-values are", values);
 	return values;
+}
+
+/** Evaluate iteratively the mu-th derivative of a 1d refinable function
+ *  on 2^{-j} with refinement mask a within its compact support [0, a.length].
+ *  (similar to the MatLab-reference-code)
+ *
+ *	(last modification: 27.4.16 Andreas)
+ *	@param{Array} 	a 		the refinement coefficients.
+ * 	@param{int} 	j 		1/2^j is the step size of the x-lattice.
+ *  @param{int}		mu		the derivative order >= 0.
+ * 
+ * 	@return{Array} 	values  the array of x-lattice-points and the corresponding
+ * 							function-values at these points in the form [x,y].
+ */
+
+function iterativePointEvaluation2(a, j, mu) {
+	var N = a.length - 1;
+	
+	if(N <= 0){
+		console.error('mask  a is too short');
+	}
+	
+	//change with testCoeffs
+	if (sum(a) !=2){
+		console.error('mask a does not belong to a generator');
+	}
+	
+	if(j === undefined && mu === undefined){
+		j = 0;
+		mu = 0;
+	}
+	
+	if(mu === undefined){
+		mu = 0;
+	}
+	
+	//create the x-lattice with dyadic resolution j
+	var pow2_j = Math.pow(2, j);
+	var values = createArray(N * pow2_j + 1, 2);
+	for(var i = 0; i < N * pow2_j + 1; i++){
+		values[i][0] = i/pow2_j;
+	}
+
+	if(N == 1){
+		//exclude the Haar generator case
+		for(var i = 0; i < N * pow2_j; i++){
+			values[i][1] = 1;
+		}
+		values[N * pow2_j][1] = 0;
+	}
+	else{
+		/*
+		for(var i = 0; i < N * pow2_j + 1; i++){
+			values[i][1] = 0;
+		}*/
+		
+		console.log("mu",mu,"a",a);
+		var v = calculateIntegerPointValues(a, mu);
+		
+		//write the known values at the integer points in 'values'
+		for (var i = 0; i < v.length; i++) {
+			values[i*pow2_j][1] = v[i][1];
+		}
+		
+		//printMatrix(values);
+		
+		//console.log(1/Math.pow(2, j));
+		//use the refinement equation to fill in the remaining values
+		for(var l = 0; l < j; l++){
+			var pow2_l = Math.pow(2, l);
+			var pow2_minusl = 1/pow2_l;
+			var pow2_j_minus_l = Math.pow(2, j - l);
+			for(var m = 0; m < N * pow2_l; m++){
+				result = 0;
+				
+				var k1 = Math.max(0, Math.ceil(pow2_minusl * (2 * m + 1)) - N);
+				var k2 = Math.min(N, Math.floor(pow2_minusl * (2 * m + 1)));
+				
+				//console.log();
+				
+				for(var k = k1; k < k2 + 1; k++)
+				{	
+					var t = pow2_j_minus_l * (2 * m + 1) - pow2_j * k;
+					//console.log(k);
+					result += Math.pow(2, mu) * a[k]*values[Math.pow(2, j - l) *
+						(2 * m + 1) - Math.pow(2,j) * k][1];
+					//result += a[k]*values[pow2_j_minus_l * (2 * m + 1) - pow2_j * k][1];
+					//console.log(values[t][1]);
+					//console.log(pow2_j_minus_l * (2 * m + 1) - pow2_j * k);	
+					//console.log(values[t][1][1]);
+				}
+				values[Math.pow(2, j - l - 1) * (2 * m + 1)][1] = result;
+			}
+		}
+		return values;
+	}
 }
