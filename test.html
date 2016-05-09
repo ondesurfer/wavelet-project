@@ -19,6 +19,8 @@
 <script src="matrixOperations.js"></script>
 <script src="pointEvaluation.js"></script>
 <script src="gauss.js"></script>
+<script src="gauss2.js"></script>
+<script src="numeric-1.2.6.js"></script>
 <!-- load http://maurizzzio.github.io/function-plot/ -->
 <script src="function-plot.js"></script>
 <script>
@@ -29,18 +31,18 @@
 	var d4 = [0.32580343, 1.01094572, 0.8922014, -0.03967503, 
 		-0.26450717, 0.0436163, 0.0465036, -0.01498699];
 
-	function compareMethods(method1, method2, a, N) {
+	function compareMethods(method1, method2, a, N,mu) {
 		var values = new Array(6);
 		var t_start1, t_end1, t_start2, t_end2;
 		//take the time of the first variant and save it in values[0]
 		t_start1 = new Date().getTime();
-		var rek = method1(a, N);
+		var rek = method1(a, N, mu);
 		t_end1 = new Date().getTime();
 		values[0] = t_end1 - t_start1;
 
 		//take the time of the second variant and save it in values[1]
 		t_start2 = new Date().getTime();
-		var it = method2(a, N);
+		var it = method2(a, N, mu);
 		t_end2 = new Date().getTime();
 		values[1] = t_end2 - t_start2;
 
@@ -49,7 +51,7 @@
 		for (var z = 0; z < diff.length; z++) {
 			for (var s = 0; s < 2; s++) {
 				if (s == 0)
-					diff[z][s] = rek[z][s];
+					diff[z][s] = rek[z][1];
 				if (s == 1) {
 					diff[z][s] = rek[z][s] - it[z][s];
 				}
@@ -67,8 +69,9 @@
 		return values;
 	}
 
-	var values = compareMethods(recursivePointEvaluation, 
-		iterativePointEvaluation, d4, 19);
+	var values = compareMethods(iterativePointEvaluation, 
+		iterativePointEvaluation2, d4, 5, 0);
+		
 	console.log("comparison of both methods: time of the first method:", 
 		values[0], "time of the second method:", values[1], 
 		"difference-vector of both methods:", values[2], 

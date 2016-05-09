@@ -307,11 +307,11 @@ function calculateIntegerPointValues(a, mu) {
 	var mat = coeffsToMatrix2(a, mu);
 	
 	var m1 = Math.max(N - 1, mu + 1);
-	console.log("m1",m1);
+	//console.log("m1",m1);
 	var V = vander90(onetwothree(m1));
-	printMatrix(V);
+	//printMatrix(V);
 	V = numeric.getBlock(V, [0,0], [mu, N-2]);
-	printMatrix(V);
+	//printMatrix(V);
 	
 	
 	//append the matrix V row-wise
@@ -323,12 +323,12 @@ function calculateIntegerPointValues(a, mu) {
 	//console.log(typeof(mu));
 	//console.log((N-1)+mu);
 	for (var i = 0; i<(N-1)+mu; i++) {
-		console.log("i",i);
+		//console.log("i",i);
 		b[i] = 0;
 	}
 	
 	b[(N - 1) + mu] = Math.pow((-1), mu) * factorial(mu);
-	console.log("b",b);
+
 	
 	
 	//console.log(mat,b);
@@ -469,7 +469,7 @@ function factorial(n) {
  *   @return{Array} A = [1,2, ..., n].
  */
 function onetwothree(n){
-	console.log(n);
+	//console.log(n);
 	var A = new Array(n);
 	for(i = 0; i < n; i++){
 		A[i] = i + 1;

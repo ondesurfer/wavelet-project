@@ -119,11 +119,11 @@
 			var c;
 			var mu;
 			var values;
-			var N_0 = 8;
+			var N_0 = 4;
 			var N_max = 17;
 			var M = 300;
 			var plot;
-			var type_nr;
+			var type_nr=document.getElementById('selection1').value;
 			//sollten den plot loeschen, wenn sich das global aendert.
 			
 			function draw() {
@@ -170,7 +170,7 @@
 			//add the selection of the function to plot
 			document.getElementById('selection1').onchange = function(event) {
 				event.preventDefault();
-				// type_nr = document.getElementById('selection1').value;
+				type_nr = document.getElementById('selection1').value;
 				// var daub_field2 = document.getElementById('daub_field2');
 				if(type_nr == "DG"){
 					 daub_field.style.visibility = "visible";

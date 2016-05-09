@@ -17,8 +17,14 @@
  * 	@return{Array} 	values  the array of x-lattice-points and the corresponding
  * 							wavelet-values at these points in the form [x,y].
  */
-function naiveRecursivePointEvaluation(a, N) {
-	var solu = calculateIntegerPointValues(a);
+function naiveRecursivePointEvaluation(c, N) {
+	var solu = calculateIntegerPointValues(c);
+	
+	var a = new Array(c.length);
+	for(var i=0; i<c.length; i++){
+		a[i]=Math.pow(2,mu)*c[i];
+	}
+	
 
 	var supportWidth = a.length - 1;
 	var step = Math.pow(2, N);
@@ -68,7 +74,7 @@ function naiveRecursivePointEvaluation(a, N) {
  * 	@return{Array} 	values  the array of x-lattice-points and the corresponding
  * 							wavelet-values at these points in the form [x,y].
  */
-//Achtung, funktioniert noch nicht richtig fuer Ableitungen
+//Achtung, funktioniert noch nicht richtig fuer Ableitungen- doch!
 function recursivePointEvaluation(c, N, mu) {
 	var solu = calculateIntegerPointValues(c, mu);
 	var supportWidth = c.length - 1;
@@ -269,8 +275,14 @@ function recursivePointEvaluation2(a, leftXValue, rightXValue, valuesOld, N) {
  * 							wavelet-values at these points in the form [x,y].
  */
 
-function iterativePointEvaluation(a, N) {
-	var sol = calculateIntegerPointValues(a);
+function iterativePointEvaluation(c, N, mu) {
+	var sol = calculateIntegerPointValues(c,mu);
+	
+	var a = new Array(c.length);
+	for(var i=0; i<c.length; i++){
+		a[i]=Math.pow(2,mu)*c[i];
+	}
+	
 
 	var step = Math.pow(2, N);
 	var supportWidth = a.length - 1;
@@ -278,7 +290,7 @@ function iterativePointEvaluation(a, N) {
 
 	//write the known values at integer points in 'values'
 	for (var i = 0; i < sol.length; i++) {
-		values[i*step][1] = sol[i];
+		values[i*step][1] = sol[i][1];
 		values[i*step][0] = i;
 	}
 
@@ -339,9 +351,9 @@ function iterativePointEvaluation2(a, j, mu) {
 	}
 	
 	//change with testCoeffs
-	if (sum(a) !=2){
+	/*if (sum(a) !=2){
 		console.error('mask a does not belong to a generator');
-	}
+	}*/
 	
 	if(j === undefined && mu === undefined){
 		j = 0;
@@ -371,8 +383,6 @@ function iterativePointEvaluation2(a, j, mu) {
 		for(var i = 0; i < N * pow2_j + 1; i++){
 			values[i][1] = 0;
 		}*/
-		
-		console.log("mu",mu,"a",a);
 		var v = calculateIntegerPointValues(a, mu);
 		
 		//write the known values at the integer points in 'values'
