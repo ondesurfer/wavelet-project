@@ -1,6 +1,6 @@
 /** This file contains functions for matrix manipulations
  *
- *	(last modification: 3.5.16 Andreas)
+ *	(last modification: 12.5.16 Andreas)
  */
 
 /**Search pivot-elements of a matrix.
@@ -144,7 +144,6 @@ function coeffsToMatrix(a) {
  * @return{Array} mat the matrix with the sorted coefficients
  */
 function coeffsToMatrix2(akk, mu) {
-
 	var N = akk.length;
 	var pow2_minus_mu = Math.pow(2, -mu);
 	var mat2 = createArray(N - 2, N - 2);
@@ -471,9 +470,36 @@ function factorial(n) {
 function onetwothree(n){
 	//console.log(n);
 	var A = new Array(n);
-	for(i = 0; i < n; i++){
+	for(var i = 0; i < n; i++){
 		A[i] = i + 1;
 	}
 	return A;
+}
+
+/** Compute the discrete convolution of two vectors
+ *  (last modification: 12.5.16 Andreas)
+ * 
+ *   @param{Array} a the first vector.
+ * 	 @param{Array} b the second vector.
+ * 
+ *   @param{Array} c the convolution of a and b.
+ */
+function conv(a,b){
+	var m = a.length;
+	var n = b.length;
+	var p = m + n - 1; // length of the convolution vector
+	var c = new Array(p);
+	for(var k = 0; k < p; k++){
+		c[k] = 0;
+		j = 0;
+		while(k - j > n - 1){
+			j++;	
+		}
+		while(k - j >= 0 && j < m){
+			c[k] += a[j]*b[k - j];
+			j++;
+		}
+	}
+	return c;
 }
 
