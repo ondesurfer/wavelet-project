@@ -10,6 +10,7 @@
 		<!--include scripts and libraries-->
 		<script src="d3.js"></script>
 		<script src="math.js"></script>
+		<script src="math2.js"></script>
 		<script src="matrixOperations.js"></script>
 		<script src="pointEvaluation.js"></script>
 		<script src="function-plot.js"></script>
@@ -156,7 +157,7 @@
 						console.log("Derivative order: " + mu);
 						console.log("Coefficients: " + c);
 						
-						values = iterativePointEvaluation(c, N_0, mu);
+						values = iterativePointEvaluation2(c, N_0, mu);
 						//printMatrix(values);
 						
 						var plotInstance = functionPlot({
