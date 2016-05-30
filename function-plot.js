@@ -1221,6 +1221,7 @@ module.exports = function (options) {
     instance.emit('before:draw')
     instance.syncOptions()
     instance.updateAxes()
+    instance.emit('during:draw')
     instance.buildContent()
     instance.emit('after:draw')
   }

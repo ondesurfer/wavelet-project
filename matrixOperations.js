@@ -1,6 +1,6 @@
 /** This file contains functions for matrix manipulations
  *
- *	(last modification: 12.5.16 Andreas)
+ *	(last modification: 13.5.16 Andreas)
  */
 
 /**Search pivot-elements of a matrix.
@@ -144,6 +144,7 @@ function coeffsToMatrix(a) {
  * @return{Array} mat the matrix with the sorted coefficients
  */
 function coeffsToMatrix2(akk, mu) {
+
 	var N = akk.length;
 	var pow2_minus_mu = Math.pow(2, -mu);
 	var mat2 = createArray(N - 2, N - 2);
@@ -220,62 +221,6 @@ function createArray(length1, length2) {
 
 	//printMatrix(array);
 	return array;
-}
-
-/** Test the coefficients for being Daubechies-Wavelet-coefficients:
- * 	- their sum should be 2,
- *  - the sum over their squares should be also 2 and
- *  - sum(a(l) * a(l - 2k)) = 0 for fixed k.
- * 	(last modification: 11.4.16 Andreas)
- * 
- *	@param{Array} a 	coefficients to be checked.
- * 	@param{int} n 		10^(-n) is the fault tolerance.
- * 
- * 	@return{boolean} true iff the coefficients pass the test.
- */
-function testCoeffs(a, n) {
-
-	var faultTolerance = Math.pow(10, -n);
-
-	var sum1 = 0;
-	//sum of the coefficients should be 2
-	var sum2 = 0;
-	//sum over the squares of the coefficients should be 2
-	for (var i = 0; i < a.length; i++) {
-		sum1 += a[i];
-		sum2 += (a[i] * a[i]);
-	}
-
-	//console.log(sum1);
-	//console.log(sum2);
-	if (Math.abs(sum1 - 2.0) > faultTolerance) {
-		return false;
-	}
-	if (Math.abs(sum2 - 2.0) > faultTolerance) {
-		return false;
-	}
-
-	//sum over a_l*a_(l-2k) should be 0 for all k!=0
-	var sum3;
-	
-	//the summand a_l*a_(l-2k) is != 0,
-	//if 0 <= l < a.length
-	//and 0 <= l - 2*k < a.length, thus k <= l/2,
-	//because supp(phi) lies completely in [0, N]
-	//(note that JavaScript starts at 0 for indexing)
-	for (var k = 1; k < a.length / 2; k++) {
-		sum3 = 0;
-		for (var l = 0; l < a.length; l++) {
-			if ((l - 2 * k) >= 0) {
-				sum3 += a[l] * a[l - 2 * k];
-			}
-		}
-		//console.log(sum3);
-		if (Math.abs(sum3) > faultTolerance) {
-			return false;
-		}
-	}
-	return true;
 }
 
 /** Compute the values of the wavelet at integer points by solving a linear
@@ -404,6 +349,38 @@ function ones(n) {
 	return A;
 }
 
+/** Create a vector of length n with all entries = 0.
+ * (last modification 17.5.16 Andreas) 
+ * 
+ *  @param{int} n size of the array.
+ * 
+ * 	@return{Array} A the matrix.
+ */
+function zerosVec(n) {
+	var A = new Array(n);
+	for (var i = 0; i < n; i++) {
+		A[i] = 0;
+	}
+
+	return A;
+}
+
+/** Multiply a vector of length n with a real scalar
+ *  (last modification Andreas 17.5.16)
+ * 
+ *  @param{Array} a 		the input vector. 
+ *  @param{float} lambda 	the input scalar.
+ *  
+ *  @return{Array} b		the product lambda * a.
+ */
+function mult(lambda, a){
+	var b = new Array(a.length);
+	for(i = 0; i < a.length; i++){
+		b[i] = a[i] * lambda; 
+	}
+	return b; 
+}
+
 /** Create the Vandermonde-matrix of size n.
  *	(last modification 3.5.16 Andreas)
  * 
@@ -444,22 +421,6 @@ function rot90(A) {
 	return B;
 }
 
-/** Computes the factorial of an integer.
- *  (last modification 3.5.16 Andreas)
- * 
- *   @param{int} n.
- * 
- *   @return{int} result n!.
- */
-function factorial(n) {
-	if(n==0){return 1;}
-	var result = n;
-	for(var i = n - 1; i > 1; i--) {
-		result = result * i;
-	}
-	return result;
-}
-
 /** Creates an array of integers from 1 to n.
  *  (last modification 3.5.16 Andreas)
  * 
@@ -470,7 +431,7 @@ function factorial(n) {
 function onetwothree(n){
 	//console.log(n);
 	var A = new Array(n);
-	for(var i = 0; i < n; i++){
+	for(i = 0; i < n; i++){
 		A[i] = i + 1;
 	}
 	return A;
@@ -502,4 +463,3 @@ function conv(a,b){
 	}
 	return c;
 }
-

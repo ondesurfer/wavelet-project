@@ -334,7 +334,7 @@ function iterativePointEvaluation(c, N, mu) {
  *  on 2^{-j} with refinement mask a within its compact support [0, a.length].
  *  (similar to the MatLab-reference-code)
  *
- *	(last modification: 27.4.16 Andreas)
+ *	(last modification: 30.5.16 Simon)
  *	@param{Array} 	a 		the refinement coefficients.
  * 	@param{int} 	j 		(1/2)^(-j) is the step size of the x-lattice.
  *  @param{int}		mu		the derivative order >= 0.
@@ -409,6 +409,60 @@ function iterativePointEvaluation2(a, j, mu) {
 				values[Math.pow(2, j - l - 1) * (2 * m + 1)][1] = result;
 			}
 		}
-		return values;
 	}
+	return values;
+}
+
+/** This method searches only a few nessecary values of a function in a  equally spaced grid.  
+ *	This makes the plot a lot faster
+ *
+ *	(last modification: 30.5.16 Simon)
+ *	@param{Array} 	allValues 	Input of all the values, which should be filtered
+ * 	@param{float} 	leftXvalue 		left border of the function plot
+ *  @param{float}	rightXvalue		right border of the function plot
+ *  @param{int} 	wantedNumOfValues  wanted Number of values in the interval leftXvalue..rightXvalue
+ * 
+ * 	@return{Array} 	values  
+ */
+
+function filter(leftXvalue, rightXvalue, allValues, wantedNumOfValues){
+			
+		//distance between x-values
+	var delta=allValues[1][0]-allValues[0][0];	
+		//Indices of the left and right xValue
+	var leftXindex=Math.floor((leftXvalue-allValues[0][0])/delta);
+	var rightXindex=Math.ceil((rightXvalue-allValues[0][0])/delta);
+		
+	//if the indices are out of border
+	if(leftXindex<0){leftXindex=0;}
+	if(rightXindex>=allValues.length){rightXindex=allValues.length-1;}
+		
+	//values in the allvalues array between right and left xValue
+	var numOfValues=rightXindex-leftXindex;
+
+	var step=numOfValues/(wantedNumOfValues-1);	
+	if (step<0.1){
+		console.log("Aufloesung zu niedrig");
+		return undefined;
+	}else{
+		step=Math.floor(step);
+	}
+		
+	if(step==0){step=1;}		
+		
+	var newNumOfValues= Math.ceil(numOfValues/step)+1;			
+	var newValues = createArray(newNumOfValues,2);
+			
+	var index = leftXindex;
+	for(var i=0;i<newValues.length-1;i++){
+		newValues[i][0]=allValues[index][0];
+		newValues[i][1]=allValues[index][1];
+		index += step;
+	}
+	
+	newValues[newValues.length-1][0]= allValues[rightXindex][0];		
+	newValues[newValues.length-1][1]= allValues[rightXindex][1];
+	
+	return newValues;
+	
 }
