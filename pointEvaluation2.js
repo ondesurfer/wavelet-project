@@ -22,8 +22,8 @@
 function waveletPointEvaluation(a, a_start, a_tilde, a_tilde_start, j){
 	var N = a.length - 1; //support of phi
 	var N_tilde = a_tilde.length - 1;  //support of phi-tilde
-	console.log("N_tilde", N_tilde);
-	var sf_values = iterativePointEvaluation2(a, j - 1, 0);
+	//console.log("N_tilde", N_tilde);
+	var sf_values = iterativePointEvaluation2(a, a_start, j - 1, 0);
 	var b_array = refCoeffstoWaveletCoeffs(a_tilde, a_tilde_start);
 	var b = b_array[0]; //achtung evtl. b zerstoert.
 	var b_start = b_array[1];
@@ -35,18 +35,17 @@ function waveletPointEvaluation(a, a_start, a_tilde, a_tilde_start, j){
 	var pow2_minusj_plus1 = 1/pow2_j_minus1;
 	
 	var wavelet_support = (N_tilde + N)/2;
-	console.log("wavelet_supp", wavelet_support);
+	//console.log("wavelet_supp", wavelet_support);
 	var values = createArray(wavelet_support * pow2_j + 1, 2);
 	
-	console.log("-a_start", -a_start);
-	console.log("-a_start", -a_start);	
+	//console.log("-a_start", -a_start);	
 	//console.log("pow2_j_plus1", pow2_j_plus1);
 	
 	for(var i = 0; i < values.length; i++){
 		values[i][0] = i/pow2_j + a_start;	
 	}
 	
-	console.log("values.length", values.length);	
+	// console.log("values.length", values.length);	
 	
 	var result = 0;		
 	for(var m = 0; m < values.length; m++){
@@ -60,14 +59,14 @@ function waveletPointEvaluation(a, a_start, a_tilde, a_tilde_start, j){
 		
 		for(var k = k1; k < k2 + 1; k++)
 		{	
-			console.log("m",m);
-			console.log("k1",k1);
-			console.log("k2",k2);
-			console.log("k", k);		
+			// console.log("m",m);
+			// console.log("k1",k1);
+			// console.log("k2",k2);
+			// console.log("k", k);		
 			// console.log("sf_values_index", m - pow2_j*k - pow2_j_minus1*a_start);
 			// result +=  b[k]*sf_values[m - pow2_j_minus1*k - pow2_j_minus1*a_start][1];
 			
-			console.log("sf_values_index", m - pow2_j*k);
+			//console.log("sf_values_index", m - pow2_j*k);
 			result +=  b[k]*sf_values[m - pow2_j_minus1*k][1];
 		}
 		values[m][1] = result;

@@ -334,8 +334,9 @@ function iterativePointEvaluation(c, N, mu) {
  *  on 2^{-j} with refinement mask a within its compact support [0, a.length].
  *  (similar to the MatLab-reference-code)
  *
- *	(last modification: 30.5.16 Simon)
+ *	(last modification: 27.4.16 Andreas)
  *	@param{Array} 	a 		the refinement coefficients.
+ *  @param{int}		a_start the start index of the refinement mask.
  * 	@param{int} 	j 		(1/2)^(-j) is the step size of the x-lattice.
  *  @param{int}		mu		the derivative order >= 0.
  * 
@@ -343,7 +344,7 @@ function iterativePointEvaluation(c, N, mu) {
  * 							function-values at these points in the form [x,y].
  */
 
-function iterativePointEvaluation2(a, j, mu) {
+function iterativePointEvaluation2(a, a_start, j, mu) {
 	var N = a.length - 1;
 	
 	if(N <= 0){
@@ -368,7 +369,7 @@ function iterativePointEvaluation2(a, j, mu) {
 	var pow2_j = Math.pow(2, j);
 	var values = createArray(N * pow2_j + 1, 2);
 	for(var i = 0; i < N * pow2_j + 1; i++){
-		values[i][0] = i/pow2_j;
+		values[i][0] = i/pow2_j + a_start;
 	}
 
 	if(N == 1){
@@ -413,14 +414,16 @@ function iterativePointEvaluation2(a, j, mu) {
 	return values;
 }
 
-/** This method searches only a few nessecary values of a function in a  equally spaced grid.  
- *	This makes the plot a lot faster
+/** This method searches only a few nessecary values of a function in a
+ *  qually spaced grid.  This makes the plot a lot faster.
  *
  *	(last modification: 30.5.16 Simon)
- *	@param{Array} 	allValues 	Input of all the values, which should be filtered
- * 	@param{float} 	leftXvalue 		left border of the function plot
- *  @param{float}	rightXvalue		right border of the function plot
- *  @param{int} 	wantedNumOfValues  wanted Number of values in the interval leftXvalue..rightXvalue
+ *	@param{Array} 	allValues 		Input of all the values, which should be
+ * 										filtered.
+ * 	@param{float} 	leftXvalue 		left border of the function plot.
+ *  @param{float}	rightXvalue		right border of the function plot.
+ *  @param{int} 	wantedNumOfValues  wanted Number of values in the interval
+ * 						leftXvalue..rightXvalue.
  * 
  * 	@return{Array} 	values  
  */
@@ -441,7 +444,7 @@ function filter(leftXvalue, rightXvalue, allValues, wantedNumOfValues){
 	var numOfValues=rightXindex-leftXindex;
 
 	var step=numOfValues/(wantedNumOfValues-1);	
-	if (step<0.1){
+	if (step<0.25){
 		console.log("Aufloesung zu niedrig");
 		return undefined;
 	}else{
