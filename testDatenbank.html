@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>New Web Project</title>
+	
+		 <script src="sql.js"></script>
+	</head>
+	<body>
+		<script>
+		
+		
+		var xhr = new XMLHttpRequest();
+		
+		//muss im gleichen Ordner wie die html-Datei liegen wegen 'Same-Origin-Policy'
+		//true steht fuer eine asynchrone Verarbeitung
+		xhr.open('GET', 'ScalingFunctions.sqlite', true);
+		
+		xhr.responseType = 'arraybuffer';
+		
+		
+		//onload wird durch xhr.send() aufgerufen
+		xhr.onload = function(e) {
+			//this.response ist die datei, die xhr.open	liefert als Objekt eines ArrayBuffer. 'this' bezieht sich auf xhr		
+  			var uInt8Array = new Uint8Array(this.response);
+  			//konstruiere ein Database-Objekt aus dem Uint8ArrayObjekt:
+  			var db = new SQL.Database(uInt8Array);
+  			var contents = db.exec("SELECT* FROM ScalingFunctionsSupp");
+  			console.log(contents);
+  			console.log(contents[0]);
+  			//Array mit den Werten vom Haar-Wavelet
+  			console.log(contents[0].values[0]);
+  			//Array mit den Werten vom Daub2-Wavelet
+  			console.log(contents[0].values[1]);
+  			document.speicher=contents[0].values[1];
+  			return null;
+  		};
+		
+		// die Anfrage wird gesandt
+		xhr.send();
+		
+		//Wie zum Teufel bekommt man die Werte aus der 'onload'-Variable raus? 
+		//1.Mloeglichkeit: ueber local-Storage, aber nur mit Strings moeglich...
+		
+		</script>
+		
+		<h1>New Web Project Page</h1>
+	</body>
+</html>
+
