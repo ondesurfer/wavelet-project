@@ -8,40 +8,70 @@
 		 <script src="sql.js"></script>
 	</head>
 	<body>
+		
+<form method="post" style="width: 177px">
+	<br />
+	symmetrie<br />
+	<input checked="checked" name="Radio2" style="width: 20px" type="radio" /> 
+	none<br />
+	<input name="Radio2" type="radio" value="V1" /> even<br />
+	<input name="Radio2" type="radio" /> odd</form>
+<form method="post" style="width: 177px">
+	<div id="Ebene1" style="position: absolute; width: 320px; height: 206px; z-index: 1; left: 248px; top: 17px">
+		<select name="Select1" style="width: 321px; height: 19px">
+		<option></option>
+		</select></div>
+	<input align="middle" checked="checked" name="Checkbox1" style="width: 24px; height: 23px" title="orthogonal translations" type="checkbox" value="orthogonal translations" visible="true" />orthogonal 
+	translations</form>
+<form action="" method="post" style="width: 181px">
+	spline<br />
+	<input checked="checked" name="Radio3" type="radio" /> egal<br />
+	<input name="Radio3" type="radio" /> yes<br />
+	<input name="Radio3" type="radio" /> no</form>
+<form method="post" style="width: 394px">
+	<input checked="checked" name="Text1" type="text" value="0" /> Exactness of 
+	polynomial approximation</form>
+
+
+
 		<script>
+				
+		function httpGetAsync(theUrl, callback){
+   			 var xmlHttp = new XMLHttpRequest();
+   			 xmlHttp.responseType = 'arraybuffer';
+   			 
+   			//wenn sich der Status aendert wird es bemerkt und die anonyme 
+   			//function in einem neuen Thread aufgerufen
+    		xmlHttp.onreadystatechange = function() { 
+    			//...und wenn die Bedingungen erfuellt wurden wird callback ausgefuehrt
+        		if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+            		callback(xmlHttp.response);
+    			}
+    		};
+    	xmlHttp.open("GET", theUrl, true); // true bedeutet, dass onreadystate in neuem thread aufgerufen wird
+    	xmlHttp.send(null);
+		}
+		 
 		
+		var db;
+		var contents;
 		
-		var xhr = new XMLHttpRequest();
+		function start(){			
+			//wird aufgerufen beim laden in einem anderen Thread aufgerufen.
+			var callback = function(str){
+				var uInt8Array = new Uint8Array(str);
+  				db = new SQL.Database(uInt8Array);
+  				contents = db.exec("SELECT * FROM ScalingFunctionsSupp");
+			};
+			httpGetAsync('ScalingFunctions.sqlite', callback);
+			
+					
+		}
+		start();
+		//Hier muss die Ausgabe etwas verzoegert stattfinden, da sonst die variablen db und contents noch nicht ueberschrieben sind.
+		setTimeout(function(){console.log(contents,db);},2000);
 		
-		//muss im gleichen Ordner wie die html-Datei liegen wegen 'Same-Origin-Policy'
-		//true steht fuer eine asynchrone Verarbeitung
-		xhr.open('GET', 'ScalingFunctions.sqlite', true);
-		
-		xhr.responseType = 'arraybuffer';
-		
-		
-		//onload wird durch xhr.send() aufgerufen
-		xhr.onload = function(e) {
-			//this.response ist die datei, die xhr.open	liefert als Objekt eines ArrayBuffer. 'this' bezieht sich auf xhr		
-  			var uInt8Array = new Uint8Array(this.response);
-  			//konstruiere ein Database-Objekt aus dem Uint8ArrayObjekt:
-  			var db = new SQL.Database(uInt8Array);
-  			var contents = db.exec("SELECT* FROM ScalingFunctionsSupp");
-  			console.log(contents);
-  			console.log(contents[0]);
-  			//Array mit den Werten vom Haar-Wavelet
-  			console.log(contents[0].values[0]);
-  			//Array mit den Werten vom Daub2-Wavelet
-  			console.log(contents[0].values[1]);
-  			document.speicher=contents[0].values[1];
-  			return null;
-  		};
-		
-		// die Anfrage wird gesandt
-		xhr.send();
-		
-		//Wie zum Teufel bekommt man die Werte aus der 'onload'-Variable raus? 
-		//1.Mloeglichkeit: ueber local-Storage, aber nur mit Strings moeglich...
+	
 		
 		</script>
 		
