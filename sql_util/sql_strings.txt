@@ -1,0 +1,12 @@
+Creation of a table for scaling functions with compact support:
+
+CREATE TABLE "ScalingFunctionsSupp" ("ID" INTEGER,"name" VARCHAR,
+"DOI" VARCHAR,"reference" VARCHAR,"mask" VARCHAR,
+"critical_Sobolev_exponent" DOUBLE DEFAULT (null) ,
+"critical_Hoelder_exponent" DOUBLE DEFAULT (null) ,
+"exactness_of_polynomial_approximation" INTEGER DEFAULT (null) ,
+"ID_of_dual_function" VARCHAR DEFAULT (null),
+"orthogonal_translations" BOOL DEFAULT (null) ,
+"spline_order" INTEGER DEFAULT (-1) ,
+"comment" TEXT DEFAULT (null),
+"symmetry" VARCHAR DEFAULT (null) )

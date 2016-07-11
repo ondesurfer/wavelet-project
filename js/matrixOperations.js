@@ -437,6 +437,25 @@ function onetwothree(n){
 	return A;
 }
 
+/**	Creates an array of integers with n + 1 entries and increment m
+ * 	beginning at a start integer.
+ *  (last modification 9.7.16 Andreas)
+ * 
+ * 	@param{int}	start	the integer to start with.
+ * 	@param{int} n		the number of entries.
+ * 	@param{int} m		the increment size.
+ * 	
+ * 	@param{return} A = [start, start + m, ..., start + n * m]
+ */
+
+function onemtwom(start,n,m){
+	//console.log(n);
+	var A = new Array(n);
+	for(i = 0; i < n + 1; i++){
+		A[i] = start + i*m;
+	}
+	return A;
+}
 /** Compute the discrete convolution of two vectors
  *  (last modification: 12.5.16 Andreas)
  * 

@@ -8,16 +8,16 @@
 		<meta name="author" content="Simon" />
 		<meta name="author" content="Andreas" />
 		<!--include scripts and libraries-->
-		<script src="d3.js"></script>
-		<script src="math.js"></script>
-		<script src="math2.js"></script>
-		<script src="mask.js"></script>
-		<script src="matrixOperations.js"></script>
-		<script src="pointEvaluation.js"></script>
-		<script src="pointEvaluation2.js"></script>
-		<script src="function-plot.js"></script>
-		<script src="numeric-1.2.6.js"></script>
-		<script src="gauss2.js"></script>
+		<script src="js/d3.js"></script>
+		<script src="js/math.js"></script>
+		<script src="js/math2.js"></script>
+		<script src="js/mask.js"></script>
+		<script src="js/matrixOperations.js"></script>
+		<script src="js/pointEvaluation.js"></script>
+		<script src="js/pointEvaluation2.js"></script>
+		<script src="js/function-plot.js"></script>
+		<script src="js/numeric-1.2.6.js"></script>
+		<script src="js/gauss2.js"></script>
 
 		<style>
 			input[type=text] {
@@ -66,8 +66,8 @@
 					 </form>
 			    </td>
 			    <td>
-					<form id="approx_order">
-						<label for="mt">Approximation Order:</label>
+					<form id="vanishing moments">
+						<label for="mt">Vanishing Moments:</label>
 						<input type="text" id="mt" size="4" value="2" >
 					 </form>	    	
 			    </td>
@@ -173,7 +173,7 @@
 			var c_tilde_start = 0;
 			var mu;	//derivation order
 			var m;	//BSpline order
-			var mt;	//approximation order of the dual BSpline
+			var mt;	//number of vanishing moments
 			var values;
 			var N_0 = 14;
 			//var N_max = 17;

@@ -81,6 +81,54 @@ function testOrthoCoeffs(a, n) {
 	return true;
 }
 
+/** Get the Daubechies-2N-mask
+* 	(last modification: 8.7.16 Andreas)
+*   @param{int} m 	order of Daubechies scaling function, 1 <= m <= 4
+*
+*   @return{Array} [a, a_start] a 		the coefficients of the mask,
+* 								a_start the start index of the refinement mask. 
+*/
+function getDaubCoeffs(m){
+	var ac;
+	switch(m) {
+		case 1:
+        	ac = [1, 1];
+        	break;
+		case 2:
+        	ac = [(1+Math.sqrt(3))/4,(3+Math.sqrt(3))/4,(3-Math.sqrt(3))/4,
+        		  (1-Math.sqrt(3))/4];
+        	break;
+    	case 3:
+	        var theta = Math.sqrt(5+2*Math.sqrt(10));
+	        ac=[(1+Math.sqrt(10)+theta)/16,
+	           (5+Math.sqrt(10)+3*theta)/16,
+	           (5-Math.sqrt(10)+theta)/8,
+	           (5-Math.sqrt(10)-theta)/8,
+	           (5+Math.sqrt(10)-3*theta)/16,
+	           (1+Math.sqrt(10)-theta)/16];
+	        break;
+    	case 4:
+	        var u=700+210*Math.sqrt(15);
+	        var v=(28+6*Math.sqrt(35))*Math.pow(u,(1/3))-70*Math.pow(2,(1/3))
+	        		+Math.pow((2*u),(2/3));
+	        var s=(Math.pow(56*u,(1/3))*Math.sqrt(v)+70*Math.pow(2,(1/3))
+	        		*Math.sqrt(v)-Math.pow((2*u),(2/3))*Math.sqrt(v)
+	        		+12*Math.pow(u,(1/3))*Math.sqrt(35*v)+336*Math.sqrt(3*u)
+	        		+48*Math.sqrt(105*u))/(Math.pow(u,(1/3))*Math.sqrt(v));
+	            	
+	        var alpha=0.5+0.5*Math.sqrt(35)+Math.sqrt(3*v/Math.pow(u,(1/3)))/
+	        			6+Math.sqrt(3*s)/6;
+	        console.log("u,v,s,alpha");
+	        console.log(u,v,s,alpha);
+	        ac=mult(1/32, conv([1,4,6,4,1],[alpha,2-Math.sqrt(140)+5/
+	        		alpha,2+Math.sqrt(140)-alpha,-5/alpha]));
+	        break;
+	    default: 
+        	console.log('illegal order m');
+	}
+	return ac;
+}
+
 /** Generate cardinal B-Spline-mask of order d.
  *  (last modification: 18.5.16 Andreas)
  *

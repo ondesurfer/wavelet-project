@@ -3,13 +3,11 @@
  *	(last modification: 1.7.16 Simon)
  */
 
-
-
 /** loads the database named './ScalingFunctions.sqlite' (must exist in the same folder as the html-file) in a new thread
  *  (last modification: 1.7.16 Simon)
  * 
  */	
-	function loadDB(){
+function loadDB(){
 		
 		//builds an HttpRequest on 'theUrl' and runs the 'callback' function with the content of the HttpRequest response
 		function httpGetAsync(theUrl, callback){
