@@ -161,7 +161,7 @@
  * 	warning: there is no test if the input is right. The input format must be "1.23; 4.56; ... ; 7.89"
  *  (last modification: 1.7.16 Simon)
  * 
- *	@param{String} coeffsAsString  	String only containing numbers an ";"
+ *	@param{String} coeffsAsString  	String only containing numbers an ","
  * 
  * 	@return{array} array  Array containing the numbers
  */
@@ -172,7 +172,7 @@
 			var array=new Array();
 			for(i=0; i<coeffsAsString.length; i++){
 				
-				if(coeffsAsString.charAt(i)==";"){
+				if(coeffsAsString.charAt(i)==","){
 					var number=parseFloat(str.trim());
 					array.push(number);
 					str="";
