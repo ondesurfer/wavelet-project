@@ -5,14 +5,16 @@
 
 /**
  * Generate a sql-string for creating a row-entry
+ * (last modification: 15.7.16 Andreas)
  * 
  * 	@param{String}  table name
  * 
- *	@param{int} 	ID 		
+ *	@param{int} 	ID
  * 	@param{String} 	name
  *  @param{String}	DOI
  * 	@param{String}	reference
  * 	@param{Array}	mask
+ * 	@param{int}		a_start
  * 	@param{float}	critical Sobolev exponent
  * 	@param{float}	critical Hoelder exponent
  * 	@param{int}		exactness of polynomial approximation
@@ -25,10 +27,11 @@
  * 	@return{String} the sql-string for row-creation	
  *  
  */
-function genRowString(table_name, ID, name, DOI, reference, mask, critical_Sobolev_exponent,
-	critical_Hoelder_exponent, exactness_of_poly_approx, ID_dual, orth_transl,
-	spline_order, comment, symmetry){
-	var a = [ID, name, DOI, reference, mask, critical_Sobolev_exponent,
+function genRowString(table_name, ID, name, DOI, reference, mask, a_start,
+	critical_Sobolev_exponent, critical_Hoelder_exponent,
+	exactness_of_poly_approx, ID_dual, orth_transl, spline_order, comment,
+	symmetry){
+	var a = [ID, name, DOI, reference, mask, a_start, critical_Sobolev_exponent,
 	critical_Hoelder_exponent, exactness_of_poly_approx, ID_dual, orth_transl,
 	spline_order, comment, symmetry];
 	var sqlstr = "INSERT INTO " + table_name + " VALUES (" + a.toString() + ");";
@@ -51,6 +54,7 @@ function genRowString(table_name, ID, name, DOI, reference, mask, critical_Sobol
  * 		approx_order_4_dual_scaling_function
  * 		...
  * 	...
+ *  (last modification: 15.7.16 Andreas)
  * 
  *  @param{int} start_ID	the ID to start with.
  *  @param{int}	N			the maximal order of a generated spline-entry.
@@ -68,9 +72,10 @@ function genSplineScalingString(ID_start, N, M){
 	var DOI = "NULL";
 	var reference = "NULL";
 	var mask;
+	var a_start = 0;
 	var critical_Sobolev_exponent = 0;
 	var critical_Hoelder_exponent = 0;
-	var exactness_of_poly_approx = "NULL";
+	var exactness_of_poly_approx = 0;
 	var ID_dual;
 	var orth_transl = 1;
 	var spline_order;
@@ -80,20 +85,22 @@ function genSplineScalingString(ID_start, N, M){
 	var ID_primal;
 	for(var i=1; i < N + 1; i++){
 		ID_primal = ID;
-		name = "\'(" + i + ")-Daubechies\'";
+		name = "\'(" + i + ")-BSpline\'";
 		// DOI = "NULL";
 		// reference = "NULL";
-		mask = "\'" + genBSplineCoeffs(i)[0].toString() + "\'";
+		var a_t = genBSplineCoeffs(i);
+		mask = "\'" + a_t[0].toString() + "\'";
+		a_start = a_t[1];
 		// critical_Sobolev_exponent = 0;
 		// critical_Hoelder_exponent = 0;
-		exactness_of_poly_approx = "NULL";
+		exactness_of_poly_approx = 0;
 		ID_dual = onemtwom(ID + 1, M - 1, 1);
 		ID_dual = "\'" + ID_dual.toString() + "\'";
 		spline_order = i;
 		symmetry = "\'even\'";
 		//create the primal scaling function entry
 		sqlstr += genRowString(table_name, ID, name, DOI, reference, mask,
-			critical_Sobolev_exponent, critical_Hoelder_exponent,
+			a_start, critical_Sobolev_exponent, critical_Hoelder_exponent,
 			exactness_of_poly_approx, ID_dual, orth_transl,
 			spline_order, comment, symmetry);
  		
@@ -105,7 +112,9 @@ function genSplineScalingString(ID_start, N, M){
 		for(j; j < 2*M + 1; j += 2){
 			ID++;
 			name = "\'(" + i + "," + j + ")-dual-BSpline\'";
-			mask = "\'" + genDualBSplineCoeffs(i,j).toString() + "\'";
+			a_t = genDualBSplineCoeffs(i,j);
+			mask = "\'" + a_t[0].toString() + "\'";
+			a_start = a_t[1];
 			exactness_of_poly_approx = j;
 			ID_dual =  "\'" + ID_primal + "\'";
 			//orth_transl = true;
@@ -113,7 +122,7 @@ function genSplineScalingString(ID_start, N, M){
 			comment = "NULL";
 			symmetry = "\'even\'";
 			sqlstr += genRowString(table_name, ID, name, DOI, reference, mask,
-			critical_Sobolev_exponent, critical_Hoelder_exponent,
+			a_start, critical_Sobolev_exponent, critical_Hoelder_exponent,
 			exactness_of_poly_approx, ID_dual, orth_transl,
 			spline_order, comment, symmetry);
 		}
@@ -126,6 +135,7 @@ function genSplineScalingString(ID_start, N, M){
 /**
  *  Generate a sql-string to generate DB-entries with
  *  all Daubechies Scaling functions with Daubechies-number 2, ... , 2N.
+ *  (last modification: 15.7.16 Andreas)
  *  
  *  @param{int} start_ID	the ID to start with.
  *  @param{int}	N			the Daubechies-number.
@@ -142,9 +152,10 @@ function genDaubechiesScalingString(ID_start, N){
 	var DOI = "NULL";
 	var reference = "NULL";
 	var mask;
+	var a_start = 0;
 	var critical_Sobolev_exponent = 0;
 	var critical_Hoelder_exponent = 0;
-	var exactness_of_poly_approx = "NULL";
+	var exactness_of_poly_approx = 0;
 	var ID_dual = "NULL";
 	var orth_transl = 1;
 	var spline_order = -1;
@@ -161,11 +172,27 @@ function genDaubechiesScalingString(ID_start, N){
 		
 		//create the primal scaling function entry
 		sqlstr += genRowString(table_name, ID, name, DOI, reference, mask,
-			critical_Sobolev_exponent, critical_Hoelder_exponent,
+			a_start, critical_Sobolev_exponent, critical_Hoelder_exponent,
 			exactness_of_poly_approx, ID_dual, orth_transl,
 			spline_order, comment, symmetry);
 		
 		ID++;
 	}
 	return sqlstr;
+}
+
+/**
+ *  Generate a sql-string to manually change a whole column of the db.
+ *  (last modification: 15.7.16 Andreas)
+ *  
+ *  @param{String} column_name	the name of the column to change.
+ *  @param{Array}  input		the input array (each entry corresponds to a
+ *  							row).
+ * 
+ *  @return{String} sqlstr 	a string that contains all necessary sql-commands
+ * 							to change a column to contain the given input.
+ */
+
+function changeColumn(column_name, input){
+	// TODO
 }

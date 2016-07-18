@@ -13,14 +13,11 @@
 		document.getElementById('input3').onchange=updateList;
 		document.getElementById('input4').onchange=updateList;
 		
-		
 		//cleans the info field and the function plot if the choosen scalingfunction is changed
 		document.getElementById('select3').onchange=function(){
 			cleanPlotAndInfo();
 			
 		};
-		
-				
 		
 		//adds the showInformation function to the showInformation button 
 		document.getElementById('input5').onclick = function() { 			
@@ -68,7 +65,7 @@
 			cond[2] = [document.getElementById('input1').name, document.getElementById('input1').value];
 			cond[3] = [document.getElementById('input2').name, document.getElementById('input2').value];
 			cond[4] = [document.getElementById('input3').name, document.getElementById('input3').value];
-			cond[5] =  [document.getElementById('input4').name, document.getElementById('input4').value];
+			cond[5] = [document.getElementById('input4').name, document.getElementById('input4').value];
 			
 			var str= generateSQLCommand(cond);
 			var newstr= "SELECT * FROM ScalingFunctionsSupp" + str;
@@ -108,9 +105,7 @@
 		function fillList(database){
 			var dropDB = document.getElementById('select3');
 			//delete all elements
-			for(var i =0; i<dropDB.length+1; i++){
-				dropDB.remove(0);				
-			}
+			dropDB.length = 0;
 			//check if there is at leas one element in the new database
 			if(database[0]!=undefined){
 				//add all elements to the list

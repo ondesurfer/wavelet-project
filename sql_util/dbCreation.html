@@ -15,9 +15,30 @@
 	</head>
 	<body>
 		<script>
-		console.log(genSplineScalingString(6, 2, 3));
-
-		//console.log(genDaubechiesScalingString(2, 4));
+		var str_create_SF_supp_Table = "CREATE TABLE"+
+		"\"ScalingFunctionsSupp\" ("+
+		"\"ID\" INTEGER,"+
+		"\"name\" VARCHAR,"+
+		"\"DOI\" VARCHAR,"+
+		"\"reference\" VARCHAR,"+
+		"\"mask\" VARCHAR,"+
+		"\"a_start\" INTEGER DEFAULT (0),"+
+		"\"critical_Sobolev_exponent\" DOUBLE DEFAULT (null) ,"+
+		"\"critical_Hoelder_exponent\" DOUBLE DEFAULT (null) ,"+
+		"\"exactness_of_polynomial_approximation\" INTEGER DEFAULT (null) ,"+
+		"\"ID_of_dual_function\" VARCHAR DEFAULT (null),"+
+		"\"orthogonal_translations\" BOOL DEFAULT (null) ,"+
+		"\"spline_order\" INTEGER DEFAULT (-1) ,"+
+		"\"comment\" TEXT DEFAULT (null),"+
+		"\"symmetry\" VARCHAR DEFAULT (null) );";
+		
+		// add Daubechies SF
+		str_create_SF_supp_Table += genDaubechiesScalingString(1, 4);
+		
+		// add cardinal BSpline SF
+		str_create_SF_supp_Table += genSplineScalingString(5, 2, 3)
+		
+		console.log(str_create_SF_supp_Table);
 		</script>
 	</body>
 </html>
