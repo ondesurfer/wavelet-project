@@ -83,7 +83,7 @@ function genSplineScalingString(ID_start, N, M){
 		name = "\'(" + i + ")-Daubechies\'";
 		// DOI = "NULL";
 		// reference = "NULL";
-		mask = "\'" + genBSplineCoeffs(i).toString() + "\'";
+		mask = "\'" + genBSplineCoeffs(i)[0].toString() + "\'";
 		// critical_Sobolev_exponent = 0;
 		// critical_Hoelder_exponent = 0;
 		exactness_of_poly_approx = "NULL";

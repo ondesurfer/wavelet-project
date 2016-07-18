@@ -32,8 +32,11 @@
 		document.getElementById('input6').onclick = function(event) {
 				event.preventDefault();
 				//Fehlerabfrage nötig!!
-				var c=getCoeffs(document.getElementById('select3').value);
-				var c_start=0;
+				var c_t=getCoeffs(document.getElementById('select3').value);
+				var c = c_t[0];
+				var c_start = c_t[1];
+				console.log("c", c);
+				console.log("c_start", c_start);
 				var N_0=10;
 				var mu=0;
 				//calculates the new scaling-function values and saves it globally
@@ -195,19 +198,23 @@
         		}  		
    			}
 		
-	/** returns the coefficients of the scalingfunction as an array of numbers 
+/** returns the coefficients of the scalingfunction as an array of numbers 
  * which were stored as one String in the database
  *  (last modification: 1.7.16 Simon)
  * 
  *	@param{integer} idOfScf 	id of the scalingfunction
  * 
- * 	@return{array} array  Array containing scalingfunction-coefficients
+ * 	@return{array} [a, a_start]  Array containing scalingfunction-coefficients
+ 								 and the start index a_start
  */			
-		function getCoeffs(idOfScf){
-			var coeffsAsString = db.exec("SELECT mask FROM ScalingFunctionsSupp WHERE id="+idOfScf)[0].values[0][0];		
-			return stringToNoArray(coeffsAsString);
-		}
-		
+	function getCoeffs(idOfScf){
+		var coeffsAsString = db.exec("SELECT mask FROM ScalingFunctionsSupp "+
+				"WHERE id="+idOfScf)[0].values[0][0];
+		var a = stringToNoArray(coeffsAsString);
+		a_start = db.exec("SELECT a_start FROM ScalingFunctionsSupp "+
+				"WHERE id="+idOfScf)[0].values[0][0];
+		return [a, a_start];
+	}
 		
 /** Converts a String of the form "1, 2, 3; 4" to an array as [1;2;3;4].
  * 	warning: there is no test if the input is right. The input format must be "1.23, 4.56; ... ; 7.89"
