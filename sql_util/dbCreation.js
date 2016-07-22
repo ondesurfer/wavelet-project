@@ -38,10 +38,82 @@ function genRowString(table_name, ID, name, DOI, reference, mask, a_start,
 	return sqlstr;    	
 }
 
+
+/**
+ *  Generate a sql-string to generate a DB-entriey for a
+ *  CDF-scaling-functions (CDF-SFs)
+ *  (last modification: 22.7.16 Andreas)
+ * 
+ *  @param{int} ID
+ *  @param{int} ID_primal	the ID of the primal Cardinal-BSpline-SF
+ *  @param{int} m			the spline order of the primal Cardinal-BSpline-SF.
+ *  @param{int}	mt			the approximation order.
+ *  
+ *  @return{String} sqlstr 	a string that contains all necessary sql-commands
+ * 							to create a row-entry for a CDF-scaling-function.
+ */
+
+function genCDFString(table_name, ID, ID_primal, m, mt){
+	var name = "\'(" + m + "," + mt + ")-CDF\'";
+	var DOI = "NULL";
+	var reference = "NULL";
+	var a_t = genDualBSplineCoeffs(m,mt);
+	var mask = "\'" + a_t[0].toString() + "\'";
+	var a_start = a_t[1];
+	var critical_Sobolev_exponent = 0;
+	var critical_Hoelder_exponent = 0;
+	var exactness_of_poly_approx = mt;
+	var ID_dual =  "\'" + ID_primal + "\'";
+	var orth_transl = 1;
+	var spline_order = - 1;
+	var comment = "NULL";
+	var symmetry = "\'even\'";
+	
+	return genRowString(table_name, ID, name, DOI, reference, mask,
+	a_start, critical_Sobolev_exponent, critical_Hoelder_exponent,
+	exactness_of_poly_approx, ID_dual, orth_transl, spline_order, comment,
+	symmetry);
+}
+
+/**
+ *  Generate a sql-string to generate a DB-entriey with a
+ *  Cardinal-BSpline-functions
+ *  (last modification: 22.7.16 Andreas)
+ * 
+ *  @param{int} 	ID
+ *  @param{Array}	ID_dual		list with IDs of the corresponding CDF-SFs.
+ *  @param{int} 	m			the spline order.
+ *  
+ *  @return{String} sqlstr 	a string that contains all necessary sql-commands
+ * 							to create a row-entry for a CDF-scaling-function.
+ */
+
+function genCardinalBSplineString(table_name, ID, ID_dual, m){
+	var name = "\'(" + m + ")-BSpline\'";
+	var DOI = "NULL";
+	var reference = "NULL";
+	var a_t = genBSplineCoeffs(i);
+	var mask = "\'" + a_t[0].toString() + "\'";
+	var a_start = a_t[1];
+	var critical_Sobolev_exponent = 0;
+	var critical_Hoelder_exponent = 0;
+	var exactness_of_poly_approx = m - 1;
+	ID_dual = "\'" + ID_dual.toString() + "\'";
+	var orth_transl = 1;
+	spline_order = m;
+	var comment = "NULL";
+	symmetry = "\'even\'";
+	
+	return genRowString(table_name, ID, name, DOI, reference, mask,
+			a_start, critical_Sobolev_exponent, critical_Hoelder_exponent,
+			exactness_of_poly_approx, ID_dual, orth_transl, spline_order, comment,
+			symmetry);
+}
+
 /**
  *  Generate a sql-string to generate DB-entries with
  *  all Spline Scaling functions with order m =  1, ... , N and approximation order
- *  of their dual scaling function
+ *  of their dual scaling function (CDF-SF)
  *  mt = 1, 3, 5, ... , (2M - 1) for m odd 
  *  mt = 2, 4, 6, ... , (2M) for m even
  *  in the following way:
@@ -54,7 +126,7 @@ function genRowString(table_name, ID, name, DOI, reference, mask, a_start,
  * 		approx_order_4_dual_scaling_function
  * 		...
  * 	...
- *  (last modification: 15.7.16 Andreas)
+ *  (last modification: 22.7.16 Andreas)
  * 
  *  @param{int} start_ID	the ID to start with.
  *  @param{int}	N			the maximal order of a generated spline-entry.
@@ -65,66 +137,22 @@ function genRowString(table_name, ID, name, DOI, reference, mask, a_start,
  * 							functions and their dual functions.
  */
 function genSplineScalingString(ID_start, N, M){
-	var sqlstr="";
+	var sqlstr ="";
 	var ID = ID_start;
 	var table_name = "\"ScalingFunctionsSupp\"";
-	var name = "\'BSpline\'";
-	var DOI = "NULL";
-	var reference = "NULL";
-	var mask;
-	var a_start = 0;
-	var critical_Sobolev_exponent = 0;
-	var critical_Hoelder_exponent = 0;
-	var exactness_of_poly_approx = 0;
-	var ID_dual;
-	var orth_transl = 1;
-	var spline_order;
-	var comment = "NULL";
-	var symmetry;
-	
 	var ID_primal;
-	for(var i=1; i < N + 1; i++){
+	for(var m=1; m < N + 1; m++){
 		ID_primal = ID;
-		name = "\'(" + i + ")-BSpline\'";
-		// DOI = "NULL";
-		// reference = "NULL";
-		var a_t = genBSplineCoeffs(i);
-		mask = "\'" + a_t[0].toString() + "\'";
-		a_start = a_t[1];
-		// critical_Sobolev_exponent = 0;
-		// critical_Hoelder_exponent = 0;
-		exactness_of_poly_approx = 0;
 		ID_dual = onemtwom(ID + 1, M - 1, 1);
-		ID_dual = "\'" + ID_dual.toString() + "\'";
-		spline_order = i;
-		symmetry = "\'even\'";
-		//create the primal scaling function entry
-		sqlstr += genRowString(table_name, ID, name, DOI, reference, mask,
-			a_start, critical_Sobolev_exponent, critical_Hoelder_exponent,
-			exactness_of_poly_approx, ID_dual, orth_transl,
-			spline_order, comment, symmetry);
+		sqlstr += genCardinalBSplineString(table_name, ID, ID_dual, m);
  		
-		var j = 1;
-		if(i % 2 == 0){
-			j++;
-		}
+		// mt >= m
+		var mt = m;
 		
-		for(j; j < 2*M + 1; j += 2){
+		for(var j=0; j < M; j++){
 			ID++;
-			name = "\'(" + i + "," + j + ")-dual-BSpline\'";
-			a_t = genDualBSplineCoeffs(i,j);
-			mask = "\'" + a_t[0].toString() + "\'";
-			a_start = a_t[1];
-			exactness_of_poly_approx = j;
-			ID_dual =  "\'" + ID_primal + "\'";
-			//orth_transl = true;
-			spline_order = i;
-			comment = "NULL";
-			symmetry = "\'even\'";
-			sqlstr += genRowString(table_name, ID, name, DOI, reference, mask,
-			a_start, critical_Sobolev_exponent, critical_Hoelder_exponent,
-			exactness_of_poly_approx, ID_dual, orth_transl,
-			spline_order, comment, symmetry);
+			sqlstr += genCDFString(table_name, ID, ID_primal, m, mt);
+			mt += 2;
 		}
 		
 		ID++;
@@ -163,10 +191,11 @@ function genDaubechiesScalingString(ID_start, N){
 	var symmetry = "\'none\'";
 	
 	for(var i=1; i < N + 1; i ++){
-		name = "\'(" + 2*i + ")-Daubechies\'";
+		name = "\'(" + i + ")-Daubechies\'";
 		// DOI = "NULL";
 		// reference = "NULL";
 		mask = "\'" + getDaubCoeffs(i).toString() + "\'";
+		exactness_of_poly_approx = 2*i;
 		// critical_Sobolev_exponent = 0;
 		// critical_Hoelder_exponent = 0;
 		
