@@ -32,11 +32,18 @@
 		"\"comment\" TEXT DEFAULT (null),"+
 		"\"symmetry\" VARCHAR DEFAULT (null) );";
 		
+		// add Haar SF
+		str_create_SF_supp_Table += genRowString("\"ScalingFunctionsSupp\"",
+				1, "\"Haar\"", "NULL", "NULL", "\'1,1\'",
+				0, 0.5, 0,
+				1, "NULL", 1, -1, "NULL",
+				"\"none\"");
+		
 		// add Daubechies SF
-		str_create_SF_supp_Table += genDaubechiesScalingString(1, 4);
+		str_create_SF_supp_Table += genDaubechiesScalingString(2, 4);
 		
 		// add cardinal BSpline SF
-		str_create_SF_supp_Table += genSplineScalingString(5, 2, 4)
+		str_create_SF_supp_Table += genSplineScalingString(6, 2, 4)
 		
 		console.log(str_create_SF_supp_Table);
 		</script>

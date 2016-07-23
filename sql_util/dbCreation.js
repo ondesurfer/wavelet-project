@@ -195,7 +195,7 @@ function genDaubechiesScalingString(ID_start, N){
 		// DOI = "NULL";
 		// reference = "NULL";
 		mask = "\'" + getDaubCoeffs(i).toString() + "\'";
-		exactness_of_poly_approx = 2*i;
+		exactness_of_poly_approx =i;
 		// critical_Sobolev_exponent = 0;
 		// critical_Hoelder_exponent = 0;
 		
