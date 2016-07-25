@@ -119,7 +119,6 @@
 
 			<div>
 				<select name="select3" id="select3">
-					<option></option>
 				</select>
 			</div>
 
@@ -145,13 +144,21 @@
 		<p>
 			<b>Plot of the choosen scaling function:</b>
 		</p>
-		<div id="plot1"></div>
+		<div id="plot1"> </div>
 
-
+		
 		<p>
-			<b>Plot of the choosen derivative:</b>
+				Show derivative: <input type="checkbox" id="check1" name="show derivative">
 		</p>
-		<div id="plot2"></div>
+		
+		<div id="plot2Area"  style="display:none">	
+			<p> Enter derivative order: <input name="derivative_order=" type="text" value="0"
+					id="input7" />
+			</p>
+			<b>Plot of the choosen derivative:</b>			
+			<div id="plot2"> </div>
+		</div>
+		
 		</section>
 
 
@@ -161,10 +168,10 @@
 	</div>
 
 	<script>
-		//unschoen: auf diese variable bezieht sich immer der zoom Filter.
-		valuesScf=[[0],[0]];
-		valuesDer=[[0],[0]];
-				
+		//global variables containing the points of the ScalingFunctionPlot, Derivate-Plot and Wavelet-Plot
+		valuesScf=[];
+		valuesDer=[];
+			
 		//loads the database. (See dbMethods.js)
 		loadDB();
 		//links the Html elements to their functions. (See htmlElementFunctions.js)

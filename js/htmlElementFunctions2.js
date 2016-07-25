@@ -26,34 +26,48 @@
 			};
 		
 		//following is added to the plot button: calculate
-		document.getElementById('input6').onclick = function(event) {
-				event.preventDefault();
-				//Fehlerabfrage nötig!!
+		document.getElementById('input6').onclick = function() {
+				//Fehlerabfrage noetig!!
 				var c_t=getCoeffs(document.getElementById('select3').value);
-				var c = c_t[0];
-				var c_start = c_t[1];
-				console.log("c", c);
-				console.log("c_start", c_start);
-				var N_0=10;
-				var mu=0;
-				//calculates the new scaling-function values and saves it globally
-				valuesScf = iterativePointEvaluation2(c, c_start, N_0,	mu);
-				//updates the data of the plotInstance1 object
-				plotInstance1.draw();
+				//calculates the new derivative values and saves it globally
+				valuesScf = iterativePointEvaluation2(c_t[0],c_t[1], 14, 0);
+				//updates the data of the plotInstance2 object
+				plotInstance1.draw();	
 							
 			};
+		
+		//displays/hides the plot2Area when the checkBox is changed	
+		document.getElementById('check1').onchange = function() {
+  			if(document.getElementById('check1').checked){
+  				document.getElementById('plot2Area').style.display = 'block';
+  			}
+  			else{
+  				document.getElementById('plot2Area').style.display = 'none';
+  			}
+		};
+		
+		//calculates the derivation points and plots them, if the derivation order input-textfield is changed
+		document.getElementById('input7').onchange=function(){		
+				//Fehlerabfrage noetig!!
+				var c_t=getCoeffs(document.getElementById('select3').value);
+				//calculates the new derivative values and saves it globally
+				valuesDer = iterativePointEvaluation2(c_t[0],c_t[1], 14, parseInt(document.getElementById('input7').value));
+				//updates the data of the plotInstance2 object
+				plotInstance2.draw();	
+		};
 	}
-/** resets the string in the textArea and sets the points of the plots to [[0],[0]]
+/** resets the string in the textArea and sets the points of the plots to []
  *  (last modification: 15.7.16 Simon)
  */			
 		function cleanPlotAndInfo(){
 			document.getElementById('textarea1').value="";
-			valuesScf=[[0],[0]];
-			valuesDer=[[0],[0]];
+			valuesScf=[];
+			valuesDer=[];
 			plotInstance1.draw();
 			plotInstance2.draw();
 		}
 		
+			
 /** updates the List containing the scalingfunctions complying the conditions given in the html elements
  *  (last modification: 1.7.16 Simon)
  */			
@@ -172,24 +186,22 @@
 // zoomFilterScf refers to the values 'valuesScf' and zoomFilterDer refers to 'valuesDer'
 		function zoomFilterScf(){
 				var xDomain=this.options.xDomain;	
-				var newPoints=filter(xDomain[0],xDomain[1],valuesScf,700);
+				var newPoints=filter(xDomain[0],xDomain[1],valuesScf,1000);
 				if(newPoints==undefined){
-					console.log("No more detailled points available. Please zoom out.");
-					//alert("No more detailled points available. Please zoom out.");
+					//console.log("No more detailled points available. Please zoom out.");
+					alert("No more detailled points available. Please zoom out.");
 				}else{		
         			this.options.data[0].points= newPoints;
-        			//console.log("newPoints",newPoints);
         		}  		
    			}
    		function zoomFilterDer(){
 				var xDomain=this.options.xDomain;	
-				var newPoints=filter(xDomain[0],xDomain[1],valuesDer,700);
+				var newPoints=filter(xDomain[0],xDomain[1],valuesDer,1000);
 				if(newPoints==undefined){
-					console.log("No more detailled points available. Please zoom out.");
-					//alert("No more detailled points available. Please zoom out.");
+					//console.log("No more detailled points available. Please zoom out.");
+					alert("No more detailled points available. Please zoom out.");
 				}else{		
         			this.options.data[0].points= newPoints;
-        			//console.log("newPoints",newPoints);
         		}  		
    			}
 		
