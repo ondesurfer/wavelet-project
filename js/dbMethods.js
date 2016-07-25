@@ -32,6 +32,8 @@ function loadDB(){
 				var uInt8Array = new Uint8Array(str);
 				// do not use a 'var' here! So the database is saved as an global document. attribute
   				db = new SQL.Database(uInt8Array);
+  				//when the Database is loaded the list containing the scf is updated
+  				updateList();
 			};
 			httpGetAsync('./ScalingFunctions.sqlite', callback);				
 		}
