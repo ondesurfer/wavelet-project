@@ -61,6 +61,7 @@
  */			
 		function cleanPlotAndInfo(){
 			document.getElementById('textarea1').value="";
+			document.getElementById('input7').value="";
 			valuesScf=[];
 			valuesDer=[];
 			plotInstance1.draw();
@@ -72,6 +73,7 @@
  *  (last modification: 1.7.16 Simon)
  */			
 		function updateList(){
+			console.log("updateList1");
 			cleanPlotAndInfo();
 			var cond= new Array();
 			cond[0] = [document.getElementById('select1').name, document.getElementById('select1').value];
@@ -80,14 +82,15 @@
 			cond[3] = [document.getElementById('input2').name, document.getElementById('input2').value];
 			cond[4] = [document.getElementById('input3').name, document.getElementById('input3').value];
 			cond[5] = [document.getElementById('input4').name, document.getElementById('input4').value];
-			
+			console.log("updateList2");
 			var str= generateSQLCommand(cond);
 			var newstr= "SELECT * FROM ScalingFunctionsSupp" + str;
 			var currentdb = db.exec(newstr);
-			
+			console.log("updateList3");
 			//console.log(currentdb);	
 			//console.log(currentdb[0].values[zeile]);
 			fillList(currentdb);
+			console.log("updateList2");
 		}
 		
 /** generates an SQL command for the search of the database complying the condition given in the 'cond' Array
@@ -120,6 +123,7 @@
 			var dropDB = document.getElementById('select3');
 			//delete all elements
 			dropDB.length = 0;
+			console.log("fillList1");
 			//check if there is at leas one element in the new database
 			if(database[0]!=undefined){
 				//add all elements to the list
@@ -130,6 +134,7 @@
 					option.text = database[0].values[j][1];
 					dropDB.add(option);
 				}
+				console.log("fillList2");
 			}
 		}	
 
