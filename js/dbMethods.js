@@ -33,8 +33,68 @@ function loadDB(){
 				// do not use a 'var' here! So the database is saved as an global document. attribute
   				db = new SQL.Database(uInt8Array);
 			};
-			httpGetAsync('./ScalingFunctions.sqlite', callback);				
+			httpGetAsync('./ScalingFunctions.sqlite', callback);
 		}
 		
 		start();
+}
+
+/** generates an SQL command for filtering the database complying
+ * the condition given in the 'cond' Array.
+ * (last modification: 25.7.16 Andreas)
+ * 
+ * @param{Array}	cond	array conditions which should be complied
+ * 
+ * @param{String}	str		the SQL-filter-command after 'WHERE'
+ */
+function genSQLFilter(cond) {
+	str = "";
+	for (var i = 0; i < cond.length; i++) {
+		//(-2) means, that this condition should not be included in the search
+		if (cond[i][1] != -2) {
+			str = str + cond[i][0] + " " + cond[i][1] + " AND ";
+		}
+
+	}
+	//cut of the last 'AND':
+	str = str.slice(0, str.length - 5);
+	str = str + ";";
+	return str;
+}
+
+/** Create a SQL-String to get an DB-entry.
+ * (last modification: 25.7.16 Andreas)
+ * 
+ *  @param{String}	table_name
+ *  @param{String}	row_name
+ *  @param{String} 	conditions
+ *  Select row_name FROM table_name WHERE conditions.
+ *  
+ *  @return{String} sqlstr		SQL-String to get the entry
+ *  which satisfies the specified conditions.
+ */
+
+function getDBEntryString(table_name, row_name, conditions){
+	sqlstr = "SELECT " + row_name + " FROM "+ table_name+
+	" WHERE "+conditions;
+	return sqlstr;
+}
+
+/** Get a DB-entry with specified conditions.
+ *  (last modification: 25.7.16 Andreas)
+ * 
+ *  @param{String}	table_name
+ *  @param{String}	row_name
+ *  @param{int}  	ID
+ *  Select row_name FROM table_name WHERE id = ID.
+ *  
+ *  @return{Object} DB-entry
+ *  which satisfies the specified conditions.
+ */
+
+function getDBEntryByID(table_name, row_name, ID){
+	var sqlstr = getDBEntryString(table_name, row_name, "id = "+ID);
+	var scf = db.exec(sqlstr);
+	
+	return scf[0].values[0][0];
 }

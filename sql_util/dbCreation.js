@@ -38,7 +38,6 @@ function genRowString(table_name, ID, name, DOI, reference, mask, a_start,
 	return sqlstr;    	
 }
 
-
 /**
  *  Generate a sql-string to generate a DB-entriey for a
  *  CDF-scaling-functions (CDF-SFs)
@@ -92,7 +91,7 @@ function genCardinalBSplineString(table_name, ID, ID_dual, m){
 	var name = "\'(" + m + ")-BSpline\'";
 	var DOI = "NULL";
 	var reference = "NULL";
-	var a_t = genBSplineCoeffs(i);
+	var a_t = genBSplineCoeffs(m);
 	var mask = "\'" + a_t[0].toString() + "\'";
 	var a_start = a_t[1];
 	var critical_Sobolev_exponent = 0;
