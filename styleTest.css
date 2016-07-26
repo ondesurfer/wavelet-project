@@ -11,11 +11,28 @@ header, nav, footer, aside, section {
 }
 
 /*allgemeine Einstellungen*/
-
-
 div{
 	padding: 8px 8px 8px 8px;
 }
+
+#middle input{
+	font-size: 14px;
+	background-color: yellow;
+	border-radius: 5px;
+	padding: 8px 8px 8px 8px;
+}
+#middle select{
+   background: white;
+   width: 200px;
+   padding: 5px;
+   font-size: 14px;
+   line-height: 1;
+   border: 0;
+   border-radius: 5;
+   height: 34px;
+   -webkit-appearance: none;
+}
+
 
 p{
 	padding-left: 5px;
@@ -139,30 +156,13 @@ footer{
     margin-right: 195px;
 }
 
-#primalScalingFunctions{
-   background: white;
-   width: 268px;
-   padding: 5px;
-   font-size: 14px;
-   line-height: 1;
-   border: 0;
-   border-radius: 5;
-   height: 34px;
-   -webkit-appearance: none;
+#scfForm{
+	float: left;
 }
 
-#input5{
-	font-size: 18px;
-	background-color: yellow;
-	border-radius: 5px;
-	padding: 8px 8px 8px 8px;
-}
-#input6{
-	font-size: 18px;
-	background-color: yellow;
-	border-radius: 5px;
-	padding: 8px 8px 8px 8px;
-}
+
+
+
 
 
 
