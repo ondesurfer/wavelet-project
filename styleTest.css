@@ -94,7 +94,7 @@ footer{
 }
 
 /*Einstellungen einzelner Elemente*/
-#ueberschrift {
+#title {
     padding-top: 40px;
     font-size: 50pt;
     color: blue;
@@ -110,19 +110,19 @@ footer{
     background-color: red;
 }
 
-#icon1{
+#icon-introduction{
 	float: left;
 }
 
-#icon2{
+#icon-wavelet-plots{
 	float: left;
 }
 
-#icon3{
+#icon-database{
 	float: left;
 }
 
-#icon4{
+#icon-information{
 	float: left;
 }
 
@@ -156,7 +156,7 @@ footer{
     margin-right: 195px;
 }
 
-#scfForm{
+#form-scf{
 	float: left;
 }
 

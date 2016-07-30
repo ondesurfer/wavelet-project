@@ -6,31 +6,31 @@
 function setHtmlFunctions() {
 
 	// updates the List if any condition is changed
-	document.getElementById('select1').onchange = updateScfList;
-	document.getElementById('select2').onchange = updateScfList;
-	document.getElementById('input1').onchange = updateScfList;
-	document.getElementById('input2').onchange = updateScfList;
-	document.getElementById('input3').onchange = updateScfList;
-	document.getElementById('input4').onchange = updateScfList;
+	document.getElementById('select-orthogonal-translates').onchange = updateScfList;
+	document.getElementById('select-symmetry').onchange = updateScfList;
+	document.getElementById('input-exactness-poly-approx').onchange = updateScfList;
+	document.getElementById('select-critical-hoelder-exponent').onchange = updateScfList;
+	document.getElementById('select-critical-sobolev-exponent').onchange = updateScfList;
+	document.getElementById('select-spline-order').onchange = updateScfList;
 
 	// cleans the info field and the function plot if the choosen
 	// scalingfunction is changed
-	document.getElementById('primalScalingFunctions').onchange = function() {
+	document.getElementById('select-primal-scfs').onchange = function() {
 		cleanPlotAndInfo();
 		updateDualScfList(this.value);
 
 	};
 
 	// adds the showInformation function to the showInformation button
-	document.getElementById('input5').onclick = function() {
-		showInformation(document.getElementById('primalScalingFunctions').value);
+	document.getElementById('button-show-scfs-info').onclick = function() {
+		showInformation(document.getElementById('select-primal-scfs').value);
 
 	};
 
 	// following is added to the scf-plot button:
-	document.getElementById('input6').onclick = function() {
+	document.getElementById('button-plot-scfs').onclick = function() {
 		// Fehlerabfrage noetig!!
-		var c_t = getCoeffs(document.getElementById('primalScalingFunctions').value);
+		var c_t = getCoeffs(document.getElementById('select-primal-scfs').value);
 		// calculates the new derivative values and saves it globally
 		valuesScf = iterativePointEvaluation2(c_t[0], c_t[1], 14, 0);
 		// updates the data of the plotInstance2 object
@@ -39,10 +39,10 @@ function setHtmlFunctions() {
 	};
 
 	// following is added to the wav-plot button:
-	document.getElementById('input8').onclick = function() {
+	document.getElementById('button-plot-wavelet').onclick = function() {
 		// Fehlerabfrage noetig!!
-		var c_t = getCoeffs(document.getElementById('primalScalingFunctions').value);
-		var d_t = getCoeffs(document.getElementById('dualScalingFunctions').value);
+		var c_t = getCoeffs(document.getElementById('select-primal-scfs').value);
+		var d_t = getCoeffs(document.getElementById('select-dual-scfs').value);
 		// calculates the new derivative values and saves it globally
 		valuesWav = waveletPointEvaluation(c_t[0], c_t[1], d_t[0], d_t[1], 13);
 
@@ -52,22 +52,22 @@ function setHtmlFunctions() {
 	};
 
 	// displays/hides the plot2Area when the checkBox is changed
-	document.getElementById('check1').onchange = function() {
-		if (document.getElementById('check1').checked) {
-			document.getElementById('plot2Area').style.display = 'block';
+	document.getElementById('check-show-derivative').onchange = function() {
+		if (document.getElementById('check-show-derivative').checked) {
+			document.getElementById('area-plot-derivative').style.display = 'block';
 		} else {
-			document.getElementById('plot2Area').style.display = 'none';
+			document.getElementById('area-plot-derivative').style.display = 'none';
 		}
 	};
 
 	// calculates the derivation points and plots them, if the derivation order
 	// input-textfield is changed
-	document.getElementById('input7').onchange = function() {
+	document.getElementById('select-derivative-order').onchange = function() {
 		// Fehlerabfrage noetig!!
-		var c_t = getCoeffs(document.getElementById('primalScalingFunctions').value);
+		var c_t = getCoeffs(document.getElementById('select-primal-scfs').value);
 		// calculates the new derivative values and saves it globally
 		valuesDer = iterativePointEvaluation2(c_t[0], c_t[1], 14,
-				parseInt(document.getElementById('input7').value));
+				parseInt(document.getElementById('select-derivative-order').value));
 		// updates the data of the plotInstance2 object
 		plotInstance2.draw();
 	};
@@ -77,14 +77,14 @@ function setHtmlFunctions() {
  * (last modification: 15.7.16 Simon)
  */
 function cleanPlotAndInfo() {
-	document.getElementById('textarea1').value = "";
-	document.getElementById('input7').value = "";
+	document.getElementById('textarea-scfs-info').value = "";
+	document.getElementById('select-derivative-order').value = "";
 	valuesScf = [];
 	valuesDer = [];
 	plotInstance1.draw();
 	plotInstance2.draw();
 	cleanWaveletPlot();
-	document.getElementById('dualScalingFunctions').length = 0;
+	document.getElementById('select-dual-scfs').length = 0;
 }
 
 /**
@@ -94,24 +94,22 @@ function cleanPlotAndInfo() {
 function updateScfList() {
 	cleanPlotAndInfo();
 	var cond = new Array();
-	cond[0] = [ document.getElementById('select1').name,
-			document.getElementById('select1').value ];
-	cond[1] = [ document.getElementById('select2').name,
-			document.getElementById('select2').value ];
-	cond[2] = [ document.getElementById('input1').name,
-			document.getElementById('input1').value ];
-	cond[3] = [ document.getElementById('input2').name,
-			document.getElementById('input2').value ];
-	cond[4] = [ document.getElementById('input3').name,
-			document.getElementById('input3').value ];
-	cond[5] = [ document.getElementById('input4').name,
-			document.getElementById('input4').value ];
+	cond[0] = [ document.getElementById('select-orthogonal-translates').name,
+			document.getElementById('select-orthogonal-translates').value ];
+	cond[1] = [ document.getElementById('select-symmetry').name,
+			document.getElementById('select-symmetry').value ];
+	cond[2] = [ document.getElementById('input-exactness-poly-approx').name,
+			document.getElementById('input-exactness-poly-approx').value ];
+	cond[3] = [ document.getElementById('select-critical-hoelder-exponent').name,
+			document.getElementById('select-critical-hoelder-exponent').value ];
+	cond[4] = [ document.getElementById('select-critical-sobolev-exponent').name,
+			document.getElementById('select-critical-sobolev-exponent').value ];
+	cond[5] = [ document.getElementById('select-spline-order').name,
+			document.getElementById('select-spline-order').value ];
 	var str = generateSQLCommand(cond);
 	var newstr = "SELECT * FROM scalingfunctionsSupp" + str;
 	var currentdb = db.exec(newstr);
-	// console.log(currentdb);
-	// console.log(currentdb[0].values[zeile]);
-	fillList(document.getElementById('primalScalingFunctions'), currentdb);
+	fillList(document.getElementById('select-primal-scfs'), currentdb);
 }
 /**
  * updates the List containing the dual scaling functions fitting to the choosen
@@ -135,12 +133,12 @@ function updateDualScfList(id) {
 		command2 += " ID = " + noAr[noAr.length - 1];
 		// console.log(command2);
 		var currentdb = db.exec(command2);
-		fillList(document.getElementById('dualScalingFunctions'), currentdb);
+		fillList(document.getElementById('select-dual-scfs'), currentdb);
 	}
 	// if no dual-scf is found, the list is set empty
 	else {
 		console.log("no dual scalingfunction in database");
-		document.getElementById('dualScalingFunctions').length = 0;
+		document.getElementById('select-dual-scfs').length = 0;
 	}
 }
 
@@ -182,7 +180,7 @@ function generateSQLCommand(cond) {
  * @param{database} database with the elements which will be put into the list
  */
 function fillList(list, database) {
-	// var dropDB = document.getElementById('primalScalingFunctions');
+	// var dropDB = document.getElementById('select-primal-scfs');
 	// delete all elements
 	list.length = 0;
 	// check if there is at leas one element in the new database
@@ -215,7 +213,7 @@ function showInformation(idOfScf) {
 			+ "\n  exactness of polynomial approxmation = " + scf[8]
 			+ "\n  comment: " + scf[12];
 
-	document.getElementById('textarea1').value = info;
+	document.getElementById('textarea-scfs-info').value = info;
 }
 
 /**

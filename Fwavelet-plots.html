@@ -17,7 +17,6 @@
 <!--Desing wird fuer die einzelnen Elemente extern geladen-->
 <link rel="stylesheet" href="styleTest.css">
 
-
 <script src="js/sql.js"></script>
 <script src="js/d3.js"></script>
 <script src="js/math.js"></script>
@@ -32,7 +31,6 @@
 <script src="js/dbMethods.js"></script>
 <script src="js/htmlElementFunctions2.js"></script>
 
-
 </head>
 
 <body>
@@ -41,16 +39,16 @@
 		<div id="logo">
 			<img src="./waveletLogo1.jpg" height="151px">
 		</div>
-		<p id="ueberschrift">Wavelets</p>
+		<p id="title">Wavelets</p>
 		</header>
 
 
 		<nav id="steuerungoben">
 		<ul>
-			<li id="icon1"><a href="Fintroduction.html">Introduction</a></li>
-			<li id="icon2"><a href="Fwavelet-plots.html">Wavelet-Plots</a></li>
-			<li id="icon3"><a href="Fdatabase.html">Database</a></li>
-			<li id="icon4"><a href="FmoreInformation.html">More
+			<li id="icon-introduction"><a href="Fintroduction.html">Introduction</a></li>
+			<li id="icon-wavelet-plots"><a href="Fwavelet-plots.html">Wavelet-Plots</a></li>
+			<li id="icon-database"><a href="Fdatabase.html">Database</a></li>
+			<li id="icon-information"><a href="FmoreInformation.html">More
 					information</a></li>
 		</ul>
 		</nav>
@@ -62,7 +60,7 @@
 		<form method="post">
 			<p>Orthogonal translates</p>
 			<p>
-				<select id="select1" name="orthogonal_translations =">
+				<select id="select-orthogonal-translates" name="orthogonal_translations =">
 					<option selected="selected" value="-2">Show all</option>
 					<option value="0">no</option>
 					<option value="1">yes</option>
@@ -71,7 +69,7 @@
 
 			<p>Symmetry</p>
 			<p>
-				<select id="select2" name="symmetry =">
+				<select id="select-symmetry" name="symmetry =">
 					<option selected="selected" value="-2">Show all</option>
 					<option value="'odd'">odd</option>
 					<option value="'even'">even</option>
@@ -82,24 +80,24 @@
 			<p>
 				<input checked="checked"
 					name="exactness_of_polynomial_approximation &gt;=" type="text"
-					value="0" id="input1" />
+					value="0" id="input-exactness-poly-approx" />
 			</p>
 
 			<p>Critical Hölder exponent</p>
 			<p>
 				<input name="critical_Hoelder_exponent &gt;=" type="text" value="0"
-					id="input2" />
+					id="select-critical-hoelder-exponent" />
 			</p>
 
 			<p>Critical Sobolev exponent</p>
 			<p>
 				<input name="critical_Sobolev_exponent &gt;=" type="text" value="0"
-					id="input3" />
+					id="select-critical-sobolev-exponent" />
 			</p>
 
 			<p>Spline order</p>
 			<p>
-				<input id="input4" name="spline_order &gt;=" type="text" value="-1" />
+				<input id="select-spline-order" name="spline_order &gt;=" type="text" value="-1" />
 			</p>
 		</form>
 
@@ -115,38 +113,38 @@
 
 		<section id="middle">
 
-		<form id="scfForm" action="" method="post">
+		<form id="form-scf" action="" method="post">
 			<p>
 				<b> Scaling-functions complying the conditions:</b>
 			</p>
 
 			<div>
-				<select name="primalScalingFunctions" id="primalScalingFunctions">
+				<select id="select-primal-scfs">
 				</select>
 			</div>
 
 			<div>
 				<p>
-					<input id="input5" name="Button1" type="button"
-						value="show information" /> <input id="input6" name="Button2"
+					<input id="button-show-scfs-info" type="button"
+						value="show information" /> <input id="button-plot-scfs"
 						type="button" value="plot scaling function" />
 				</p>
 			</div>
 		</form>
 		
-		<form id="wavForm" action="" method="post">
+		<form id="form-wavelets" action="" method="post">
 			<p>
 				<b> Possible dual scalingfunctions:</b>
 			</p>
 
 			<div>
-				<select name="dualScalingFunctions" id="dualScalingFunctions">
+				<select id="select-dual-scfs">
 				</select>
 			</div>
 
 			<div>
 				<p>
-					<input id="input8" name="Button3" type="button"
+					<input id="button-plot-wavelet" type="button"
 						value="plot wavelet" /> 
 				</p>
 			</div>
@@ -156,31 +154,31 @@
 			<b>Infomation about the choosen scaling function:</b>
 		</p>
 		<div>
-			<textarea id="textarea1" name="TextArea1" readonly rows="10"
+			<textarea id="textarea-scfs-info" readonly rows="10"
 				cols="50"> </textarea>
 		</div>
 
 		<p>
 			<b>Plot of the choosen scaling function:</b>
 		</p>
-		<div id="plot1"> </div>
+		<div id="plot-scf"> </div>
 
 		
 		<p>
-				Show derivative: <input type="checkbox" id="check1" name="show derivative">
+				Show derivative: <input type="checkbox" id="check-show-derivative">
 		</p>
 		
-		<div id="plot2Area"  style="display:none">	
+		<div id="area-plot-derivative"  style="display:none">	
 			<p> Enter derivative order: <input name="derivative_order=" type="text" value=""
-					id="input7" />
+					id="select-derivative-order" />
 			</p>
 			<b>Plot of the choosen derivative:</b>			
-			<div id="plot2"> </div>
+			<div id="plot-derivative"> </div>
 		</div>
 		
-		<div id="plot3Area">	
+		<div id="area-plot-wavelet">	
 			<b>Plot of wavelet:</b>			
-			<div id="plot3"> </div>
+			<div id="plot-wavelet"> </div>
 		</div>
 		
 		</section>
@@ -205,16 +203,16 @@
 		setHtmlFunctions();
 		
 				
-		//build the first function plot object into 'plot1' area
-		plotInstance1=buildPlot('#plot1');
+		//build the first function plot object into 'plot-scf' area
+		plotInstance1=buildPlot('#plot-scf');
 		plotInstance1.on("during:draw", zoomFilterScf);
 
-		//build the second function plot object into 'plot2' area
-		plotInstance2=buildPlot('#plot2');
+		//build the second function plot object into 'plot-derivative' area
+		plotInstance2=buildPlot('#plot-derivative');
 		plotInstance2.on("during:draw", zoomFilterDer);
 		
-		//build the third function plot object into 'plot3' area
-		plotInstance3=buildPlot('#plot3');
+		//build the third function plot object into 'plot-wavelet' area
+		plotInstance3=buildPlot('#plot-wavelet');
 		plotInstance3.on("during:draw", zoomFilterWav);
 		
 		</script>
