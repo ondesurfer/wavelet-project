@@ -63,13 +63,27 @@ function setHtmlFunctions() {
 	// calculates the derivation points and plots them, if the derivation order
 	// input-textfield is changed
 	document.getElementById('select-derivative-order').onchange = function() {
+		var idOfScf = document.getElementById('select-primal-scfs').value;
+		var scf = db.exec("SELECT * FROM scalingfunctionsSupp WHERE id=" + idOfScf)[0].values[0];
+		var scf_name = scf[1];
+		var spline_order = scf[11];
+		var poly_exactness = scf[8];
+		var derivative_order = document.getElementById('select-derivative-order').value;
+		//var no_derivative_name_list = [""];
+		
 		// Fehlerabfrage noetig!!
-		var c_t = getCoeffs(document.getElementById('select-primal-scfs').value);
-		// calculates the new derivative values and saves it globally
-		valuesDer = iterativePointEvaluation2(c_t[0], c_t[1], 14,
-				parseInt(document.getElementById('select-derivative-order').value));
-		// updates the data of the plotInstance2 object
-		plotInstance2.draw();
+		if(spline_order - 2 - derivative_order >= 0 || 
+				(poly_exactness > 3 && derivative_order == 1)){
+			var c_t = getCoeffs(document.getElementById('select-primal-scfs').value);
+			// calculates the new derivative values and saves it globally
+			valuesDer = iterativePointEvaluation2(c_t[0], c_t[1], 14,
+					parseInt(derivative_order));
+			// updates the data of the plotInstance2 object
+			plotInstance2.draw();
+		}
+		else{
+			alert("Scaling function has not enough regularity");
+		}
 	};
 }
 /**

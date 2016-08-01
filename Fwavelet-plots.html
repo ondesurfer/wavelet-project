@@ -170,7 +170,7 @@
 		
 		<div id="area-plot-derivative"  style="display:none">	
 			<p> Enter derivative order: <input name="derivative_order=" type="text" value=""
-					id="select-derivative-order" />
+					id="select-derivative-order"  min="0" max ="100" />
 			</p>
 			<b>Plot of the choosen derivative:</b>			
 			<div id="plot-derivative"> </div>
@@ -182,7 +182,6 @@
 		</div>
 		
 		</section>
-
 
 		<footer>
 		<p>© 2016 - www.wavelets.de</p>
@@ -202,7 +201,6 @@
 		//links the Html elements to their functions. (See htmlElementFunctions.js)
 		setHtmlFunctions();
 		
-				
 		//build the first function plot object into 'plot-scf' area
 		plotInstance1=buildPlot('#plot-scf');
 		plotInstance1.on("during:draw", zoomFilterScf);

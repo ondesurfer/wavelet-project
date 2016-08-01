@@ -34,6 +34,9 @@ function loadDB(){
   				db = new SQL.Database(uInt8Array);
   				//when the Database is loaded the list containing the scf is updated
   				updateScfList();
+  				
+  				//assuming that the selected primal scaling function by default has ID 1
+  				updateDualScfList(1);
 			};
 			httpGetAsync('./ScalingFunctions.sqlite', callback);				
 		}
