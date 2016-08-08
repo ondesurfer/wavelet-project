@@ -88,7 +88,7 @@ function setHtmlFunctions() {
 }
 /**
  * resets the string in the textArea and sets the points of the plots to []
- * (last modification: 15.7.16 Simon)
+ * (last modification: 8.8.16 Andreas)
  */
 function cleanPlotAndInfo() {
 	document.getElementById('textarea-scfs-info').value = "";
@@ -99,6 +99,8 @@ function cleanPlotAndInfo() {
 	plotInstance2.draw();
 	cleanWaveletPlot();
 	document.getElementById('select-dual-scfs').length = 0;
+	var referenceLink = document.getElementById('link-reference');
+	referenceLink.text = "";
 }
 
 /**
@@ -205,21 +207,29 @@ function fillList(list, dbEntries) {
 /**
  * generates an string representing the information of a scalingfunction (given
  * by the database) and places it in the textfield on the html page (last
- * modification: 15.7.16 Simon)
+ * modification: 8.8.16 Simon)
  * 
  * @param{idOfScf} number id of the scalingfunction
  */
 function showInformation(idOfScf) {
-	var scf = db.exec("SELECT * FROM scalingfunctionsSupp WHERE id=" + idOfScf)[0].values[0];
-	// console.log(scf);
-	var info = "  id: " + scf[0] + "\n  name: " + scf[1] + "\n  DOI: " + scf[2]
-			+ "\n  reference: " + scf[3] + "\n  mask: " + scf[4]
-			+ "\n  critical Sobolev exponent = " + scf[6]
-			+ "\n  critical Hoelder exponent = " + scf[7]
-			+ "\n  exactness of polynomial approxmation = " + scf[8]
-			+ "\n  comment: " + scf[12];
-
-	document.getElementById('textarea-scfs-info').value = info;
+	if(idOfScf != ""){
+		var scf = db.exec("SELECT * FROM scalingfunctionsSupp WHERE id=" + idOfScf)[0].values[0];
+		// console.log(scf);
+		var info = "  id: " + scf[0] + "\n  name: " + scf[1] + "\n  DOI: " + scf[2]
+				+ "\n  reference: " + scf[3] + "\n  mask: " + scf[4]
+				+ "\n  critical Sobolev exponent = " + scf[6]
+				+ "\n  critical Hoelder exponent = " + scf[7]
+				+ "\n  exactness of polynomial approxmation = " + scf[8]
+				+ "\n  comment: " + scf[12];
+	
+		document.getElementById('textarea-scfs-info').value = info;
+		
+		//update the reference link
+		var referenceLink = document.getElementById('link-reference');
+		referenceLink.text = scf[3];
+		referenceLink.href = "http://www.dx.doi.org/"+scf[2];
+	}
+	
 }
 
 /**

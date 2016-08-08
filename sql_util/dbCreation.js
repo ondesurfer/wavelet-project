@@ -54,8 +54,8 @@ function genRowString(table_name, ID, name, DOI, reference, mask, a_start,
 
 function genCDFString(table_name, ID, ID_primal, m, mt){
 	var name = "\'(" + m + "," + mt + ")-CDF\'";
-	var DOI = "NULL";
-	var reference = "NULL";
+	var DOI = "\'10.1002/cpa.3160450502\'";
+	var reference = "\"Biorthogonal bases of compactly supported wavelets\"";
 	var a_t = genDualBSplineCoeffs(m,mt);
 	var mask = "\'" + a_t[0].toString() + "\'";
 	var a_start = a_t[1];
@@ -89,14 +89,14 @@ function genCDFString(table_name, ID, ID_primal, m, mt){
 
 function genCardinalBSplineString(table_name, ID, ID_dual, m){
 	var name = "\'(" + m + ")-BSpline\'";
-	var DOI = "NULL";
-	var reference = "NULL";
+	var DOI = "\'10.1002/cpa.3160450502\'";
+	var reference = "\"Biorthogonal bases of compactly supported wavelets\"";
 	var a_t = genBSplineCoeffs(m);
 	var mask = "\'" + a_t[0].toString() + "\'";
 	var a_start = a_t[1];
 	var critical_Sobolev_exponent = 0;
 	var critical_Hoelder_exponent = 0;
-	var exactness_of_poly_approx = m - 1;
+	var exactness_of_poly_approx = m;
 	ID_dual = "\'" + ID_dual.toString() + "\'";
 	var orth_transl = 1;
 	spline_order = m;
@@ -176,8 +176,8 @@ function genDaubechiesScalingString(ID_start, N){
 	var ID = ID_start;
 	var table_name = "\"ScalingFunctionsSupp\"";
 	var name = "\'Daubechies\'";
-	var DOI = "NULL";
-	var reference = "NULL";
+	var DOI = "\'10.1002/cpa.3160410705\'";
+	var reference = "\"Orthonormal bases of compactly supported wavelets\"";
 	var mask;
 	var a_start = 0;
 	var critical_Sobolev_exponent = 0;
