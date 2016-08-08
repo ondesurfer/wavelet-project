@@ -43,3 +43,24 @@ function loadDB(){
 		
 		start();
 }
+
+/**
+ * generates an SQL command for the search of the database complying the
+ * condition given in the 'cond' Array (last modification: 8.8.16 Andreas)
+ * 
+ * @param{cond} array conditions which should be complied
+ */
+function genFilterString(cond) {
+	str = "";
+	for (var i = 0; i < cond.length; i++) {
+		// (-2) means, that this condition should not be included in the search
+		if (cond[i][1] != -2) {
+			str = str + cond[i][0] + " " + cond[i][1] + " AND ";
+		}
+
+	}
+	// cut of the last 'AND':
+	str = str.slice(0, str.length - 5);
+	str = str + ";";
+	return str;
+}

@@ -6,12 +6,12 @@
 function setHtmlFunctions() {
 
 	// updates the List if any condition is changed
-	document.getElementById('select-orthogonal-translates').onchange = updateScfList;
-	document.getElementById('select-symmetry').onchange = updateScfList;
-	document.getElementById('input-exactness-poly-approx').onchange = updateScfList;
-	document.getElementById('select-critical-hoelder-exponent').onchange = updateScfList;
-	document.getElementById('select-critical-sobolev-exponent').onchange = updateScfList;
-	document.getElementById('select-spline-order').onchange = updateScfList;
+	document.getElementById('select-orthogonal-translates').onchange = updateLists;
+	document.getElementById('select-symmetry').onchange = updateLists;
+	document.getElementById('input-exactness-poly-approx').onchange = updateLists;
+	document.getElementById('select-critical-hoelder-exponent').onchange = updateLists;
+	document.getElementById('select-critical-sobolev-exponent').onchange = updateLists;
+	document.getElementById('select-spline-order').onchange = updateLists;
 
 	// cleans the info field and the function plot if the choosen
 	// scalingfunction is changed
@@ -102,7 +102,7 @@ function cleanPlotAndInfo() {
 }
 
 /**
- * updates the List containing the scaling functions complying the conditions
+ * updates the list containing the scaling functions complying the conditions
  * given in the html elements (last modification: 1.7.16 Simon)
  */
 function updateScfList() {
@@ -120,13 +120,13 @@ function updateScfList() {
 			document.getElementById('select-critical-sobolev-exponent').value ];
 	cond[5] = [ document.getElementById('select-spline-order').name,
 			document.getElementById('select-spline-order').value ];
-	var str = generateSQLCommand(cond);
-	var newstr = "SELECT * FROM scalingfunctionsSupp" + str;
+	var str =  genFilterString(cond);
+	var newstr = "SELECT * FROM scalingfunctionsSupp WHERE " + str;
 	var currentdb = db.exec(newstr);
 	fillList(document.getElementById('select-primal-scfs'), currentdb);
 }
 /**
- * updates the List containing the dual scaling functions fitting to the choosen
+ * updates the list containing the dual scaling functions fitting to the choosen
  * scf (last modification: 26.7.16 Simon)
  * 
  * @param id
@@ -157,6 +157,19 @@ function updateDualScfList(id) {
 }
 
 /**
+ * updates the scf-list and the dual-scf-list
+ * (last modification: 8.8.16 Andreas)
+ * 
+ */
+function updateLists(){
+	updateScfList();	
+	var id = document.getElementById('select-primal-scfs').value;
+	if(id != ""){
+		updateDualScfList(id);
+	}
+}
+
+/**
  * cleans the wavelet Plot (last modification: 26.7.16 Simon)
  */
 function cleanWaveletPlot() {
@@ -165,46 +178,25 @@ function cleanWaveletPlot() {
 }
 
 /**
- * generates an SQL command for the search of the database complying the
- * condition given in the 'cond' Array (last modification: 1.7.16 Simon)
- * 
- * @param{cond} array conditions which should be complied
- */
-function generateSQLCommand(cond) {
-	str = " WHERE ";
-	for (var i = 0; i < cond.length; i++) {
-		// (-2) means, that this condition should not be included in the search
-		if (cond[i][1] != -2) {
-			str = str + cond[i][0] + " " + cond[i][1] + " AND ";
-		}
-
-	}
-	// cut of the last 'AND':
-	str = str.slice(0, str.length - 5);
-	str = str + ";";
-	return str;
-}
-
-/**
  * fills a selectBox with the scaling functions in the new database (last
  * modification: 26.7.16 Simon)
  * 
  * @param {list}
  *            selectBox which should be filled
- * @param{database} database with the elements which will be put into the list
+ * @param{array} dbEntries		the elements which will be put into the list
  */
-function fillList(list, database) {
+function fillList(list, dbEntries) {
 	// var dropDB = document.getElementById('select-primal-scfs');
 	// delete all elements
 	list.length = 0;
-	// check if there is at leas one element in the new database
-	if (database[0] != undefined) {
+	// check if there is at least one element in the new database
+	if (dbEntries[0] != undefined) {
 		// add all elements to the list
-		for (var j = 0; j < database[0].values.length; j++) {
+		for (var j = 0; j < dbEntries[0].values.length; j++) {
 			var option = document.createElement('option');
 			// save the id of the scalingfunction as value of the option entry
-			option.value = database[0].values[j][0];
-			option.text = database[0].values[j][1];
+			option.value = dbEntries[0].values[j][0];
+			option.text = dbEntries[0].values[j][1];
 			list.add(option);
 		}
 	}
