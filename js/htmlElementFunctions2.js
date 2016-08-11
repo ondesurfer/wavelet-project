@@ -67,13 +67,16 @@ function setHtmlFunctions() {
 		var scf = db.exec("SELECT * FROM scalingfunctionsSupp WHERE id=" + idOfScf)[0].values[0];
 		var scf_name = scf[1];
 		var spline_order = scf[11];
+		var sobolev_order = scf[6];
 		var poly_exactness = scf[8];
 		var derivative_order = document.getElementById('select-derivative-order').value;
 		//var no_derivative_name_list = [""];
 		
 		// Fehlerabfrage noetig!!
-		if(spline_order - 2 - derivative_order >= 0 || 
-				(poly_exactness > 3 && derivative_order == 1)){
+		//if(spline_order - 2 - derivative_order >= 0 || 
+				//(poly_exactness > 3 && derivative_order == 1))
+				
+			if(derivative_order<=sobolev_order)	{
 			var c_t = getCoeffs(document.getElementById('select-primal-scfs').value);
 			// calculates the new derivative values and saves it globally
 			valuesDer = iterativePointEvaluation2(c_t[0], c_t[1], 14,
@@ -342,9 +345,10 @@ function stringToNoArray(coeffsAsString) {
 				str = str + coeffsAsString.charAt(i);
 			}
 		}
-
-		var number = parseFloat(str.trim());
-		array.push(number);
+		if(str.trim().length>0){
+			var number = parseFloat(str.trim());
+			array.push(number);
+		}
 		// console.log(array);
 		return array;
 	} catch (err) {
