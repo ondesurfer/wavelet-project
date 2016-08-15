@@ -1,4 +1,5 @@
-/** This file contains the function of the Gauss-Algorithm to solve unique solvable linear equation systems.
+/** This file contains the function of the Gauss-Algorithm to solve unique
+ * solvable linear equation systems.
  * They do not need to be square
  *
  *	(last modification: 25.4.16 Simon) 
@@ -35,14 +36,13 @@ function gaus2($A, $x) {
         //start with the diagonal element
         $maxEl = Math.abs($A[$i][$i]);
         $maxRow = $i;
-        //iterate throw the rows and check if there is an bigger element
+        //iterate through the rows and check if there is an bigger element
         for ($k=$i+1; $k < $rows; $k++) { 
             if (Math.abs($A[$k][$i]) > $maxEl) {
                 $maxEl = Math.abs($A[$k][$i]);
                 $maxRow = $k;
             }
         }
-
 
         // Swap maximum row with current row (column by column)
         for ($k=$i; $k < $columns+1; $k++) { 
@@ -51,13 +51,14 @@ function gaus2($A, $x) {
             $A[$i][$k] = $tmp;
         }
 
+        if(Math.abs($A[$i][$i])<0.00000000000001){
+    		console.log('LGS nicht eindeutig loesbar');
+    		return new Error('LGS nicht eindeutig loesbar');
+    	}
+        
         // Make all rows below this one 0 in current column
         //k iterates through all rows 
-        for ($k=$i+1; $k < $rows; $k++) { 
-        	if(Math.abs($A[$i][$i])<0.00000000000001){
-        		console.log('LGS nicht eindeutig loesbar');
-        		return new Error('LGS nicht eindeutig loesbar');
-        	}
+        for ($k=$i+1; $k < $rows; $k++) {	
             $c = $A[$k][$i]/$A[$i][$i];
             //iterate throug all columns beginning at the not zero,diagonal element
             for ($j=$i; $j < $columns+1; $j++) { 
@@ -85,7 +86,7 @@ function gaus2($A, $x) {
     	$x[$m]=0;
     }
 
-    //iterate throw the columns beginning at the last
+    //iterate through the columns beginning at the last
     for ($i=$columns-1; $i > -1; $i--) { 
     	//divide the line through A[i][i]
     	if(Math.abs($A[$i][$i])<0.0000000001){

@@ -452,7 +452,6 @@ function filter(leftXvalue, rightXvalue, allValues, wantedNumOfValues){
 	//distance between x-values in allValues
 	var gridDist=allValues[1][0]-allValues[0][0];
 	
-	
 	//distance nessecary to get 'wantedNumOfValues' 
 	var wishedDist=(rightXvalue-leftXvalue)/wantedNumOfValues;
 	//step
