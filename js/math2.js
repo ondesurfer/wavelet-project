@@ -1,7 +1,19 @@
 /** This file contains further functions for mathematical purposes
  *
- *	(last modification: 13.5.16 Andreas)
+ *	(last modification: 17.8.16 Andreas)
  */
+
+/**
+ * Get the length of a number.
+ * (last modification: 17.8.16 Andreas)
+ * 
+ * @param{int}	number.
+ * 
+ * @return{int}	the number length.
+ */
+function getNumberlength(number) {
+    return number.toString().length;
+}
 
 /** Compute n choose k.
  *  (last modification: 13.5.16 Andreas)

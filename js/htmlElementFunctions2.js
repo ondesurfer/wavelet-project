@@ -89,7 +89,7 @@ function setHtmlFunctions() {
  */
 function cleanPlotAndInfo() {
 	document.getElementById('textarea-scfs-info').value = "";
-	document.getElementById('select-derivative-order').value = "";
+document.getElementById('select-derivative-order').value = "";
 	valuesScf = [];
 	valuesDer = [];
 	plotInstance1.draw();
@@ -107,6 +107,13 @@ function cleanPlotAndInfo() {
 function updateScfList() {
 	cleanPlotAndInfo();
 	var cond = new Array();
+	//Validation of number-inputs
+	// reduce the size of digit-length to the maximum-length
+	limitInt(document.getElementById('input-exactness-poly-approx'));
+	limitFloat(document.getElementById('select-critical-hoelder-exponent'));
+	limitFloat(document.getElementById('select-critical-sobolev-exponent'));
+	limitInt(document.getElementById('select-spline-order'));
+	
 	cond[0] = [ document.getElementById('select-orthogonal-translates').name,
 			document.getElementById('select-orthogonal-translates').value ];
 	cond[1] = [ document.getElementById('select-symmetry').name,
@@ -122,6 +129,7 @@ function updateScfList() {
 	var str =  genFilterString(cond);
 	var newstr = "SELECT * FROM scalingfunctionsSupp WHERE " + str;
 	var currentdb = db.exec(newstr);
+	
 	fillList(document.getElementById('select-primal-scfs'), currentdb);
 }
 /**
@@ -169,7 +177,7 @@ function updateLists(){
 }
 
 /**
- * cleans the wavelet Plot (last modification: 26.7.16 Simon)
+ * Clean the wavelet Plot (last modification: 26.7.16 Simon)
  */
 function cleanWaveletPlot() {
 	valuesWav = [];
@@ -177,10 +185,69 @@ function cleanWaveletPlot() {
 }
 
 /**
+ * Limitation of float-number-input-size.
+ * (last modification: 18.8.16 Andreas)
+ * 
+ * @param{html-input-element}	element.
+ * 	
+ */
+function limitFloat(element){
+	var max_int_digits = 3;
+	var max_decimal_digits = 6;	//i.e. 0.1234
+	
+	var n = element.value;
+	
+	var int_portion = Math.floor(Math.abs(n));
+	var decimal_portion = (Math.round(Math.abs(n)*10000 - int_portion*10000)
+			/10000).toFixed(4);
+	
+	var int_portion_length = getNumberlength(int_portion);
+	var int_diff = getNumberlength(int_portion) - max_int_digits;
+	if(int_diff > 0){
+		int_portion = int_portion.toString().substring(int_diff,
+				int_portion_length + 1);
+	}
+	
+	decimal_portion = decimal_portion.toString().substring(2,
+			max_decimal_digits);
+	n = Math.sign(n)*int_portion + "." + decimal_portion;
+	
+	element.value = n;
+}
+
+/**
+ * Limitation of integer-number-input-size.
+ * (last modification: 18.8.16 Andreas)
+ * 
+ * @param{html-input-element}	element.
+ * 	
+ */
+function limitInt(element){
+	var max_int_digits = 3;
+
+	var n = element.value;
+	
+	var sign_n = Math.sign(n);
+	var int_portion = Math.floor(Math.abs(n));
+	
+	var int_portion_length = getNumberlength(int_portion);
+	var int_diff = getNumberlength(int_portion) - max_int_digits;
+	
+	if(int_diff > 0){
+		int_portion = int_portion.toString().substring(int_diff,
+				int_portion_length + 1);
+	}
+	
+	n = sign_n*int_portion;
+	
+	element.value = n;
+}
+
+/**
  * fills a selectBox with the scaling functions in the new database (last
  * modification: 26.7.16 Simon)
  * 
- * @param {list}
+ * @param{list}
  *            selectBox which should be filled
  * @param{array} dbEntries		the elements which will be put into the list
  */
@@ -265,7 +332,7 @@ function buildPlot(target) {
 // so that not a few necessary points must be plotted
 // zoomFilterScf refers to the values 'valuesScf' and zoomFilterDer refers to
 // 'valuesDer'
-function zoomFilterScf() {
+function zoomFilterScf(values) {
 	var xDomain = this.options.xDomain;
 	var newPoints = filter(xDomain[0], xDomain[1], valuesScf, 1000);
 	if (newPoints == undefined) {

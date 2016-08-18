@@ -78,26 +78,51 @@
 
 			<p>Exactness of polynomial approximation</p>
 			<p>
-				<input checked="checked"
-					name="exactness_of_polynomial_approximation &gt;=" type="text"
-					value="0" id="input-exactness-poly-approx" />
+				<input	id="input-exactness-poly-approx"
+						name="exactness_of_polynomial_approximation &gt;="
+					 	type="number"
+						value="0"
+						min = "0"
+						step = "1"
+						max = "100"
+						maxlength = "3"/>
 			</p>
 
 			<p>Critical Hölder exponent</p>
 			<p>
-				<input name="critical_Hoelder_exponent &gt;=" type="text" value="0"
-					id="select-critical-hoelder-exponent" />
+				<!-- start min from 0 because all scaling functions are bounded -->
+				<input	id="select-critical-hoelder-exponent" 	
+						name="critical_Hoelder_exponent &gt;="
+						type="number"
+						value="0"
+						min = "0"
+						step = "0.0001"
+						max = "100"
+						maxlength = "3"/>
 			</p>
 
 			<p>Critical Sobolev exponent</p>
 			<p>
-				<input name="critical_Sobolev_exponent &gt;=" type="text" value="0"
-					id="select-critical-sobolev-exponent" />
+				<input	id="select-critical-sobolev-exponent"
+						name="critical_Sobolev_exponent &gt;="
+						type="number"
+						value="0"
+						min = "0"
+						step = "0.0001"	
+						max = "100"
+						maxlength = "3"/>
 			</p>
 
 			<p>Spline order</p>
 			<p>
-				<input id="select-spline-order" name="spline_order &gt;=" type="text" value="-1" />
+				<input	id="select-spline-order"
+						name="spline_order &gt;="
+						type="number"
+						value="-1"
+						min = "-1"
+						step = "1"
+						max = "100"
+						maxlength = "3"/>
 			</p>
 		</form>
 
@@ -198,8 +223,7 @@
 		valuesScf=[];
 		valuesDer=[];
 		valuesWav=[];
-			
-			
+		
 		//loads the database. (See dbMethods.js)
 		loadDB();
 		
