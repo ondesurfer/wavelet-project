@@ -25,6 +25,13 @@
 		<header>
 			<div id="logo"><img src="./waveletLogo1.jpg"  height="151px"> </div>	
 			<p id="title"> Wavelets </p>
+			
+			<script type="text/x-mathjax-config">
+  			MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+			</script>
+	        <script type="text/javascript" async
+			src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML">
+			</script>
 		</header>
 		
 		
@@ -47,14 +54,39 @@
 		</aside>
 		
 		<section id="middle">
-						
-				<p> Wavelets are great!	</p>
-				<p> You can use them for everything you want.</p>
-				<p> For example to solve differential equations.	</p>		
-			
+				<p>
+					This site provides you with a database of scaling functions for wavelets.
+				</p>
+				<p>
+					You can filter certain ones out by specifiying
+					properties like symmetry, polynomial exactness, critical
+					Hoelder and Sobolev exponents or spline order (in the
+					case of spline functions).
+				</p>
+				<p>
+					Thereby the critical Hoelder exponent is defined as
+				</p>
+				<p>
+				<br>
+					$\tilde{\beta}(\phi) :=  \sup \{\, \gamma \geq 0 \, ; \, \gamma = k + \alpha
+					\, ; \, k \in \mathbb{N} \, , \, \alpha \in (0, 1] \, ; \, \phi 
+					\in \mathcal{C}^{k, \alpha}(\mathbb{R}) \,\}.$
+				<br>
+				<br>
+				</p>
+				<p>
+					and the critical Sobolev exponent is defined as
+				</p>
+				<p>
+				<br>
+					$\beta(\phi) :=  \sup \{\, \alpha \geq 0 \, ;
+					\, \phi \in H^{\alpha}_2(\mathbb{R}) \, \}.$
+				<br>
+				<br>
+				</p>
+				
 		</section>
 		
-
 		<footer>
   			<p>© 2016 - www.wavelets.de</p>
 		</footer>		
