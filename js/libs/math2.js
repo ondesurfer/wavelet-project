@@ -1,5 +1,7 @@
 /** This file contains further functions for mathematical purposes
  *
+ *	Dependencies: matrixOperations.js
+ *
  *	(last modification: 17.8.16 Andreas)
  */
 

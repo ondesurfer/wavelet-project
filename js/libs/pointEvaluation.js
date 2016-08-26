@@ -1,7 +1,9 @@
 /** This file contains functions for point evaluations of scaling functions
- *  with given refinement coefficients and step size of the x-lattice
- *
- *	(last modification: 18.5.16 Andreas)
+ *  with given refinement coefficients and step size of the x-lattice.
+ *  
+ *  Dependencies: matrixOperations.js
+ *	
+ *  (last modification: 18.5.16 Andreas)
  */
 
 //Attention: calculateIntegerPointValues doesn't return the right last value

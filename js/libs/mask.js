@@ -1,4 +1,6 @@
-/** This file contains functions for mask manipulations
+/** This file contains functions for mask manipulations.
+ * 
+ *  Dependencies: math.js, math2.js, matrixOperations.js
  *
  *	(last modification: 18.5.16 Andreas)
  */

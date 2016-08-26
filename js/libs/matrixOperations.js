@@ -1,4 +1,6 @@
-/** This file contains functions for matrix manipulations
+/** This file contains functions for matrix manipulations.
+ * 
+ *  Dependencies: numeric-1.2.6.js
  *
  *	(last modification: 13.5.16 Andreas)
  */
@@ -228,7 +230,7 @@ function createArray(length1, length2) {
  *  (last modification: 3.5.16 Andreas)
  * 
  *	@param{Array} a the Wavelet-coefficients.
- *  @param{int}	  mu the derivation-order	
+ *  @param{int}	  mu the derivation-order.	
  * 
  * 	@return{Array} sol y-values at the integer points with 0
  *  	and the "end of the compact support".
@@ -236,61 +238,30 @@ function createArray(length1, length2) {
 
 function calculateIntegerPointValues(a, mu) {
 	var N = a.length - 1;
-	//tests if the Wavelet is the Haar-Wavelet and then returns the y values 0 and 1
-	//eventuell ist es sinnvoller das Haar-Wavelet bereits frueher abzufangen, 
-	//da es dann nicht verfeinert wird.
-	//gilt das auch noch fuer mu > 0 ? Ja und das wird schon in der Auswertung abgefangen
-	// if(a.length==2){
-		// var mat3=new Array(2);
-		// mat3[0]=1;
-		// mat3[1]=0;
-		// return formatIntegerPointValues(mat3);
-	// }
 	
 	//sparsify if possible
 	var mat = coeffsToMatrix2(a, mu);
 	
 	var m1 = Math.max(N - 1, mu + 1);
-	//console.log("m1",m1);
 	var V = vander90(onetwothree(m1));
-	//printMatrix(V);
 	V = numeric.getBlock(V, [0,0], [mu, N-2]);
-	//printMatrix(V);
-	
 	
 	//append the matrix V row-wise
 	mat = mat.concat(V);
 	
 	//create the vector b
 	var b = new Array((N - 1) + mu + 1);
-	//console.log("N",N,"mu",mu);
-	//console.log(typeof(mu));
-	//console.log((N-1)+mu);
+	
 	for (var i = 0; i<(N-1)+mu; i++) {
-		//console.log("i",i);
 		b[i] = 0;
 	}
 	
 	b[(N - 1) + mu] = Math.pow((-1), mu) * factorial(mu);
 
-	
-	
-	//console.log(mat,b);
-	
 	var sol = gaus2(mat, b);
 	
-	//console.log(sol);
-	
-	//adds zero at the end and the beginning of the solution Vektor 
-	//because phi(0)=0 and phi(a.length)=0  
-	
-	//printMatrix(mat);
-	
-	//console.log(sol);
-	
-	//fuer Haar-Wavelet rausnehmen?	
-	 sol.push(0);
-	 sol.unshift(0);
+	sol.push(0);
+	sol.unshift(0);
 	
 	console.log("phi at integer points:",sol);
 	return formatIntegerPointValues(sol);

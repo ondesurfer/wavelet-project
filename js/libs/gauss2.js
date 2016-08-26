@@ -1,6 +1,6 @@
 /** This file contains the function of the Gauss-Algorithm to solve unique
  * solvable linear equation systems.
- * They do not need to be square
+ * They do not need to be square.
  *
  *	(last modification: 25.4.16 Simon) 
  **/
