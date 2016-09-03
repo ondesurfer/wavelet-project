@@ -1,0 +1,13 @@
+/* 	This style-sheet adds style
+	to the webpage with the same name.
+	(last modification: 3.9.16 Andreas)
+*/
+
+/*setting of distinct elements*/
+#select-primal-scfs {
+	width: 150px;
+}
+
+#select-dual-scfs {
+	width: 150px;
+}

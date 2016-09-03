@@ -5,17 +5,12 @@
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<!--Ueberschrift des Tabs und bei Suchmachinen -->
-<title>Wavelets</title>
-<!--Name des Autors-->
-<meta name="author" content="Simon" />
-<!--Beschreibung,- wird bei Suchmachinen geliefert-->
+<title>Wavelet Database</title>
 <meta name="description"
-	content="Wavlets are the basic principal of many mathematical applications. 
-			we present an overview of many known wavelets and their properties" />
-
-<!--Desing wird fuer die einzelnen Elemente extern geladen-->
-<link rel="stylesheet" href="styleTest.css">
+	content="Wavelets are the basic principal of many mathematical applications. 
+			We present an overview of many known wavelets and their properties." />
+<link rel="stylesheet" href="stylePlain.css">
+<link rel="stylesheet" href="Fwavelet-plots.css">
 
 <script src="js/ext_libs/sql.js"></script>
 <script src="js/ext_libs/d3.js"></script>
@@ -32,20 +27,18 @@
 
 <script src="js/sites/Fwavelet-plots.js"></script>
 
-
 </head>
 
 <body>
 	<div id="wrapper">
-		<header>
-		<div id="logo">
-			<img src="./waveletLogo1.jpg" height="151px">
+		<div id="header">
+			<div id="logo">
+				<img src="./waveletLogo1.jpg" height="151px">
+			</div>
+			<div id="title">Wavelet Database</div>
 		</div>
-		<p id="title">Wavelets</p>
-		</header>
 
-
-		<nav id="steuerungoben">
+		<nav id="topmenu">
 		<ul>
 			<li id="icon-introduction"><a href="Fintroduction.html">Introduction</a></li>
 			<li id="icon-wavelet-plots"><a href="Fwavelet-plots.html">Wavelet-Plots</a></li>
@@ -54,197 +47,167 @@
 					information</a></li>
 		</ul>
 		</nav>
-
-		<aside id="left">
-		<p>
-			<b>Choose your conditions:</b>
-		</p>
-		<form method="post">
-			<p>Orthogonal translates</p>
-			<p>
-				<select id="select-orthogonal-translates" name="orthogonal_translations =">
-					<option selected="selected" value="-2">Show all</option>
-					<option value="0">no</option>
-					<option value="1">yes</option>
-				</select>
-			</p>
-
-			<p>Symmetry</p>
-			<p>
-				<select id="select-symmetry" name="symmetry =">
-					<option selected="selected" value="-2">Show all</option>
-					<option value="'odd'">odd</option>
-					<option value="'even'">even</option>
-				</select>
-			</p>
-
-			<p>Exactness of polynomial approximation</p>
-			<p>
-				<input	id="input-exactness-poly-approx"
-						name="exactness_of_polynomial_approximation &gt;="
-					 	type="number"
-						value="0"
-						min = "0"
-						step = "1"
-						max = "100"
-						maxlength = "3"/>
-			</p>
-
-			<p>Critical Hölder exponent</p>
-			<p>
-				<!-- start min from 0 because all scaling functions are bounded -->
-				<input	id="select-critical-hoelder-exponent" 	
-						name="critical_Hoelder_exponent &gt;="
-						type="number"
-						value="0"
-						min = "0"
-						step = "0.0001"
-						max = "100"
-						maxlength = "3"/>
-			</p>
-
-			<p>Critical Sobolev exponent</p>
-			<p>
-				<input	id="select-critical-sobolev-exponent"
-						name="critical_Sobolev_exponent &gt;="
-						type="number"
-						value="0"
-						min = "0"
-						step = "0.0001"	
-						max = "100"
-						maxlength = "3"/>
-			</p>
-
-			<p>Spline order</p>
-			<p>
-				<input	id="select-spline-order"
-						name="spline_order &gt;="
-						type="number"
-						value="-1"
-						min = "-1"
-						step = "1"
-						max = "100"
-						maxlength = "3"/>
-			</p>
-		</form>
-
-		</aside>
-
-		<aside id="right">
-		<p>Hier können wir noch irgendwas hinschreiben. Zwar weiß ich
-			nicht so genau was, aber da das 3-Spalten-Layout sehr angesehen ist
-			und oft bekannt, liegt es nahe dies zu benutzen. Uns fällt bestimmt
-			noch was ein was wir dort hinschreiben können.</p>
-
-		</aside>
-
-		<section id="middle">
-
-		<form id="form-scf" action="" method="post">
-			<p>
-				<b> Scaling-functions complying the conditions:</b>
-			</p>
-
-			<div>
-				<select id="select-primal-scfs">
-				</select>
-			</div>
-
-			<div>
+		<div id="content">
+			<div id="left-side-bar">
 				<p>
-					<input id="button-show-scfs-info" type="button"
-						value="show information" /> <input id="button-plot-scfs"
-						type="button" value="plot scaling function" />
+					<b>Choose your conditions:</b>
 				</p>
-			</div>
-		</form>
-		
-		<form id="form-wavelets" action="" method="post">
-			<p>
-				<b> Possible dual scalingfunctions:</b>
-			</p>
+				<form method="post">
+					<p>Orthogonal translates</p>
+					<p>
+						<select id="select-orthogonal-translates"
+							name="orthogonal_translations =">
+							<option selected="selected" value="-2">Show all</option>
+							<option value="0">no</option>
+							<option value="1">yes</option>
+						</select>
+					</p>
 
-			<div>
-				<select id="select-dual-scfs">
-				</select>
-			</div>
+					<p>Symmetry</p>
+					<p>
+						<select id="select-symmetry" name="symmetry =">
+							<option selected="selected" value="-2">Show all</option>
+							<option value="'odd'">odd</option>
+							<option value="'even'">even</option>
+						</select>
+					</p>
 
-			<div>
+					<p>Exactness of polynomial approximation</p>
+					<p>
+						<input id="input-exactness-poly-approx"
+							name="exactness_of_polynomial_approximation &gt;=" type="number"
+							value="0" min="0" step="1" max="100" maxlength="3" />
+					</p>
+
+					<p>Critical Hölder exponent</p>
+					<p>
+						<!-- start min from 0 because all scaling functions are bounded -->
+						<input id="select-critical-hoelder-exponent"
+							name="critical_Hoelder_exponent &gt;=" type="number" value="0"
+							min="0" step="0.0001" max="100" maxlength="3" />
+					</p>
+
+					<p>Critical Sobolev exponent</p>
+					<p>
+						<input id="select-critical-sobolev-exponent"
+							name="critical_Sobolev_exponent &gt;=" type="number" value="0"
+							min="0" step="0.0001" max="100" maxlength="3" />
+					</p>
+
+					<p>Spline order</p>
+					<p>
+						<input id="select-spline-order" name="spline_order &gt;="
+							type="number" value="-1" min="-1" step="1" max="100"
+							maxlength="3" />
+					</p>
+				</form>
+			</div>
+			<div id="middle">
+				<form id="form-scf" action="" method="post">
+					<p>
+						<b> Scaling-functions complying the conditions:</b>
+					</p>
+
+					<div>
+						<select id="select-primal-scfs">
+						</select>
+					</div>
+
+					<div>
+						<p>
+							<input id="button-show-scfs-info" type="button"
+								value="show information" /> <input id="button-plot-scfs"
+								type="button" value="plot scaling function" />
+						</p>
+					</div>
+				</form>
+
+				<form id="form-wavelets" action="" method="post">
+					<p>
+						<b> Possible dual scalingfunctions:</b>
+					</p>
+
+					<div>
+						<select id="select-dual-scfs">
+						</select>
+					</div>
+
+					<div>
+						<p>
+							<input id="button-plot-wavelet" type="button"
+								value="plot wavelet" />
+						</p>
+					</div>
+				</form>
+
 				<p>
-					<input id="button-plot-wavelet" type="button"
-						value="plot wavelet" /> 
+					<b>Infomation about the choosen scaling function:</b>
 				</p>
+				<div>
+					<textarea id="textarea-scfs-info" readonly rows="10" cols="50"> </textarea>
+				</div>
+				<p></p>
+				<div>
+					Reference: <a href="" id="link-reference"></a>
+				</div>
+
+				<p>
+					<b>Plot of the choosen scaling function:</b>
+				</p>
+				<div id="plot-scf"></div>
+
+
+				<p>
+					Show derivative: <input type="checkbox" id="check-show-derivative">
+				</p>
+
+				<div id="area-plot-derivative" style="display: none">
+					<p>
+						Enter derivative order: <input name="derivative_order="
+							type="text" value="" id="select-derivative-order" min="0"
+							max="100" />
+					</p>
+					<b>Plot of the choosen derivative:</b>
+					<div id="plot-derivative"></div>
+				</div>
+
+				<div id="area-plot-wavelet">
+					<b>Plot of wavelet:</b>
+					<div id="plot-wavelet"></div>
+				</div>
+
 			</div>
-		</form>
 
-		<p>
-			<b>Infomation about the choosen scaling function:</b>
-		</p>
-		<div>
-			<textarea id="textarea-scfs-info" readonly rows="10"
-				cols="50"> </textarea>
-		</div>
-		<p></p>
-		<div>
-			Reference: 
-			<a href="" id="link-reference" ></a>
+			<div id="footer">
+				<p>© 2016 - www.wavelets.de</p>
+			</div>
 		</div>
 
-		<p>
-			<b>Plot of the choosen scaling function:</b>
-		</p>
-		<div id="plot-scf"> </div>
+		<script>
+			//global variables containing the points of the ScalingFunctionPlot, Derivate-Plot and Wavelet-Plot
+			valuesScf = [];
+			valuesDer = [];
+			valuesWav = [];
 
-		
-		<p>
-				Show derivative: <input type="checkbox" id="check-show-derivative">
-		</p>
-		
-		<div id="area-plot-derivative"  style="display:none">	
-			<p> Enter derivative order: <input name="derivative_order=" type="text" value=""
-					id="select-derivative-order"  min="0" max ="100" />
-			</p>
-			<b>Plot of the choosen derivative:</b>			
-			<div id="plot-derivative"> </div>
-		</div>
-		
-		<div id="area-plot-wavelet">	
-			<b>Plot of wavelet:</b>			
-			<div id="plot-wavelet"> </div>
-		</div>
-		
-		</section>
+			//loads the database. (See dbMethods.js)
+			loadDB();
 
-		<footer>
-		<p>© 2016 - www.wavelets.de</p>
-		</footer>
-	</div>
+			//links the Html elements to their functions. (See htmlElementFunctions.js)
+			setHtmlFunctions();
 
-	<script>
-		//global variables containing the points of the ScalingFunctionPlot, Derivate-Plot and Wavelet-Plot
-		valuesScf=[];
-		valuesDer=[];
-		valuesWav=[];
-		
-		//loads the database. (See dbMethods.js)
-		loadDB();
-		
-		//links the Html elements to their functions. (See htmlElementFunctions.js)
-		setHtmlFunctions();
-		
-		//build the first function plot object into 'plot-scf' area
-		plotInstance1=buildPlot('#plot-scf');
-		plotInstance1.on("during:draw", zoomFilterScf);
+			//build the first function plot object into 'plot-scf' area
+			plotInstance1 = buildPlot('#plot-scf');
+			plotInstance1.on("during:draw", zoomFilterScf);
 
-		//build the second function plot object into 'plot-derivative' area
-		plotInstance2=buildPlot('#plot-derivative');
-		plotInstance2.on("during:draw", zoomFilterDer);
-		
-		//build the third function plot object into 'plot-wavelet' area
-		plotInstance3=buildPlot('#plot-wavelet');
-		plotInstance3.on("during:draw", zoomFilterWav);
-		
+			//build the second function plot object into 'plot-derivative' area
+			plotInstance2 = buildPlot('#plot-derivative');
+			plotInstance2.on("during:draw", zoomFilterDer);
+
+			//build the third function plot object into 'plot-wavelet' area
+			plotInstance3 = buildPlot('#plot-wavelet');
+			plotInstance3.on("during:draw", zoomFilterWav);
 		</script>
 </body>
+
 </html>
 
