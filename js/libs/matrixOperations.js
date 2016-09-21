@@ -353,6 +353,26 @@ function mult(lambda, a){
 }
 
 /** Create the Vandermonde-matrix of size n.
+ *	(last modification 21.9.16 Andreas)
+ * 
+ *  @param{Array} x entries x_1, x_2, ..., x_n of the second column.
+ * 
+ *  @return{Array} A the Vandermonde-matrix. 
+ */
+
+function vander(x) {
+	var n = x.length;
+	var A = createArray(n,n);
+	for (var i = 0; i < n; i++) {
+		for(var j = 0; j < n; j++) {
+			A[i][j] = Math.pow(x[i],j);
+		}
+	}
+
+	return A;
+}
+
+/** Create the Vandermonde-matrix of size n (rotated by 90 degree clockwise).
  *	(last modification 3.5.16 Andreas)
  * 
  *  @param{Array} x entries x_1, x_2, ..., x_n of the second column.
@@ -360,7 +380,6 @@ function mult(lambda, a){
  *  @return{Array} A the Vandermonde-matrix. 
  */
 
-//Achtung stimmt nicht mit wikipedia ueberein
 function vander90(x) {
 	var n = x.length;
 	var A = createArray(n,n);

@@ -1,11 +1,11 @@
 /**
- * this file contains the method to add the functions to some html elements on
- * the Fwavelet-plot.html file
+ *	This file contains the method to add the functions to some html elements on
+ * 	the Fwavelet-plot.html file
  * 
- * Dependencies:
- * sql.js, d3.js, function-plot.js, math.js, numeric-1.2.6.js, math2.js,
- * mask.js, matrixOperations.js, pointEvaluation.js, pointEvaluation2.js
- * gauss2.js, dbMethods.js
+ * 	Dependencies:
+ * 	sql.js, d3.js, function-plot.js, math.js, numeric-1.2.6.js, math2.js,
+ * 	mask.js, matrixOperations.js, pointEvaluation.js, pointEvaluation2.js
+ * 	gauss2.js, dbMethods.js
  */
 
 function setHtmlFunctions() {

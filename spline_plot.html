@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<!-- Date: 2016-04-26 -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Wavelet Plot</title>
+		<meta name="author" content="Simon" />
+		<meta name="author" content="Andreas" />
+		<!--include scripts and libraries-->
+		<script src="js/ext_libs/d3.js"></script>
+		<script src="js/libs/math2.js"></script>
+		<script src="js/libs/matrixOperations.js"></script>
+		<script src="js/ext_libs/function-plot.js"></script>
+		<script src="js/numeric-1.2.6.js"></script>
+		<script src="js/libs/gauss2.js"></script>
+
+	</head>
+	<body>
+		    	 
+    	<!--  <form id="draw_field"> 
+			<input type="submit" value="Draw" />
+		</form> -->
+    
+		<div id="plot"></div>
+		
+		<p>
+			Plot library:
+			<a href="https://github.com/maurizzzio/function-plot">
+				https://github.com/maurizzzio/function-plot
+			</a>
+		</p>
+
+		<script>
+			var plotInstance;
+			var controlPoints = [[-1, 2],[0, 0],[1, -2],[2, 0]];
+			var controlPointsX = [];	// vector with the x-coordinates of the controlPoints
+			var controlPointsY = [];	// vector with the y-coordinates of the controlPoints
+			
+			for(var k = 0; k < controlPoints.length; k++){
+				controlPointsX[k] = controlPoints[k][0];
+				controlPointsY[k] = controlPoints[k][1];
+			}
+			
+			// matrix with given constraints to the polynomial
+			var M = vander(controlPointsX);
+			var a = gaus2(M, controlPointsY);
+			console.log(a);
+			
+			function draw() {
+					try{ 
+						var plotInst = functionPlot({
+							target : '#plot',
+							data :  [{
+							    fn: '0.5*x^2',
+							    range: [-1, 2]
+							  },
+							  {
+							     fn: 'x',
+							     range: [2, 3]
+							     //color: 'blue'
+							  }]
+						});
+					
+					//return the wavelet plot as object
+					return plotInst;
+					
+				}catch (err) {
+					console.log(err);
+					alert(err);
+				}
+			}
+			
+			draw();
+			
+			//add the draw-function to the draw-button
+			//document.getElementById('draw_field').onsubmit = function(event) {
+			//	event.preventDefault();
+				//draw once and save the graph as object
+			//	plotInstance = draw();
+			//};
+		</script>
+	</body>
+</html>
+
