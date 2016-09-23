@@ -33,33 +33,47 @@
 
 		<script>
 			var plotInstance;
-			var controlPoints = [[-1, 2],[0, 0],[1, -2],[2, 0]];
-			var controlPointsX = [];	// vector with the x-coordinates of the controlPoints
-			var controlPointsY = [];	// vector with the y-coordinates of the controlPoints
+			var intervals = [[-1, 2],[2, 3]];
+			//control points per interval
+			var controlPoints = [[[-1, 2],[0, 0],[1, -2],[2, 0]],
+			                     [[2,2],[2.5, 2.5],[2.7,2.7],[3,3]]];
 			
-			for(var k = 0; k < controlPoints.length; k++){
-				controlPointsX[k] = controlPoints[k][0];
-				controlPointsY[k] = controlPoints[k][1];
+			// vector with the x-coordinates of the controlPoints
+			var controlPointsX = [];
+			
+			// vector with the y-coordinates of the controlPoints
+			var controlPointsY = [];
+			
+			for(var i = 0; i < intervals.length; i++){
+				controlPointsX[i] = [];
+				controlPointsY[i] = [];
+				for(var j = 0; j < controlPoints[i].length; j++){
+					controlPointsX[i][j] = controlPoints[i][j][0];
+					controlPointsY[i][j] = controlPoints[i][j][1];
+				}	
 			}
 			
+			var splineCoeffs = [];	// coefficients per interval
+			var M;
 			// matrix with given constraints to the polynomial
-			var M = vander(controlPointsX);
-			var a = gaus2(M, controlPointsY);
-			console.log(a);
+			for(var i = 0; i < intervals.length; i++){
+				var M = vander(controlPointsX[i]);
+				splineCoeffs[i] = gaus2(M, controlPointsY[i]);
+			}
 			
+			// create the data to plot
+			var dataToPlot = [];
+			for(var i = 0; i < intervals.length; i++){
+				dataToPlot[i] = {
+						fn: coeffsToStringRepresentation(splineCoeffs[i]),  
+						range: intervals[i]
+				}
+			}
 			function draw() {
 					try{ 
 						var plotInst = functionPlot({
 							target : '#plot',
-							data :  [{
-							    fn: '0.5*x^2',
-							    range: [-1, 2]
-							  },
-							  {
-							     fn: 'x',
-							     range: [2, 3]
-							     //color: 'blue'
-							  }]
+							data :  dataToPlot
 						});
 					
 					//return the wavelet plot as object

@@ -103,5 +103,23 @@ function polyAdd2(p1,p2){
 		sum[i]=pLong[i]+pShort[i-diff];
 	}
 	return sum;
-	
+}
+
+/**
+ * Convert the coefficients of a polynomial to a string-representation.
+ * (last modification 21.9.16 Andreas)
+ * 
+ * 		@param{Array} coefficients.
+ * 
+ * 		@return{String} stringRepresentation.
+ */
+function coeffsToStringRepresentation(coeffs){
+	stringRepresentation = coeffs[0].toString();
+	if(coeffs.length > 1){
+		stringRepresentation += '+'+coeffs[1].toString()+'*x';
+	}
+	for(var i = 2; i < coeffs.length; i++){
+		stringRepresentation += '+'+coeffs[i].toString()+'*x^'+i.toString();
+	}
+	return stringRepresentation;
 }
