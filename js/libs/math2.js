@@ -109,9 +109,9 @@ function polyAdd2(p1,p2){
  * Convert the coefficients of a polynomial to a string-representation.
  * (last modification 21.9.16 Andreas)
  * 
- * 		@param{Array} coefficients.
- * 
- * 		@return{String} stringRepresentation.
+ *	 @param{Array} coefficients.
+ *  
+ * 	 @return{String} stringRepresentation.
  */
 function coeffsToStringRepresentation(coeffs){
 	stringRepresentation = coeffs[0].toString();
@@ -122,4 +122,51 @@ function coeffsToStringRepresentation(coeffs){
 		stringRepresentation += '+'+coeffs[i].toString()+'*x^'+i.toString();
 	}
 	return stringRepresentation;
+}
+
+/**
+ *  Get the coefficients of the coefficients of the mth derivative
+ *  of a polynomial with degree n.
+ *  (last modification 23.9.16 Andreas)
+ *  
+ *    @param{Integer} n		degree of the polynomial.
+ *    @param{Integer} m		derivative-order ( m <= n+1).
+ *    
+ *    @param{Array}	  a		coefficients.
+ */
+function getPolyDerivativeCoefficients(n,m){
+	var a = [];
+	
+	for(var i = 0; i < m; i++){
+		a[i] = 0;
+	}
+	
+	for(var i = m; i < n + 1; i++){
+		var b = i;
+		for(var j = 1; j < m; j++){
+			b *= i - j;
+		}
+		a[i] = b;
+	}
+	return a;
+}
+
+/**
+ *  Compute the spline coefficients of a cubic spline from given control
+ *  points. It is assumed that there are four control points per interval
+ *  (counted with multiplicity for C^0-, C^1- or C^2-transitions between
+ *  the polynomials).
+ *  (last modification 23.9.16 Andreas)
+ *  
+ *  @param{Array} controlPointsX	array with the x-coordinates of the points.
+ *  @param{Array} controlPointsY	array with the y-coordinates of the points.
+ *  
+ *  @return{Array} coefficients.
+ */
+function computeCubicSplineCoeffs(controlPointsX, controlPointsY){
+	if(controlPointsX.length != controlPointsY.length){
+		console.error("Dimensions of controlPointsX and controlPointsY" +
+				"mismatch.");
+	}
+	
 }

@@ -12,12 +12,11 @@
         <script src="js/matrixOperations.js"></script>
         <script src="js/numeric-1.2.6.js"></script>
         <script src="js/mask.js"></script>
-        <script src="js/math.js"></script>
         
         <script src="js/gauss2.js"></script>
         <script src="js/pointEvaluation2.js"></script>
         <script src="js/pointEvaluation.js"></script>
-        <script src="js/math2.js"></script>
+        <script src="js/libs/math2.js"></script>
         
         <script type="text/x-mathjax-config">
   			MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
@@ -66,6 +65,17 @@
     	<div id="plot"></div>
         
         <script>
+        
+        /**
+        *	Test of math-funcitonalities
+        */
+        var a1 = getPolyDerivativeCoefficients(3,1);
+        var a2 = getPolyDerivativeCoefficients(3,2);
+        var a3 = getPolyDerivativeCoefficients(3,3);
+        console.log("a1", a1);
+        console.log("a2", a2);
+        console.log("a3", a3);
+        
         
 //         var i = 0;
 //         var I = 2;
