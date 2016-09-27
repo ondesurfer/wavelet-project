@@ -9,7 +9,7 @@
         <meta name="author" content="Andreas">
         <!--Einbinden der Scripte und Bibliotheken-->
         <script src="js/d3.js"></script>
-        <script src="js/matrixOperations.js"></script>
+        <script src="js/libs/matrixOperations.js"></script>
         <script src="js/numeric-1.2.6.js"></script>
         <script src="js/mask.js"></script>
         
@@ -69,13 +69,16 @@
         /**
         *	Test of math-funcitonalities
         */
-        var a1 = getPolyDerivativeCoefficients(3,1);
+        /*var a1 = getPolyDerivativeCoefficients(3,1);
         var a2 = getPolyDerivativeCoefficients(3,2);
         var a3 = getPolyDerivativeCoefficients(3,3);
         console.log("a1", a1);
         console.log("a2", a2);
-        console.log("a3", a3);
-        
+        console.log("a3", a3);*/
+        var A = zeros(3);
+        var B = [[1,2],[3,4]];
+        setBlockMatrix(A,B,1,1);
+        printMatrix(A);
         
 //         var i = 0;
 //         var I = 2;

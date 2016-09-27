@@ -166,7 +166,69 @@ function getPolyDerivativeCoefficients(n,m){
 function computeCubicSplineCoeffs(controlPointsX, controlPointsY){
 	if(controlPointsX.length != controlPointsY.length){
 		console.error("Dimensions of controlPointsX and controlPointsY" +
-				"mismatch.");
+				" mismatch.");
 	}
 	
+	var n = controlPointsX.length;
+	numberOfIntervals = n/4;
+
+	if(!(Number.isInteger(numberOfIntervals))){
+		console.log(numberOfIntervals);
+		console.error("The number of points ist not a multiple of 4.");
+	}
+	
+	var M = zeros(n);
+	var b = new Array(n);
+	for(var i = 0; i < numberOfIntervals; i++){
+		
+		// array to save the x-coordinates of the control points for the
+		// current interval
+		var controlPointsX_i = new Array(4);
+		controlPointsX_i[0] = controlPointsX[4*i];
+		
+		b[4*i] = controlPointsY[4*i];
+		
+		var multipleKnots = 0;
+		// count the multiplicity of the knot at the end of the interval
+		for(var j = 1; j < 4; j ++){
+			controlPointsX_i[j] = controlPointsX[4*i + j];
+			b[4*i + j] = controlPointsY[4*i + j];
+			
+			if(controlPointsX[4*i + 3] == controlPointsX_i[j]){
+				multipleKnots++;
+			}
+		}
+		
+		var M_i = vander(controlPointsX_i);
+		
+		setBlockMatrix(M, M_i, 4*i, 4*i);
+		
+		var derivativeCoeffs = [];
+		
+		// modify the matrix in the case of multiple knots
+		// begin with j = 2, because C^0-regularity amounts no matrix-change
+		var coeff_pot = 0;
+		for(var j = 2; j < multipleKnots + 1; j++){
+			derivativeCoeffs = getPolyDerivativeCoefficients(3, j - 1);
+			for(var k = 0; k < 4; k++){
+				/*console.log("derivativeCoeffs", derivativeCoeffs[k]);
+				console.log("(controlPointsX[4*i + k])",
+						Math.pow(controlPointsX[4*i + k], k - j + 1));*/
+				coeff_pot = Math.pow(controlPointsX[4*i + k], k - j + 1);
+				if(coeff_pot == Infinity){
+					coeff_pot = 0;
+				}
+				//console.log("coeff_pot", coeff_pot);
+				M[4*i + 4 - j][4*i + k] = derivativeCoeffs[k] * coeff_pot;
+				M[4*i + 4 - j][4*i + k + 4] = -(derivativeCoeffs[k]) * coeff_pot;
+			}
+			b[4*i + 4 - j] = 0;
+		}
+	}
+	printMatrix(M);
+	console.log(b);
+	
+	var a = gaus2(M, b);
+	
+	return a;
 }

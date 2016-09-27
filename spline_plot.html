@@ -33,9 +33,9 @@
 
 		<script>
 			var plotInstance;
-			var intervals = [[-1, 2],[2, 3]];
+			//var intervals = [[-1, 2],[2, 3]];
 			//control points per interval
-			var controlPoints = [[[-1, 2],[0, 0],[1, -2],[2, 0]],
+			/*var controlPoints = [[[-1, 2],[0, 0],[1, -2],[2, 0]],
 			                     [[2,2],[2.5, 2.5],[2.7,2.7],[3,3]]];
 			
 			// vector with the x-coordinates of the controlPoints
@@ -51,24 +51,42 @@
 					controlPointsX[i][j] = controlPoints[i][j][0];
 					controlPointsY[i][j] = controlPoints[i][j][1];
 				}	
-			}
+			}*/
+			var polyDegree = 3;
+			var m = polyDegree + 1;
+			/*var controlPointsX = [-1,0,1,2,2,2.5,2.7,3];
+			var controlPointsY = [2,0,-2,0,2,2.5,2.7,3];*/
+			var controlPointsX = [0,1,2,2, 2,5,5,5, 5,6,7,8];
+			var controlPointsY = [1,2,2,2, 2,0,0,0, 0,-1,-1,0];
+			var numberOfIntervals = controlPointsX.length/m;
 			
-			var splineCoeffs = [];	// coefficients per interval
+			//test of extra-function
+			var a = computeCubicSplineCoeffs(controlPointsX, controlPointsY);
+			
+			/*var splineCoeffs = [];	// coefficients per interval
 			var M;
 			// matrix with given constraints to the polynomial
 			for(var i = 0; i < intervals.length; i++){
 				var M = vander(controlPointsX[i]);
 				splineCoeffs[i] = gaus2(M, controlPointsY[i]);
 			}
+			*/
 			
 			// create the data to plot
 			var dataToPlot = [];
-			for(var i = 0; i < intervals.length; i++){
+			var splineCoeffs = new Array(m);
+			for(var i = 0; i < numberOfIntervals; i++){
+				for(var j = 0; j < m; j++){
+					splineCoeffs[j] = a[m*i + j];  
+				}
+				
+				console.log(coeffsToStringRepresentation(splineCoeffs));
 				dataToPlot[i] = {
-						fn: coeffsToStringRepresentation(splineCoeffs[i]),  
-						range: intervals[i]
+						fn: coeffsToStringRepresentation(splineCoeffs),  
+						range: [controlPointsX[4*i], controlPointsX[4*i + 3]]
 				}
 			}
+			console.log(dataToPlot);
 			function draw() {
 					try{ 
 						var plotInst = functionPlot({

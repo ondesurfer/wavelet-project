@@ -320,6 +320,25 @@ function ones(n) {
 	return A;
 }
 
+/** Create a nxn-Matrix with all entries = 0.
+ * (last modification 26.9.16 Andreas) 
+ * 
+ *  @param{int} n size of the array.
+ * 
+ * 	@return{Array} A the matrix.
+ */
+function zeros(n) {
+	var A = new Array(n);
+	for (var i = 0; i < n; i++) {
+		A[i] = new Array(n);
+		for(var j = 0; j < n; j++) {
+			A[i][j] = 0;
+		}
+	}
+
+	return A;
+}
+
 /** Create a vector of length n with all entries = 0.
  * (last modification 17.5.16 Andreas) 
  * 
@@ -471,4 +490,29 @@ function conv(a,b){
 		}
 	}
 	return c;
+}
+
+/**
+*	Write entries in blocks into a matrix.
+*	(last modification: 26.9.16 Andreas)
+*
+*   @param{Array} A		the matrix to write to.
+*   @param{Array} B		the squared matrix to insert.
+*   
+*   @param{Integer} r1	row-index of the left upper box-entry.
+*   @param{Integer} c1	column-index of the left upper box-entry.
+*   
+*   A[r1,c1]	...		A[r1,c2]
+*   	.					.		
+*   	.					.		=	B
+*   	.					.
+*   A[r2,c1]	...		A[r2,c2]
+*/
+function setBlockMatrix(A,B,r1,c1){
+	var n = B.length;
+	for(var i = 0; i < n; i ++){
+		for(var j = 0; j < n; j ++){
+			A[r1 + i][c1 + j] = B[i][j];
+		}
+	}
 }
