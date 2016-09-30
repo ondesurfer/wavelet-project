@@ -319,7 +319,7 @@ module.exports = function (chart) {
         .attr('fill', d3.hsl(color.toString()).brighter(1.5))
         .attr('stroke', color)
         .attr('opacity', 0.7)
-        .attr('r', 1)
+        .attr('r', 5)	//changed by Andreas, 30.9.16 from 1 to 5
         .attr('cx', function (d) { return xScale(d[0]) })
         .attr('cy', function (d) { return yScale(d[1]) })
 

@@ -75,18 +75,53 @@
 			// create the data to plot
 			var dataToPlot = [];
 			var splineCoeffs = new Array(m);
+			// nSamples = floor(samplesPropConst * interval-length)
+			var nSamples;
+			var samplesPropConst = 100;
+			var intervalLength;
+			var step = 0;	// step size per interval
+			
 			for(var i = 0; i < numberOfIntervals; i++){
 				for(var j = 0; j < m; j++){
-					splineCoeffs[j] = a[m*i + j];  
+					splineCoeffs[j] = a[i*m + j];  
 				}
 				
+				intervalLength = Math.abs(controlPointsX[(i + 1)*m - 1]
+									- controlPointsX[i*m]);
+				nSamples = Math.floor(samplesPropConst * intervalLength);
+				step = intervalLength/nSamples;
+				nSamples++;
+				var values = createArray(nSamples,2);
+				
+				for(var j = 0; j < nSamples; j ++){
+					values[j][0] = controlPointsX[i*m] + j*step;
+					values[j][1] = horner(splineCoeffs, values[j][0]);
+					//console.log(values[i][1]);
+				}
 				console.log(coeffsToStringRepresentation(splineCoeffs));
-				dataToPlot[i] = {
+				/*dataToPlot[i] = {
 						fn: coeffsToStringRepresentation(splineCoeffs),  
 						range: [controlPointsX[4*i], controlPointsX[4*i + 3]]
-				}
+				}*/
+				
+				dataToPlot[i] = {
+									points : values,
+									fnType : 'points',
+									graphType : 'polyline'
+								};
+				
 			}
-			console.log(dataToPlot);
+			// add the control points to the plot
+			for(var i = 0; i < controlPointsX.length; i++){
+				dataToPlot[i + numberOfIntervals] = {
+						points : [[controlPointsX[i], controlPointsY[i]]],
+						fnType : 'points',
+						graphType : 'scatter',
+						color: 'pink'
+					};
+			}
+			
+			
 			function draw() {
 					try{ 
 						var plotInst = functionPlot({

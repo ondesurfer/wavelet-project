@@ -225,10 +225,29 @@ function computeCubicSplineCoeffs(controlPointsX, controlPointsY){
 			b[4*i + 4 - j] = 0;
 		}
 	}
-	printMatrix(M);
-	console.log(b);
+	//printMatrix(M);
+	//console.log("b", b);
 	
 	var a = gaus2(M, b);
 	
 	return a;
+}
+
+/**
+ *  Compute a polynomial via Horner-scheme.
+ *  (last modification 29.9.16 Andreas)
+ *  
+ *  @param{Array}	coeffs		coefficients of the polynomial
+ *  							(coeffs[0] + coeffs[1]*x + ...). 
+ *  @param{Float}	x			the point to evaluate.
+ *  
+ *  @return{Float}	y			the value of the evaluation.
+ *  
+ */
+function horner(coeffs, x){
+	var y = coeffs[coeffs.length - 1];
+	for(var i = coeffs.length - 1; i > 0; i--){
+		y = x*y + coeffs[i - 1];
+	}
+	return y;
 }
