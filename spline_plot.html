@@ -106,7 +106,8 @@
 
 				for (var j = 0; j < nSamples; j++) {
 					values[j][0] = splineValuesX[i * m] + j * step;
-					values[j][1] = horner(splineCoeffs, values[j][0]);
+					values[j][1] = horner(splineCoeffs, values[j][0]); // here could be the extended horner scheme for evaluation of derivative-points
+					// the extended horner scheme can be found in SCHUMAKER "Spline Functions - Basic Theory" p.105 Remark 3.1
 					//console.log(values[i][1]);
 				}
 				console.log(coeffsToStringRepresentation(splineCoeffs));
