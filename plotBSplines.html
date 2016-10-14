@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+	.chart div {
+		font: 10px sans-serif;
+		background-color: steelblue;
+		text-align: right;
+		padding: 3px;
+		margin: 1px;
+		color: white;
+	}
+
+</style>
+<div class="chart"></div>
+test-File
+<!--<script src="//d3js.org/d3.v3.min.js"></script>\\-->
+<script src="js/d3.js"></script>
+<script src="js/math.js"></script>
+<script src="js/math2.js"></script>
+<script src="js/mask.js"></script>
+<script src="js/matrixOperations.js"></script>
+<script src="js/htmlElementFunctions2.js"></script>
+<script src="js/pointEvaluation.js"></script>
+<script src="js/gauss2.js"></script>
+<!-- load http://maurizzzio.github.io/function-plot/ -->
+<script src="js/function-plot.js"></script>
+<script src="js/numeric-1.2.6.js"></script>
+
+<body>
+	<div id="plot1"> </div>
+	<div id="plot2"> </div>
+	
+</body>
+
+<script>
+	
+	//evaluates B-Spline N_{d,k} with the knots t at the point x
+	function evaluateBSplineInPointX(d,t,k,x){
+		if(d==1){
+			if(t[k-1]<=x&& x<t[k]){
+				return 1;
+			}else{
+				return 0;
+			}
+			
+		}
+		else{
+			var y=0;
+			var diff=t[k+d-2]-t[k-1];
+			if(diff>0){
+				y=(x-t[k-1])*evaluateBSplineInPointX(d-1,t,k,x)/diff;
+			}
+			diff=t[k+d-1]-t[k];
+			if(diff>0){
+				y=y+(t[k+d-1]-x)*evaluateBSplineInPointX(d-1,t,k+1,x)/diff;
+			}
+		}
+		return y;
+	}
+	
+	function makeGrid(start,end,count){
+		var x=new Array(count);
+		var step=(end-start)/(x.length-1);
+		for (var i=0; i < x.length; i++) {
+		  x[i]=start+i*step;
+		};
+		return x;
+	}
+	
+	function evaluateBSplineInGrid(d,t,k,start,end,count){
+		var x = makeGrid(start,end,count);
+		var points = new Array(x.length);
+		
+		for(var i=0; i< x.length; i++){
+			points[i]=[x[i],evaluateBSplineInPointX(d,t,k,x[i])];
+		}
+		return points;
+	}
+	
+	function evaluateFirstDerivOfBSplineInPointX(d,t,k,x){
+		if(d<2){
+			return 0;
+		}			
+		else{
+			var y=0;
+			var diff=t[k+d-2]-t[k-1];
+			if(diff>0){
+				y=(d-1)*evaluateBSplineInPointX(d-1,t,k,x)/diff;
+			}
+			diff=t[k+d-1]-t[k];
+			if(diff>0){
+				y=y-(d-1)*evaluateBSplineInPointX(d-1,t,k+1,x)/diff;
+			}
+		}
+		return y;
+	}
+	
+	function evaluateFirstDerivOfBSplineInGrid(d,t,k,start,end,count){
+		var x = makeGrid(start,end,count);
+		var points = new Array(x.length);
+		
+		for(var i=0; i< x.length; i++){
+			points[i]=[x[i],evaluateFirstDerivOfBSplineInPointX(d,t,k,x[i])];
+		}
+		return points;
+	}
+	
+	
+	//global gespeicherte Werte und Plot-Instance
+	values1 = evaluateBSplineInGrid(4,[0,0.5,2,4,5],1,-1,5,1000);
+	values2 = evaluateFirstDerivOfBSplineInGrid(4,[0,0.5,2,4,5],1,-1,5,1000);
+	plotInst1 = 0;
+	plotInst2 = 0;
+	
+	//erstellt die PlotInstance
+	function makePlotInst1() {			
+					try{ 
+							plotInst = functionPlot({
+							target : '#plot1',
+							data : [{
+								points : values1,
+								fnType : 'points',
+								graphType : 'polyline',
+							}]
+						});
+					
+					//return the wavelet plot as object
+					return plotInst;
+					
+				}catch (err) {
+					console.log(err);
+					alert(err);
+				}
+		}
+	makePlotInst1();
+	
+	function makePlotInst2() {			
+					try{ 
+							plotInst = functionPlot({
+							target : '#plot2',
+							data : [{
+								points : values2,
+								fnType : 'points',
+								graphType : 'polyline',
+							}]
+						});
+					
+					//return the wavelet plot as object
+					return plotInst;
+					
+				}catch (err) {
+					console.log(err);
+					alert(err);
+				}
+		}
+	makePlotInst2();
+
+
+	
+	
+	
+	
+
+	/*function compareMethods(method1, method2, a, N,mu) {
+		var values = new Array(6);
+		var t_start1, t_end1, t_start2, t_end2;
+		//take the time of the first variant and save it in values[0]
+		t_start1 = new Date().getTime();
+		var rek = method1(a, N, mu);
+		t_end1 = new Date().getTime();
+		values[0] = t_end1 - t_start1;
+
+		//take the time of the second variant and save it in values[1]
+		t_start2 = new Date().getTime();
+		var it = method2(a, N, mu);
+		t_end2 = new Date().getTime();
+		values[1] = t_end2 - t_start2;
+
+		//compute a difference-array and save it in values[2]
+		var diff = createArray(rek.length, 2);
+		for (var z = 0; z < diff.length; z++) {
+			for (var s = 0; s < 2; s++) {
+				if (s == 0)
+					diff[z][s] = rek[z][1];
+				if (s == 1) {
+					diff[z][s] = rek[z][s] - it[z][s];
+				}
+			}
+		}
+		values[2] = diff;
+
+		//sum the absolute values of the differences and save it in values[3]
+		var sum = 0;
+		for (var i = 0; i < diff.length; i++) {
+			sum += Math.abs(diff[i][1]);
+		}
+		values[3] = sum;
+
+		return values;
+	}
+
+	var values = compareMethods(iterativePointEvaluation, 
+		iterativePointEvaluation2, d4, 5, 0);
+		
+	console.log("comparison of both methods: time of the first method:", 
+		values[0], "time of the second method:", values[1], 
+		"difference-vector of both methods:", values[2], 
+		"sum of the absolute values of the difference:", values[3]);
+
+	function runningTime(variant) {
+		var t_start, t_end;
+		t_start = new Date().getTime();
+		console.log(d2);
+		console.log(testCoeffs(d2, 5));
+		console.log(coeffsToMatrix(d2));
+		console.log(calculateIntegerPointValues(d2));
+		console.log(iterativePointEvaluation(d2, 20, variant));
+		t_end = new Date().getTime();
+		console.log("at variant", variant, "running time", t_end - t_start);
+	}*/
+
+</script>
