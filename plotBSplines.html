@@ -14,22 +14,21 @@
 <div class="chart"></div>
 test-File
 <!--<script src="//d3js.org/d3.v3.min.js"></script>\\-->
-<script src="js/d3.js"></script>
-<script src="js/math.js"></script>
-<script src="js/math2.js"></script>
-<script src="js/mask.js"></script>
-<script src="js/matrixOperations.js"></script>
+<script src="js/ext_libs/d3.js"></script>
+<script src="js/libs/math2.js"></script>
+<script src="js/libs/mask.js"></script>
+<script src="js/libs/matrixOperations.js"></script>
 <script src="js/htmlElementFunctions2.js"></script>
-<script src="js/pointEvaluation.js"></script>
-<script src="js/gauss2.js"></script>
+<script src="js/libs/pointEvaluation.js"></script>
+<script src="js/libs/gauss2.js"></script>
 <!-- load http://maurizzzio.github.io/function-plot/ -->
-<script src="js/function-plot.js"></script>
-<script src="js/numeric-1.2.6.js"></script>
+<script src="js/ext_libs/function-plot.js"></script>
+<script src="js/ext_libs/numeric-1.2.6.js"></script>
 
 <body>
 	<div id="plot1"> </div>
 	<div id="plot2"> </div>
-	
+	<div id="plot3"> </div>
 </body>
 
 <script>
@@ -46,7 +45,7 @@ test-File
 		}
 		else{
 			var y=0;
-			var diff=t[k+d-2]-t[k-1];
+			var diff=t[k+d-2]-t[k-1]; 
 			if(diff>0){
 				y=(x-t[k-1])*evaluateBSplineInPointX(d-1,t,k,x)/diff;
 			}
@@ -67,15 +66,15 @@ test-File
 		return x;
 	}
 	
-	function evaluateBSplineInGrid(d,t,k,start,end,count){
-		var x = makeGrid(start,end,count);
-		var points = new Array(x.length);
+// 	function evaluateBSplineInGrid(d,t,k,start,end,count){
+// 		var x = makeGrid(start,end,count);
+// 		var points = new Array(x.length);
 		
-		for(var i=0; i< x.length; i++){
-			points[i]=[x[i],evaluateBSplineInPointX(d,t,k,x[i])];
-		}
-		return points;
-	}
+// 		for(var i=0; i< x.length; i++){
+// 			points[i]=[x[i],evaluateBSplineInPointX(d,t,k,x[i])];
+// 		}
+// 		return points;
+// 	}
 	
 	function evaluateFirstDerivOfBSplineInPointX(d,t,k,x){
 		if(d<2){
@@ -88,6 +87,7 @@ test-File
 				y=(d-1)*evaluateBSplineInPointX(d-1,t,k,x)/diff;
 			}
 			diff=t[k+d-1]-t[k];
+			
 			if(diff>0){
 				y=y-(d-1)*evaluateBSplineInPointX(d-1,t,k+1,x)/diff;
 			}
@@ -95,72 +95,132 @@ test-File
 		return y;
 	}
 	
-	function evaluateFirstDerivOfBSplineInGrid(d,t,k,start,end,count){
+	function evaluateRthDerivOfBSplineInPointX(d,t,k,r,x){
+		if(d<2){
+			return 0;
+		}
+		// there should be another constraint C(d,r) to return 0
+		else if(r == 1){
+			console.log("the first derivative");
+			return evaluateFirstDerivOfBSplineInPointX(d,t,k,x);
+		}
+		else{
+			var y=0;
+			var diff=t[k+d-2]-t[k-1];
+			if(diff>0){
+				y=(d-1)*evaluateRthDerivOfBSplineInPointX(d-1,t,k,r-1,x)/diff;
+			}
+			diff=t[k+d-1]-t[k];
+			if(diff>0){
+				y=y-(d-1)*evaluateRthDerivOfBSplineInPointX(d-1,t,k+1,r-1,x)/diff;
+			}
+		}
+		return y;
+	}
+	
+// 	function evaluateFirstDerivOfBSplineInGrid(d,t,k,start,end,count){
+// 		var x = makeGrid(start,end,count);
+// 		var points = new Array(x.length);
+		
+// 		for(var i=0; i< x.length; i++){
+// 			points[i]=[x[i],evaluateFirstDerivOfBSplineInPointX(d,t,k,x[i])];
+// 		}
+// 		return points;
+// 	}
+	
+	// test of a general evaluation in grid function
+	/*  Evaluate a function on grid points specified by [start, end, count]
+		(last modification: 17.10.16 Andreas)
+	*/
+	function evaluateFunctionInGrid(funct,params,start,end,count){
 		var x = makeGrid(start,end,count);
 		var points = new Array(x.length);
 		
+		params.push(0); // it would be better to have a deep copy
+		
 		for(var i=0; i< x.length; i++){
-			points[i]=[x[i],evaluateFirstDerivOfBSplineInPointX(d,t,k,x[i])];
+			params[params.length -1 ] = x[i];
+			points[i]=[x[i], funct.apply(this, params)];
+			//console.log(funct.apply(this, params));
+			//console.log(params);
+			
 		}
 		return points;
-	}
-	
+	} 
 	
 	//global gespeicherte Werte und Plot-Instance
+	//values1 = evaluateBSplineInGrid(4,[0,0.5,2,4,5],1,-1,5,1000);
+	//values1 = [];
+	//console.time("Evaluation of BSpline on Grid with generalized function");
+	var params1 = [4,[0,0.5,2,4,5],1];
+	var values1 = evaluateFunctionInGrid(evaluateBSplineInPointX, params1,-1,5,1000);
+	//console.time("Evaluation of BSpline on Grid with generalized function");
+	
+	/*console.time("Evaluation of BSpline on Grid without generalized function");
 	values1 = evaluateBSplineInGrid(4,[0,0.5,2,4,5],1,-1,5,1000);
-	values2 = evaluateFirstDerivOfBSplineInGrid(4,[0,0.5,2,4,5],1,-1,5,1000);
+	console.time("Evaluation of BSpline on Grid without generalized function");*/
+	
+	//values2 = [];
+	var params1 = [4,[0,0.5,2,4,5],1];
+	var values2 = evaluateFunctionInGrid(evaluateFirstDerivOfBSplineInPointX, params1,-1,5,1000);
+	
+	//evaluate the rth derivate
+	var r = 2
+	//values3 = [];
+	var params1 = [4,[0,0.5,2,4,5],1,r];
+	values3 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params1,-1,5,1000);
+	
 	plotInst1 = 0;
 	plotInst2 = 0;
+	plotInst3 = 0;
 	
 	//erstellt die PlotInstance
-	function makePlotInst1() {			
-					try{ 
-							plotInst = functionPlot({
-							target : '#plot1',
-							data : [{
-								points : values1,
-								fnType : 'points',
-								graphType : 'polyline',
-							}]
-						});
+// 	function makePlotInst1() {			
+// 					try{ 
+// 							plotInst = functionPlot({
+// 							target : '#plot1',
+// 							data : [{
+// 								points : values1,
+// 								fnType : 'points',
+// 								graphType : 'polyline',
+// 							}]
+// 						});
 					
-					//return the wavelet plot as object
-					return plotInst;
+// 					//return the wavelet plot as object
+// 					return plotInst;
 					
-				}catch (err) {
-					console.log(err);
-					alert(err);
-				}
-		}
-	makePlotInst1();
+// 				}catch (err) {
+// 					console.log(err);
+// 					alert(err);
+// 				}
+// 		}
+// 	makePlotInst1();
 	
-	function makePlotInst2() {			
-					try{ 
-							plotInst = functionPlot({
-							target : '#plot2',
-							data : [{
-								points : values2,
-								fnType : 'points',
-								graphType : 'polyline',
-							}]
-						});
-					
-					//return the wavelet plot as object
-					return plotInst;
-					
-				}catch (err) {
-					console.log(err);
-					alert(err);
-				}
-		}
-	makePlotInst2();
-
-
+	// a general function to create a plot-instances
+	function makePlotInst(target, values){
+		try{ 
+			plotInst = functionPlot({
+			target : target,
+			data : [{
+				points : values,
+				fnType : 'points',
+				graphType : 'polyline',
+			}]
+		});
 	
+			//return the wavelet plot as object
+			return plotInst;
+				
+			}catch (err) {
+				console.log(err);
+				alert(err);
+			}
+	}
 	
+	makePlotInst('#plot1', values1);		
+	makePlotInst('#plot2', values2);		
+	makePlotInst('#plot3', values3);		
 	
-	
-
 	/*function compareMethods(method1, method2, a, N,mu) {
 		var values = new Array(6);
 		var t_start1, t_end1, t_start2, t_end2;
