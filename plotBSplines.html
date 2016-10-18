@@ -76,7 +76,7 @@ test-File
 // 		return points;
 // 	}
 	
-	function evaluateFirstDerivOfBSplineInPointX(d,t,k,x){
+	/*function evaluateFirstDerivOfBSplineInPointX(d,t,k,x){
 		if(d<2){
 			return 0;
 		}			
@@ -93,17 +93,19 @@ test-File
 			}
 		}
 		return y;
-	}
+	}*/
 	
 	function evaluateRthDerivOfBSplineInPointX(d,t,k,r,x){
-		if(d<2){
+		//return 0 if the order of derivate is bigger than the spline-order
+		if(d<r+1){
 			return 0;
 		}
-		// there should be another constraint C(d,r) to return 0
-		else if(r == 1){
-			console.log("the first derivative");
-			return evaluateFirstDerivOfBSplineInPointX(d,t,k,x);
+		
+		//if just the point-evaluation (without derivation) is searched
+		if(r==0){
+			return evaluateBSplineInPointX(d,t,k,x);
 		}
+		
 		else{
 			var y=0;
 			var diff=t[k+d-2]-t[k-1];
@@ -136,11 +138,12 @@ test-File
 		var x = makeGrid(start,end,count);
 		var points = new Array(x.length);
 		
-		params.push(0); // it would be better to have a deep copy
+		var params2 = deepCopyVector(params);
+		params2.push(0); // it would be better to have a deep copy
 		
 		for(var i=0; i< x.length; i++){
-			params[params.length -1 ] = x[i];
-			points[i]=[x[i], funct.apply(this, params)];
+			params2[params2.length -1 ] = x[i];
+			points[i]=[x[i], funct.apply(this, params2)];
 			//console.log(funct.apply(this, params));
 			//console.log(params);
 			
@@ -152,23 +155,23 @@ test-File
 	//values1 = evaluateBSplineInGrid(4,[0,0.5,2,4,5],1,-1,5,1000);
 	//values1 = [];
 	//console.time("Evaluation of BSpline on Grid with generalized function");
-	var params1 = [4,[0,0.5,2,4,5],1];
-	var values1 = evaluateFunctionInGrid(evaluateBSplineInPointX, params1,-1,5,1000);
-	//console.time("Evaluation of BSpline on Grid with generalized function");
+	//var params1 = [4,[0,0.5,0.5,2,4,5],1];
+	//var values1 = evaluateFunctionInGrid(evaluateBSplineInPointX, params1,-1,5,1000);
+	//console.timeEnd("Evaluation of BSpline on Grid with generalized function");
 	
 	/*console.time("Evaluation of BSpline on Grid without generalized function");
 	values1 = evaluateBSplineInGrid(4,[0,0.5,2,4,5],1,-1,5,1000);
-	console.time("Evaluation of BSpline on Grid without generalized function");*/
+	console.timeEnd("Evaluation of BSpline on Grid without generalized function");*/
 	
-	//values2 = [];
-	var params1 = [4,[0,0.5,2,4,5],1];
-	var values2 = evaluateFunctionInGrid(evaluateFirstDerivOfBSplineInPointX, params1,-1,5,1000);
-	
-	//evaluate the rth derivate
-	var r = 2
+		
+
 	//values3 = [];
-	var params1 = [4,[0,0.5,2,4,5],1,r];
-	values3 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params1,-1,5,1000);
+	var params1 = [4,[0,0.5,0.5,2,4,5],1,0];
+	var params2 = [4,[0,0.5,0.5,2,4,5],1,1];
+	var params3 = [4,[0,0.5,0.5,2,4,5],1,2];
+	values1 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params1,-1,5,1000);
+	values2 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params2,-1,5,1000);
+	values3 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params3,-1,5,1000);
 	
 	plotInst1 = 0;
 	plotInst2 = 0;
