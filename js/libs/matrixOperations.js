@@ -267,6 +267,41 @@ function calculateIntegerPointValues(a, mu) {
 	return formatIntegerPointValues(sol);
 }
 
+// d = 2
+/** Compute the values of the left dual CDF-scaling-function at integer points.
+ *   Reference:
+ *		[1] M. Primbs, Stabile biorthogonale Spline-Waveletbasen auf dem Intervall,
+ *      Dissertation, 2006, S.71 - 72
+ *  (last modification: 24.11.16 Andreas)
+ * 
+ *	@param{Array}  integerPointValues	values of the dual CDF-scaling-
+ *										function at integer grid points.
+ *  @param{int}	   i 					number of the left scaling-function
+ *  									counted from right to left
+ *  									i = 0, ... , d_tilde - 1
+ *  									(interval end to interval beginning).
+ *  @param{int}    d_tilde				second CDF-parameter.
+ * 
+ * 	@return{Array} y					y-values at the integer points
+ * 										(2*d_tilde - 1 - i values, i.e.
+ *  									the number of values equals the
+ *  									support width).
+ */
+
+function calculateLeftDualCDFIntegerPointValues(integerPointValues, i, d_tilde) {
+	var N = 2*d_tilde - 1 - i;
+	var y = createArray(N);
+	
+	for(var z=0;z<N;z++){
+		var n = i;
+		while(1 + d_tilde <= z + n + 1 <= 2 * d_tilde){
+			N[z] += nchoosek(n,i) * integerPointValues[z + n + d_tilde + 1];
+			n++;
+		}
+	}
+		
+	return formatIntegerPointValues(sol);
+}
 
 /** Brings the integer-point values to the form as calculated in the point evaluation methods:
  *  [[x-value0,y-value0],[x-value1,y-value1],...]

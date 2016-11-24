@@ -152,8 +152,24 @@ test-File
 	//values1 = evaluateBSplineInGrid(4,[0,0.5,2,4,5],1,-1,5,1000);
 	//values1 = [];
 	//console.time("Evaluation of BSpline on Grid with generalized function");
-	var params1 = [4,[0,0.5,2,4,5],1];
-	var values1 = evaluateFunctionInGrid(evaluateBSplineInPointX, params1,-1,5,1000);
+	//var params1 = [4,[0,0.5,2,4,5],1];
+	//var values1 = evaluateFunctionInGrid(evaluateBSplineInPointX, params1,-1,5,1000);
+	
+	// Test of Bsplines with knot of multiplicity d on the end points and
+	// dyadic grid points between with level-resulution j
+	// d = 2, j = 2
+	//var params1 = [2,[0,0.25,0.5,0.75,1,1],4];
+	//var values1 = evaluateFunctionInGrid(evaluateBSplineInPointX, params1,0,1,1000);
+	
+	// d = 3, j = 2
+	var params1 = [3,[0,0,0,0.25,0.5,0.75,1,1,1],2];
+	var values1 = evaluateFunctionInGrid(evaluateBSplineInPointX, params1,0,1,1000);
+	
+	
+	// d = 3, j = 3
+	//var params1 = [3,[0,0,0,0.125, 0.25, 0.375,0.5,0.625, 0.75, 0.875 ,1,1,1],1];
+	//var values1 = evaluateFunctionInGrid(evaluateBSplineInPointX, params1,0,1,1000);
+	
 	//console.time("Evaluation of BSpline on Grid with generalized function");
 	
 	/*console.time("Evaluation of BSpline on Grid without generalized function");
@@ -165,7 +181,7 @@ test-File
 	var values2 = evaluateFunctionInGrid(evaluateFirstDerivOfBSplineInPointX, params1,-1,5,1000);
 	
 	//evaluate the rth derivate
-	var r = 2
+	var r = 2;
 	//values3 = [];
 	var params1 = [4,[0,0.5,2,4,5],1,r];
 	values3 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params1,-1,5,1000);
@@ -208,13 +224,13 @@ test-File
 			}]
 		});
 	
-			//return the wavelet plot as object
-			return plotInst;
-				
-			}catch (err) {
-				console.log(err);
-				alert(err);
-			}
+		//return the wavelet plot as object
+		return plotInst;
+			
+		}catch (err) {
+			console.log(err);
+			alert(err);
+		}
 	}
 	
 	makePlotInst('#plot1', values1);		
