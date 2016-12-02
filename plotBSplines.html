@@ -57,6 +57,30 @@ test-File
 		return y;
 	}
 	
+	//same method as above just with indices of [TL08] - seems to be wrong.
+	function evaluateBSplineInPointX2(d,t,k,x){
+		if(d==1){
+			if(t[k-1]<=x&& x<t[k]){
+				return 1;
+			}else{
+				return 0;
+			}
+			
+		}
+		else{
+			var y=0;
+			var diff=t[k+d-1]-t[k-1]; 
+			if(diff>0){
+				y=(x-t[k-1])*evaluateBSplineInPointX(d-1,t,k,x)/diff;
+			}
+			diff=t[k+d]-t[k];
+			if(diff>0){
+				y=y+(t[k+d]-x)*evaluateBSplineInPointX(d-1,t,k+1,x)/diff;
+			}
+		}
+		return y;
+	}
+	
 	function makeGrid(start,end,count){
 		var x=new Array(count);
 		var step=(end-start)/(x.length-1);
@@ -155,51 +179,21 @@ test-File
 	//values1 = evaluateBSplineInGrid(4,[0,0.5,2,4,5],1,-1,5,1000);
 	//values1 = [];
 	//console.time("Evaluation of BSpline on Grid with generalized function");
-<<<<<<< HEAD
-	//var params1 = [4,[0,0.5,2,4,5],1];
-	//var values1 = evaluateFunctionInGrid(evaluateBSplineInPointX, params1,-1,5,1000);
-	
-	// Test of Bsplines with knot of multiplicity d on the end points and
-	// dyadic grid points between with level-resulution j
-	// d = 2, j = 2
-	//var params1 = [2,[0,0.25,0.5,0.75,1,1],4];
-	//var values1 = evaluateFunctionInGrid(evaluateBSplineInPointX, params1,0,1,1000);
-	
-	// d = 3, j = 2
-	var params1 = [3,[0,0,0,0.25,0.5,0.75,1,1,1],2];
-	var values1 = evaluateFunctionInGrid(evaluateBSplineInPointX, params1,0,1,1000);
-	
-	
-	// d = 3, j = 3
-	//var params1 = [3,[0,0,0,0.125, 0.25, 0.375,0.5,0.625, 0.75, 0.875 ,1,1,1],1];
-	//var values1 = evaluateFunctionInGrid(evaluateBSplineInPointX, params1,0,1,1000);
-	
-	//console.time("Evaluation of BSpline on Grid with generalized function");
-=======
 	//var params1 = [4,[0,0.5,0.5,2,4,5],1];
 	//var values1 = evaluateFunctionInGrid(evaluateBSplineInPointX, params1,-1,5,1000);
 	//console.timeEnd("Evaluation of BSpline on Grid with generalized function");
->>>>>>> branch 'master' of https://github.com/ondesurfer/wavelet-project.git
 	
 	/*console.time("Evaluation of BSpline on Grid without generalized function");
 	values1 = evaluateBSplineInGrid(4,[0,0.5,2,4,5],1,-1,5,1000);
 	console.timeEnd("Evaluation of BSpline on Grid without generalized function");*/
 	
-<<<<<<< HEAD
-	//values2 = [];
-	var params1 = [4,[0,0.5,2,4,5],1];
-	var values2 = evaluateFunctionInGrid(evaluateFirstDerivOfBSplineInPointX, params1,-1,5,1000);
-	
-	//evaluate the rth derivate
-	var r = 2;
-=======
 		
 
->>>>>>> branch 'master' of https://github.com/ondesurfer/wavelet-project.git
 	//values3 = [];
-	var params1 = [4,[0,0.5,0.5,2,4,5],1,0];
-	var params2 = [4,[0,0.5,0.5,2,4,5],1,1];
-	var params3 = [4,[0,0.5,0.5,2,4,5],1,2];
+	var params1 = [3,[0,1,2,3],1,0];
+	//params:[order, knots, ?? , derivative]
+	var params2 = [3,[0,1,2,3],1,1];
+	var params3 = [3,[0,1,2,3],1,2];
 	values1 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params1,-1,5,1000);
 	values2 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params2,-1,5,1000);
 	values3 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params3,-1,5,1000);
@@ -242,13 +236,13 @@ test-File
 			}]
 		});
 	
-		//return the wavelet plot as object
-		return plotInst;
-			
-		}catch (err) {
-			console.log(err);
-			alert(err);
-		}
+			//return the wavelet plot as object
+			return plotInst;
+				
+			}catch (err) {
+				console.log(err);
+				alert(err);
+			}
 	}
 	
 	makePlotInst('#plot1', values1);		
