@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+	.chart div {
+		font: 10px sans-serif;
+		background-color: steelblue;
+		text-align: right;
+		padding: 3px;
+		margin: 1px;
+		color: white;
+	}
+
+</style>
+<div class="chart"></div>
+test-File
+<!--<script src="//d3js.org/d3.v3.min.js"></script>\\-->
+<script src="js/ext_libs/d3.js"></script>
+<script src="js/libs/math2.js"></script>
+<script src="js/libs/mask.js"></script>
+<script src="js/libs/matrixOperations.js"></script>
+<script src="js/htmlElementFunctions2.js"></script>
+<script src="js/libs/pointEvaluation.js"></script>
+<script src="js/libs/gauss2.js"></script>
+<!-- load http://maurizzzio.github.io/function-plot/ -->
+<script src="js/ext_libs/function-plot.js"></script>
+<script src="js/ext_libs/numeric-1.2.6.js"></script>
+
+<body>
+	<div id="plot1"> </div>
+	<div id="plot2"> </div>
+	<div id="plot3"> </div>
+</body>
+
+<script>
+	//baut das Knotengitter auf [0,1] nach S.50 oben, sodass die B-Splines richtig erzeugt werden koennen
+	function buildNodeGridForBSpline(d,j){
+		var grid = new Array();
+		for(var k=0;k<d;k++){
+			grid.push(0);
+		}
+		for(var k=1; k<Math.pow(2,j); k++){
+			grid.push(Math.pow(2,-j)*k);
+		}
+		for(var k=0; k<d; k++){
+			grid.push(1);
+		}
+		console.log("Das Gitter fuer die BSplines:", grid);
+		return grid;
+	}
+	
+	//baut ganzzahliges Gitter wie im Beweis auf S. 56 unten beschrieben (0,...0,1,2,3,4...,2d)
+	function buildNodeGridForBSpline2(d){
+		var grid = new Array();
+		for(var k=0;k<d;k++){
+			grid.push(0);
+		}
+		for(var k=1; k<2*d+1; k++){
+			grid.push(k);
+		}
+		console.log("Das Gitter fuer die BSplines:", grid);
+		return grid;
+	}
+	
+	//baut Matrix B_1
+	function buildB1(d){
+		var B1= createArray(2*(d-1),d-1);
+		var t= buildNodeGridForBSpline2(d);
+
+		for(var l=0; l<2*(d-1); l++){
+			for(var k=1; k<d; k++){
+				console.log(l,k-1);
+				B1[l][k-1]=evaluateBSplineInPointX(d,t,k,l/2);
+			}
+		}
+		console.log("Die Matrix B1", B1);
+		return B1;
+	}
+
+	
+	
+	//baut Matrix B_2
+	function buildB2(d){
+		var B2= createArray(2*(d-1),2*(d-1));
+		var t= buildNodeGridForBSpline2(d);
+		//var t = [0,0,0,1,2,3,4,5];
+		console.log("t",t);
+		console.log("B2", B2);
+		for(var l=0; l<2*(d-1); l++){
+			for(var k=1; k<2*(d-1)+1; k++){
+				B2[l][k-1]=evaluateBSplineInPointX(d,t,k,l);
+			}
+		}
+		console.log("Die Matrix B2", B2);
+		return B2;
+	}
+	
+	//baue den linken Teil der ML-Matrix wie auf S.57 unten beschrieben
+	function buildLeftPartOfML(B1,B2){
+		var B2inv=numeric.inv(B2);
+		var MLleft=numeric.dot(B2inv,B1);
+		console.log("MLleft",MLleft);
+		return MLleft;
+	}
+	var d=3;
+	var dtilde=5;
+	var leftPart = buildLeftPartOfML(buildB1(d),buildB2(d));
+	
+	//baue MLMatrix wie aus S.60 oben beschrieben
+	function buildML(MLleft,d,dtilde){
+		var ak= genBSplineCoeffs(d);
+		console.log(ak);
+		var ML = createArray(3*dtilde+2*d-5,d+dtilde-2);
+		
+		for(var n=1; n < 2*d-1; n++){
+			for(var k=1; k<d; k++){
+				ML[n-1][k-1]=MLleft[n-1][k-1];
+			}			
+		}
+		for(var k=d; k<d+dtilde-1; k++){
+			for(var n=2*k-d; n<2*k+1 ; n++){
+				ML[n-1][k-1]=ak[0][n+d-2*k];
+			}			
+		}
+		console.log("ML",ML);
+		return ML;
+	}
+	
+	buildML(leftPart,d,dtilde);
+	
+	//evaluates B-Spline N_{d,k} with the knots t at the point x
+	function evaluateBSplineInPointX(d,t,k,x){
+		//index-change 
+		//k=k+d-1;
+		if(d==1){
+			if(t[k-1]<=x&& x<t[k]){
+				return 1;
+			}else{
+				return 0;
+			}
+			
+		}
+		else{
+			var y=0;
+			var diff=t[k+d-2]-t[k-1]; 
+			if(diff>0){
+				y=(x-t[k-1])*evaluateBSplineInPointX(d-1,t,k,x)/diff;
+			}
+			diff=t[k+d-1]-t[k];
+			if(diff>0){
+				y=y+(t[k+d-1]-x)*evaluateBSplineInPointX(d-1,t,k+1,x)/diff;
+			}
+		}
+		return y;
+	}
+	
+	
+	function makeGrid(start,end,count){
+		var x=new Array(count);
+		var step=(end-start)/(x.length-1);
+		for (var i=0; i < x.length; i++) {
+		  x[i]=start+i*step;
+		};
+		return x;
+	}
+	
+	
+	function evaluateRthDerivOfBSplineInPointX(d,t,k,r,x){
+		//return 0 if the order of derivate is bigger than the spline-order
+		if(d<r+1){
+			return 0;
+		}
+		
+		//if just the point-evaluation (without derivation) is searched
+		if(r==0){
+			return evaluateBSplineInPointX(d,t,k,x);
+		}
+		
+		else{
+			var y=0;
+			var diff=t[k+d-2]-t[k-1];
+			if(diff>0){
+				y=(d-1)*evaluateRthDerivOfBSplineInPointX(d-1,t,k,r-1,x)/diff;
+			}
+			diff=t[k+d-1]-t[k];
+			if(diff>0){
+				y=y-(d-1)*evaluateRthDerivOfBSplineInPointX(d-1,t,k+1,r-1,x)/diff;
+			}
+		}
+		return y;
+	}
+
+	
+	// test of a general evaluation in grid function
+	/*  Evaluate a function on grid points specified by [start, end, count]
+		(last modification: 17.10.16 Andreas)
+	*/
+	function evaluateFunctionInGrid(funct,params,start,end,count){
+		var x = makeGrid(start,end,count);
+		var points = new Array(x.length);
+		
+		var params2 = deepCopyVector(params);
+		params2.push(0); // it would be better to have a deep copy
+		
+		for(var i=0; i< x.length; i++){
+			params2[params2.length -1 ] = x[i];
+			points[i]=[x[i], funct.apply(this, params2)];
+			//console.log(funct.apply(this, params));
+			//console.log(params);
+			
+		}
+		return points;
+	} 
+
+	
+	var d=3;
+	//							   d,j
+	var t= buildNodeGridForBSpline(d,0);
+	var params1 = [d,t,1,0];
+	//params:[order, knots, 'verschiebung' , derivative]
+	var params2 = [d,t,2,0];
+	var params3 = [d,t,3,0];
+	values1 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params1,-1,5,1000);
+	values2 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params2,-1,5,1000);
+	values3 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params3,-1,5,1000);
+	
+	plotInst1 = 0;
+	plotInst2 = 0;
+	plotInst3 = 0;
+	
+
+	// a general function to create a plot-instances
+	function makePlotInst(target, values){
+		try{ 
+			plotInst = functionPlot({
+			target : target,
+			data : [{
+				points : values,
+				fnType : 'points',
+				graphType : 'polyline',
+			}]
+		});
+	
+			//return the wavelet plot as object
+			return plotInst;
+				
+			}catch (err) {
+				console.log(err);
+				alert(err);
+			}
+	}
+	
+	makePlotInst('#plot1', values1);		
+	makePlotInst('#plot2', values2);		
+	makePlotInst('#plot3', values3);		
+
+	console.log("test", evaluateBSplineInPointX(2,t,-1,0));
+	buildNodeGridForBSpline(2,2);
+</script>
