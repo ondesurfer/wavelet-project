@@ -551,3 +551,30 @@ function setBlockMatrix(A,B,r1,c1){
 		}
 	}
 }
+
+/**
+*	Check if two quadratic matrices are inverse to each other.
+*
+*   @param{Array}	A		reference matrix.
+*   @param{Array}	B		matrix to be checked.
+*   
+*   @param{bool}	t		true iff A*B = Id
+*/
+function checkInversity(A,B){
+	var t = false;
+	if(A.length != B.length){
+		throw "checkInversity: matrices have mismatching row sizes";
+	}
+	if(A[0].length != B[0].length){
+		throw "checkInversity: matrices have mismatching column sizes";
+	}
+	
+	var C = numeric.dot(A,B);
+	var I = numeric.identity(A.length);
+	var tol = numeric.epsilon;
+	if(numeric.leq(numeric.sub(C,I), numeric.mul(tol, I))){
+		t = true;
+	}
+	
+	return t;
+}

@@ -10,7 +10,7 @@
         <!--Einbinden der Scripte und Bibliotheken-->
         <script src="js/d3.js"></script>
         <script src="js/libs/matrixOperations.js"></script>
-        <script src="js/numeric-1.2.6.js"></script>
+        <script src="js/ext_libs/numeric-1.2.6.js"></script>
         <script src="js/mask.js"></script>
         
         <script src="js/gauss2.js"></script>
@@ -79,8 +79,8 @@
         var B = [[1,2],[3,4]];
         setBlockMatrix(A,B,1,1);
         printMatrix(A);*/
-        var a1 = horner([1, 0, 7, 1], 3);
-        console.log(a1)
+//        var a1 = horner([1, 0, 7, 1], 3);
+//        console.log(a1)
         
 //         var i = 0;
 //         var I = 2;
@@ -205,6 +205,14 @@
 // 					form2.style.visibility = "hidden";
 // 				}
 // 		};
+
+		/**
+		* Test of Inversity Check
+		*/
+		
+		var A = [[4,3],[3,2]];
+		var B = [[-2,3],[3,-4]];
+		console.log(checkInversity(A,B));
 		
         </script>
 
