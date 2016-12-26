@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+	.chart div {
+		font: 10px sans-serif;
+		background-color: steelblue;
+		text-align: right;
+		padding: 3px;
+		margin: 1px;
+		color: white;
+	}
+
+</style>
+<div class="chart"></div>
+test-File
+<!--<script src="//d3js.org/d3.v3.min.js"></script>\\-->
+<script src="js/ext_libs/d3.js"></script>
+<script src="js/libs/math2.js"></script>
+<script src="js/libs/mask.js"></script>
+<script src="js/libs/matrixOperations.js"></script>
+<script src="js/htmlElementFunctions2.js"></script>
+<script src="js/libs/pointEvaluation.js"></script>
+<script src="js/libs/gauss2.js"></script>
+<!-- load http://maurizzzio.github.io/function-plot/ -->
+<script src="js/ext_libs/function-plot.js"></script>
+<script src="js/ext_libs/numeric-1.2.6.js"></script>
+
+<body>
+	<div id="plot1"> </div>
+	<div id="plot2"> </div>
+	<div id="plot3"> </div>
+</body>
+
+<script>
+	/** Computes the node grid to constuct the BSplines for an intervall as primal scaling-functions as described by M.Primbs. See p.50.
+ *  (last modification: 22.12.16 Simon)
+ * 
+ *   @param{int} d order of B-Spline
+ *   @param{int} j level for which the B-Splines are wanted
+ * 
+ *   @return{int} grid grid which later will be used to construct the B-Splines.
+ */
+	function buildNodeGridForBSpline(d,j){
+		var grid = new Array();
+		for(var k=0;k<d;k++){
+			grid.push(0);
+		}
+		for(var k=1; k<Math.pow(2,j); k++){
+			grid.push(Math.pow(2,-j)*k);
+		}
+		for(var k=0; k<d; k++){
+			grid.push(1);
+		}
+		console.log("Das Gitter fuer die BSplines:", grid);
+		return grid;
+	}
+	
+/** Computes the node grid as [0,0...,0,1,2,...]. It can be used 
+ * to build BSplines for j=0 with just left side boarder-functions and
+ * to calculate B_1,B_2 Matrices. For more details see [Pr] p.56
+ *
+ *  (last modification: 22.12.16 Simon)
+ * 
+ *   @param{int} d order of B-Spline
+ * 
+ *   @return{int} grid grid which later will be used to construct the B-Splines.
+ */
+	function buildNodeGridForBSpline2(d){
+		var grid = new Array();
+		for(var k=0;k<d;k++){
+			grid.push(0);
+		}
+		for(var k=1; k<2*d+1; k++){
+			grid.push(k);
+		}
+		return grid;
+	}
+
+	/** evaluates B-Spline N_{d,k} with the knots t at the point x.
+ *  (last modification: 22.12.16 Simon)
+ * 
+ *   @param{int} d order of B-Spline
+ *   @param{int} t grid of B-Spline
+ * 	@param{int} k number of B-Spline (counted from left to right started at k=0)
+ *  @param{double} x x-value where the BSpline will be evaluated
+ * 
+ *   @return{double} y y-value of BSpline at x
+ */	
+	function evaluateBSplineInPointX(d,t,k,x){
+		if(d==1){
+			if(t[k-1]<=x&& x<t[k]){
+				return 1;
+			}else{
+				return 0;
+			}			
+		}
+		else{
+			var y=0;
+			var diff=t[k+d-2]-t[k-1]; 
+			if(diff>0){
+				y=(x-t[k-1])*evaluateBSplineInPointX(d-1,t,k,x)/diff;
+			}
+			diff=t[k+d-1]-t[k];
+			if(diff>0){
+				y=y+(t[k+d-1]-x)*evaluateBSplineInPointX(d-1,t,k+1,x)/diff;
+			}
+		}
+		return y;
+	}
+	
+	/**evaluates a IntervallWavelet which complets Psi=Phi*Mj1
+	* @param{int} j is the level of the searched wavelet
+	* @param{int}k is the number of the wavelet (usually counted from left to right)
+	* @param{object[]} scf is an vector of the scaling-functions phi
+	* @param{double[][]} Mj1 is the matrix
+	* @param{double} x is the point where the value of the wavelet is searched
+	* 
+	* @return{double} y y-value of the wavelet in x
+	*/
+	function evaluateSIWaveletInX(j,k,scf,Mj1,x){
+		var PsiInX=0;
+		
+		if(scf.length!=Mj1.length){
+			console.log("scf-length",scf.length,"Mj1-length",Mj1.length);
+			console.log("Matrix-vector dimension does not fit.");
+			return null;
+		}
+		for(var i=0; i<scf.length; i++){
+			PsiInX=PsiInX + Mj1[i][k]*scf[i].eval(x); //evtl. k nicht i
+		}
+		return PsiInX;
+	}
+	
+/** Computes the primal scaling functions as described by M.Primbs. See p.50.
+ *  (last modification: 22.12.16 Simon)
+ * 
+ *   @param{int} d order of B-Spline
+ *   @param{int} j level for which the B-Splines are wanted
+ * 
+ *   @return{object[]} scf returns all scaling-function as an array of objects. 
+ * 						Each object has the 'eval' function to evaluate the scaling-function in x
+ */
+	function buildPrimalPrimbsScf(j,d){
+		var m = Math.pow(2,j)+d-1; //Anzahl der erzeugten Skalierungsfunktionen.
+		var nodes = buildNodeGridForBSpline(d,j);
+		var scf = new Array(m);
+		//definiert das Objekt einer Primbs-scf
+		function Obj( prop1, prop2, prop3 ) { 
+    				return { 
+       				 	d1 : prop1,
+       				 	nodes1 : prop2,
+       				 	k1 : prop3, 
+        				eval : function(x){ return evaluateBSplineInPointX(this.d1,this.nodes1,this.k1+1,x); }, 
+   					 }; 			
+			};
+			
+		for(var k=0; k<m; k++){	
+			scf[k] = new Obj(d,nodes,k);
+		}
+		console.log(scf);
+		return scf;
+	}
+	
+	function buildLeftDualPrimbsScfI(d,dTilde){
+		var m = dTilde; //Anzahl der Randfunktionen siehe s.71
+		var dscf = new Array(m);
+		
+		function Obj2(d, dTilde, phiTilde, k) { 
+    				return { 
+    					d1 : d ,
+    					dTilde1 : dTilde,
+       				 	phiTilde1 : phiTilde,
+       				 	k1 : k, 
+        				eval : function(x){ return evaluateLeftDualPrimbsScf(this.d1,this.dTilde1,this.phiTilde1,this.k1+1,x); }, 
+   					 }; 			
+			};
+		//generate coefficients of dual B-Spline functions
+		//calculate values of dual B-Spline function phiTilde - wenn wir nicht phiTildeuebergeben wuerden muessten wir jedes Mal alles rechnen.
+		var coef =  genDualBSplineCoeffs(d, dTilde);
+		var phiTilde = iterativePointEvaluation2(coef[0], coef[1], 10, 0);
+
+		for(var k=0; k<m; k++){		
+			dscf[k] = new Obj2(d,dTilde,phiTilde,k);
+		}	
+		return dscf;	
+	}
+	
+	//phiTilde muss auf aequidistantem gitter gegeben sein
+	//dadurch, dass phiTilde gegeben ist spart man sich das auswerten von iterativePointEvaluation in jedem Schritt
+	function evaluateLeftDualPrimbsScf(d, d_tilde, phiTilde, k,x) {
+	//calculate left and right support of dual B-Spline function
+		var l_1=-Math.floor(d/2)-d_tilde+1;
+		var l_2=Math.ceil(d/2)+d_tilde-1;
+		
+		//gitterweite der gegebenen Werte von phiTilde
+		var delta = phiTilde[1][0]-phiTilde[0][0];
+		console.log("delta",delta);
+		var y=0;		
+			if(x<0){
+				return 0;
+			}
+			else{
+				for(var n=k; n<l_2-l_1-1;n++){			
+					y += nchoosek(n,k) * phi_tilde(phiTilde, x + n + l_1 + 1);//hier richtiger Index...
+				}
+			}
+		return y;
+	}
+	//sucht iterativ den kleinsten moeglichen wert aus phiTilde raus, der berechnet wurde. verdammt ineffizient!!!
+	function phi_tilde(values,x){
+		for(var i=0; i<values.length; i++){
+			if(Math.abs(x-values[i][0])<0.001){
+				return values[i][1];
+			}
+		}
+		return 0;
+	}
+	//berechnet den Index, der am naechsten an einem x liegt, das berechnet wurde
+	function phi_tilde2(values,x){
+		var delta = values[1][0]-values[0][0];
+		var index = Math.round((x-values[0][0])/delta);
+		if(index<values.length){
+			return values[Math.round(index)][1];
+		}
+		else{
+			return 0;
+		}
+	}
+
+
+/** Evaluates a function, given as an object with the function 'eval', in a grid
+ *  (last modification: 22.12.16 Simon)
+ * 
+ *   @param{double[]} grid grid,where the function shall be evaluated
+ *   @param{object} obj function, given as an object, which shall be evaluated
+ * 
+ *   @return{double[][]} points points of the function as [[x0,f(x0)],[x1,f(y1)],...]
+ */
+	function evaluateObjectInGrid(obj,grid){
+		var points = new Array(grid.length);	
+		for(var j=0; j<grid.length; j++){
+			points[j]=[grid[j], obj.eval(grid[j])];
+		}
+		return points;
+	}
+	
+	if(false){
+		buildLeftDualPrimbsScf(3,5);
+		var values1=values4;
+	}
+	//Ploten der dualen Skalierungsfunktionen
+	if(true){
+	var d=3;
+	var dTilde=5;
+	var j=3;
+	var dscf=buildLeftDualPrimbsScfI(d,dTilde);
+	var grid = makeGrid(0,8,8024);
+	var values1 = evaluateObjectInGrid(dscf[0],grid);
+	var values2 = evaluateObjectInGrid(dscf[1],grid);
+	var values3 = evaluateObjectInGrid(dscf[2],grid);
+	}
+	
+	
+	//Ploten der primalen Skalierungsfunktionen
+	if(false){
+	var d=2;
+	var j=3;
+	var scf=buildPrimalPrimbsScf(j,d);
+	var grid = makeGrid(0,1,100);
+	console.log(grid);
+	var values1 = evaluateObjectInGrid(scf[0],grid);
+	var values2 = evaluateObjectInGrid(scf[1],grid);
+	var values3 = evaluateObjectInGrid(scf[2],grid);
+	}
+	
+		
+	//Ploten der k-ten Wavelets (dafuer muessen vorher die primalen Skalierungsfunktionen berechnet worden sein!)
+	if(false){
+	var k=0;
+	//Matrix fuer d=2,dtilde=2,j=3
+	var Mj1_1=[[-0.5303,0,0,0],[0.3977, -0.0884, 0, 0],[-0.0884, -0.1768, 0,0],[-0.0442, 0.5303, -0.0884,  0],
+         [0, -0.1768, -0.1768, 0], [0, -0.0884, 0.5303, -0.0442],[0, 0, -0.1768, -0.0884],[0, 0, -0.0884, 0.3977],
+         [0, 0, 0,  -0.5303]];
+	//HIER andere Matrix ausprobieren
+	//var x=0.5;
+	//var y = evaluateSIWaveletInX(j,k,scf,Mj1_1,x);
+	var params1 = [j,0,scf,Mj1_1];
+	var params2 = [j,1,scf,Mj1_1];
+	var params3 = [j,2,scf,Mj1_1];
+	var values1 = evaluateFunctionInGrid(evaluateSIWaveletInX,params1,0,1,1000);
+	var values2 = evaluateFunctionInGrid(evaluateSIWaveletInX,params2,0,1,1000);
+	var values3 = evaluateFunctionInGrid(evaluateSIWaveletInX,params3,0,1,1000);
+	}
+
+	function makeGrid(start,end,count){
+		var x=new Array(count);
+		var step=(end-start)/(x.length-1);
+		for (var i=0; i < x.length; i++) {
+		  x[i]=start+i*step;
+		};
+		return x;
+	}
+	
+
+
+	
+	// test of a general evaluation in grid function
+	/*  Evaluate a function on grid points specified by [start, end, count]
+		(last modification: 17.10.16 Andreas)
+	*/
+	function evaluateFunctionInGrid(funct,params,start,end,count){
+		var x = makeGrid(start,end,count);
+		var points = new Array(x.length);
+		
+		var params2 = deepCopyVector(params);
+		params2.push(0); 
+		
+		for(var i=0; i< x.length; i++){
+			params2[params2.length -1 ] = x[i];
+			points[i]=[x[i], funct.apply(this, params2)];
+			//console.log(funct.apply(this, params));
+			//console.log(params);	
+		}
+		return points;
+	} 
+
+	
+	
+	//							   d,j
+	//var t= buildNodeGridForBSpline(d,2);
+	//var params1 = [d,t,1,0];
+	//params:[order, knots, 'verschiebung' , derivative]
+	//var params2 = [d,t,2,0];
+	//var params3 = [d,t,3,0];
+	//values1 = evaluateFunctionInGrid( buildPrimalPrimbsScf(j,d)[k].eval,params1,-1,5,1000);
+	//values2 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params2,-1,5,1000);
+	//values3 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params3,-1,5,1000);
+	
+	plotInst1 = 0;
+	plotInst2 = 0;
+	plotInst3 = 0;
+	
+		
+	function evaluateRthDerivOfBSplineInPointX(d,t,k,r,x){
+		//return 0 if the order of derivate is bigger than the spline-order
+		if(d<r+1){
+			return 0;
+		}
+		
+		//if just the point-evaluation (without derivation) is searched
+		if(r==0){
+			return evaluateBSplineInPointX(d,t,k,x);
+		}
+		
+		else{
+			var y=0;
+			var diff=t[k+d-2]-t[k-1];
+			if(diff>0){
+				y=(d-1)*evaluateRthDerivOfBSplineInPointX(d-1,t,k,r-1,x)/diff;
+			}
+			diff=t[k+d-1]-t[k];
+			if(diff>0){
+				y=y-(d-1)*evaluateRthDerivOfBSplineInPointX(d-1,t,k+1,r-1,x)/diff;
+			}
+		}
+		return y;
+	}
+
+	// a general function to create a plot-instances
+	function makePlotInst(target, values){
+		try{ 
+			plotInst = functionPlot({
+			target : target,
+			data : [{
+				points : values,
+				fnType : 'points',
+				graphType : 'polyline',
+			}]
+		});
+	
+			//return the wavelet plot as object
+			return plotInst;
+				
+			}catch (err) {
+				console.log(err);
+				alert(err);
+			}
+	}
+	
+	makePlotInst('#plot1', values1);		
+	makePlotInst('#plot2', values2);		
+	makePlotInst('#plot3', values3);		
+
+	//console.log("test", evaluateBSplineInPointX(2,t,-1,0));
+	buildNodeGridForBSpline(2,2);
+</script>
