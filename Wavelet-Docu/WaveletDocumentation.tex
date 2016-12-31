@@ -1,0 +1,496 @@
+\documentclass[11pt,a4paper,titlepage]{article}
+
+
+% Die Dokumentklassen report oder article eignet sich sehr gut zum
+% Verfassen von Bachelor- und Masterarbeiten
+% report hat Kapitel (chapter) als höchste Gliederungsebene
+% article hat Abschnitt (section) als höchste Gliederungsebene
+% durch die Option titlepage wird die Titelseite gesondert ausgegeben.
+
+% Falls es mit einzelnen Paketen Schwierigkeiten gibt kann man
+% sie mit % auskommentieren und schauen ob das Dokument dann erzeugt
+% wird.
+
+\usepackage{tikz}
+\usepackage{enumerate}
+\usepackage{stmaryrd}
+\usepackage{url}
+\usetikzlibrary{arrows}
+%%%<
+
+
+
+\usepackage[a4paper]{geometry} % Layoutänderungen, wenn das benutzt
+                               % wird kann a4paper oben weggelassen
+                               % werden
+\geometry{left=2.75cm,right=2.75cm,top=3cm,bottom=3cm,includeheadfoot}
+
+\usepackage[utf8]{inputenc} % Zeichenkodierung der Ein- und Ausgabe
+\usepackage[T1]{fontenc}    % je nach System (Windows, Linux oder Mac)
+                            % muss möglicherweise statt der Optionen
+                            % utf8 und T1 was anderes gewählt werden
+                            % bei Windows latin1 statt utf8?
+
+\usepackage[ngerman]{babel} % Spracheinstellung, ersetzt u.A. englische
+                            % Begriffe durch deutsche (z.B. Table of
+                            % Contents => Inhaltsverzeichnis)
+
+\usepackage{amsmath,amsthm,amssymb,amsfonts} % nützliche Umgebungen und
+                                % Symbole aus dem AMS-LaTeX Paket
+
+\usepackage{bbm} % Symbole für Mengen wie N, R, Z, etc.
+\usepackage{graphicx}
+
+
+%\usepackage{natbib} % Bibliographie und Referenzen die mehr als die
+                     %üblichen Optionen bieten
+
+% \usepackage[notcite,notref]{showkeys} % zum Anzeigen der Labels auf
+                                % dem Seitenrand auskommentieren
+
+\theoremstyle{plain} % Titel fett, Text kursiv
+\newtheorem{satz}{Satz}[section] % ein Zähler pro Abschnitt
+\newtheorem{beispiel}[satz]{Beispiel}  % verw. Zähler von Satz
+\newtheorem{bemerkung}[satz]{Bemerkung}
+\newtheorem{lemma}[satz]{Lemma}
+\newcommand{\skalar}[2]{\langle #1, #2\rangle}
+
+\theoremstyle{definition} % Titel fett, Text gerade
+\newtheorem{definition}[satz]{Definition}
+
+
+
+
+
+
+\newcommand{\todo}[1]{{\color{red}\textit{[TODO: #1]}}}
+\numberwithin{equation}{section} % Gliederungsebene für Formelnummern
+
+\bibliographystyle{alphadin} % andere Möglichkeiten unten
+% \bibliographystyle{plain}
+\shorthandoff{"}
+\setcounter{section}{-1}
+\begin{document}
+	\noindent
+	\parindent0pt %nimmt den Abstand zum Rand vor der Zeile nach einem Absatz raus
+	\begin{center}
+  		\huge{\textbf{Dokumentation zur Erstellung der Wavelet-Datenbank }} \\
+ 	
+    
+    	\vspace{2cm}
+ 
+
+		\large{Institut für Mathematik \\
+	 	der Johannes-Gutenberg Universität Mainz\\
+	 	Stand: \today }
+
+		\vspace*{2cm}
+		
+		Diese Dokumentation hat dreierlei Aufgaben. Erstens soll sie dem Nutzer der Website alle Hintergrund-Informationen geben, die notwendig sind um den Aufbau und die Gliderung der Website zu verstehen. Zweitens soll sie dem Nutzer verraten wo die Informationen herstammen und wo es weitere Informationen zu finden gibt und drittens soll sie das Pflegen und das Erweitern der Website vereinfachen.
+	\end{center}
+
+	\vspace*{2cm}
+	\tableofcontents % Inhaltverzeichnis
+	\newpage
+
+
+	\section{Einleitung}
+	
+	\section{Aufbau der Website}
+	
+	\section{Aufbau der Datenbank}
+	
+	Die Datenbank dient als Informationsspeicher der Website und beinhaltet die wichtigsten Informationen aller Skalierungsfunktionen. Sie ist in sqlite implementiert. Ein Programm um sqlite-Dateien zu öffnen und zu bearbeiten ist beispielsweise der 'SQLite Manager' von Firefox.\\
+	Die Datenbank ist (nach jetzigem Stand) in drei Tabellen, je nach Art der Skalierungsfunktionen, gegliedert:\\
+	
+	\begin{enumerate}
+		\item OMRA - Beinhaltet die Skalierungsfunktionen die orthogonale Wavelets mit kompaktem Träger erzeugen (s. Abschnitt \ref{OMRA})
+		\item BiMRA - Beinhaltet die Skalierungsfunktionen die biorthogonale Wavelets mit kompaktem Träger erzeugen (s. Abschnitt \ref{BiOMRA})
+		\item BiMRAI - Beinhaltet die Skalierungsfunktionen zur Konstruktion biorthogonaler Wavelets auf einem Intervall (s. Abschnitt \ref{BiOMRAI} )
+	\end{enumerate} 
+	
+	Tabelle 1  enthält folgende Spalten:
+	\begin{itemize}
+		\item ID - Identifikationsnummer der Skalierungsfunktion 
+		\item name - Name der Skalierungsfunktion (Achtung, diese sind in der Literatur keinesfalls einheitlich.)
+		\item DOI - DOI-Adresse der Hauptreferenz, welche für die Informationen verwendet wurde.
+		\item reference - Titel der Hauptreferenz.
+		\item mask - Verfeinerungskoeffizienten der Skalierungsfunktion
+		\item critical\_Sobolev\_exponent - größter Exponent für den gezeigt wurde, dass die Skalierungsfunktion im entsprechendem Sobolevraum liegt
+		\item critical\_Hoelder\_exponent - größter Exponent für den gezeigt wurde, dass die Skalierungsfunktion im entsprechendem Hölderraum liegt
+		\item excactness\_of\_polynomial\_approximation - größter Grad für den Polynome mit diesem Grad exakt reproduziert werden können
+		\item orthogonal\_translations - eigentlich nicht notwendig, da alle dieser Skalierungsfunktionen orthogonale Translate besitzen sollen. Dennoch mit aufgenommen, um die Wichtigkeit dieser Eigenschaft zu unterstreichen.
+		\item symmetry - Symmetrie der Skalierungsfunktionen. (Nur 'odd' und 'even' möglich.)
+		\item comment
+	\end{itemize}
+	
+	
+	Tabelle 2 enthält zusätzlich zur Tabelle1 die folgenden Spalten:
+		\begin{itemize}
+			\item a\_start - Index des ersten Verfeinerungskoeffizienten
+			\item ID\_of\_dual\_function - Identifikationsnummern der zu dieser Skalierungsfunktion dualen Skalierungsfunktionen
+			\item spline\_order - Ordnung der Splines, die für die Konstruktion der Skalierungsfunktion verwendet wurden
+		\end{itemize}
+	
+	Tabelle 3 enthält die folgenden Spalten:
+			\begin{itemize}
+				\item ID - Identifikationsnummer des Wavelets
+				\item name - Name des Wavelets (Achtung, diese sind in der Literatur keinesfalls einheitlich.)
+				\item DOI - DOI-Adresse der Hauptreferenz, welche für die Informationen verwendet wurde.
+				\item reference - Titel der Hauptreferenz.
+				\item mask - Verfeinerungsmatrix, sodass gilt: $\Psi_j^T=\Phi_{j+1}^T M_{j,1}$
+				\item j\_0 - kleinstes $j$, sodass $\Psi_j^T=\Phi_{j+1}^T M_{j,1}$ problemlos möglich ist.
+				\item primal\_Scaling\_Functions\_Explanation - kurze Erklärung, welche Skalierungsfunktionen die primale MRA erzeugen.
+				\item primal\_Scaling\_Functions\_Code - Methodenname, der Methode, welche die primalen Skalierungsfunktionen als Array von Objekten erzeugt.
+				\item dual\_Scaling\_Functions\_Explanation - kurze Erklärung, aus welchen Skalierungsfunktionen die duale MRA erzeugt wird.
+				\item dual\_Scaling\_Functions\_Code - Name der Methode, welche die dualen Skalierungsfunktionen als Array von Objekten erzeugt.
+				\item critical\_Sobolev\_exponent - größter Exponent für den gezeigt wurde, dass alle Wavelets im entsprechendem Sobolevraum liegt
+				\item critical\_Hoelder\_exponent - größter Exponent für den gezeigt wurde, dass alle Wavelets im entsprechendem Hölderraum liegt
+				\item excactness\_of\_polynomial\_approximation - größter Grad für den Polynome mit diesem Grad exakt reproduziert werden können
+				\item comment
+			\end{itemize}
+	
+	\newpage
+	\section{Klassifikation von Wavelets}
+		\subsection{OMRA-Wavelets (mit kompaktem Träger)}
+		\label{OMRA}
+		Wir beginnen zunächst mit einer Definition, die schließlich zur Konstruktion dieser Wavelets führt.
+		\begin{definition}[Multiskalenanalyse]
+			Ein System $(V_j)_{j\ge 0}$ abgeschlossener Teilräume von $L^2(\mathbb{R})$ heißt Multiskalenanalyse, falls gilt:
+			\begin{enumerate}
+				\item Die Räume sind geschachtelt:  $V_j\subset V_{j+1}$ für alle $j\ge0$
+				\item Es gilt die Skalierungseigenschaft: $f\in V_j \Leftrightarrow f(2^{-j} \cdot) \in V_0 \text{für alle} j\ge 0$.
+				\item Die Räume $V_j$ liegen asymptotisch dicht in $L^2(\mathbb{R})$: $\overline{\bigcup_{j\in \mathbb{N}}V_j}=L^2(\mathbb{R})$.
+				\item Es gibt eine Skalierungsfunktion $\phi$, sodass $\{\phi(\cdot-k):k\in \mathbb{Z}\}$ eine Basis von $V_0$ ist.
+			\end{enumerate}
+			Ist  $\{\phi(\cdot-k):k\in \mathbb{Z}\}$ eine orthonormale Basis von $V_0$, so heißt das System orthonormale Multiskalenanalyse.\\
+			Achtung, müssen wir die Riezsstabilität hier noch fordern?
+		\end{definition}
+		
+		\begin{lemma}[Verfeinerbarkeit von $\phi$]
+			Erzeugt $\phi$ eine Multiskalenanalyse, so besitzt $\phi$ eine Zweiskalenrelation der Form:
+			\begin{equation}
+				\phi = \sum_{k\in \mathbb{Z}}a_k \phi(2\cdot -k)
+			\end{equation}
+			Weiter gilt: $\phi$ besitzt genau dann einen kompakten Träger $supp(\phi) \subseteq [l_1, l_2]$ wenn gilt $a_k=0$ für alle $k\notin [l_1,l_2]$. \\
+			und es gilt:
+			\begin{equation}
+			\label{SummeDerKoeffizienten}
+			\sum_{k\in \mathbb{Z}}a_k = 2
+			\end{equation}
+			 
+			Erzeugt $\phi$ sogar eine orthonormale Skalenanalyse, so besitzt $\phi$ eine gerade Anzahl von Verfeinerungskoeffizienten und es gilt außerdem: 
+			\begin{equation}
+			\label{ProduktDerKoeffizienten}
+			\sum_{k\in \mathbb{Z}}a_k a_{k-2n}=\delta_{0,n}
+			\end{equation}	
+			Für den Beweis siehe \cite{Daubechies1992}.
+		\end{lemma}
+	
+		Für ein Wavelet fordern wir nun folgendes:\\
+		Sei $W_j$ das orthogonale Komplement zu $V_j$ in $V_{j+1}$, d.h. $V_{j+1}=V_j \oplus W_j$, so soll gelten: \\
+		\begin{equation}
+			W_j=\overline{span\{\psi_{j,k}:0<k<2^j\}}, \text{ j fest }
+		\end{equation}
+		
+		Hier bei ist analog zur Skalierungsfunktion: $\psi_{j,k}= \psi(2^j \cdot - k)$.	\\
+		Der folgende Satz aus \cite{Daubechies1992} liefert die Konstruktion eines Wavelets, sodass $\psi_{j}(\cdot-k)$ die wachsenden, orthogonalen Teilräume $W_j$ aufspannt: 
+		\begin{satz}[Konstruktion eines Wavelets aus Multiskalenanalyse]
+			Sei $(V_j)_j$ eine orthonormale Multiskalenanalyse, dann existiert eine orthonormale Waveletbasis $\{\psi_{j,k},k\in \mathbb{Z}, j >0\}$ für $L^2(\mathbb{R})$, sodass 
+			\begin{equation}
+				P_{j-1}=P_j+\sum_{k\in \mathbb{Z}}\skalar{\cdot}{\psi_{j,k}}\psi_{j,k}.
+			\end{equation}
+			Hierbei ist $P_j$ die orthogonale Projektion auf den Unterraum $V_j$.\\
+			Eine Möglichkeit zur Konstruktion eines solchen Wavelets ist:
+			\begin{equation}
+				\psi = \sum_{k\in \mathbb{Z}}(b_k) \phi(2\cdot-k) \text{ mit } b_k=(-1)^k a_{1-k}
+			\end{equation}
+		\end{satz}
+		
+		
+
+		Als OMRA-Wavelets bezeichnen wir diejenigen Wavelets, die auf diese Weise aus einer Skalierungsfunktion $\phi$ entstehen. Alle diese Wavelets haben gemeinsam, dass die Koeffizienten der Skalierungsfunktionen die Gleichungen \ref{SummeDerKoeffizienten} und \ref{ProduktDerKoeffizienten} erfüllen. 
+		
+		\begin{beispiel}
+			Wir suchen eine Skalierungsfunktion, mit 4 Verfeinerungskoeffizienten. Die Bedingungen \ref{SummeDerKoeffizienten} und \ref{ProduktDerKoeffizienten} liefern uns das Gleichungssystem:
+			\begin{align}
+				a_0+a_1+a_2+a_3 = 2, \hspace*{1cm} a_0 a_2+a_1 a_3 = 0, \hspace*{1cm} a_0^2+a_1^2+a_2^2+a_3^2 = 2
+			\end{align}
+			
+			Es ergeben sich die beiden folgenden Zweige als Lösungsmenge in Abhängigkeit des Parameters $t$ für $0.5-\frac{\sqrt{2}}{2}<t<0.5-\frac{\sqrt{2}}{2}$:\\
+			1. Lösungszweig: $a_3=t, a_1=1-t, a_0=0.5+0.5\sqrt{-4t^2+4t+1}, a_2=0.5-0.5\sqrt{-4t^2+4t+1}$\\
+			2. Lösungszweig: $a_3=t, a_1=1-t, a_0=0.5-0.5\sqrt{-4t^2+4t+1}, a_2=0.5+0.5\sqrt{-4t^2+4t+1}$\\
+			
+			Lässt man den Parameter $t$ von  $0.5-\frac{\sqrt{2}}{2}$ bis $0.5-\frac{\sqrt{2}}{2}$ laufen, so kann man alle möglichen Skalierungsfunktionen in einer kleinen Animation erkennen (siehe wavelets.com). Ob diese Skalierungsfunktionen jeweils eine Multiskalenanalyse und damit ein Wavelet erzeugen bleibt noch zu überprüfen.
+		\end{beispiel}
+		
+		
+		\textbf{Daubechies-Wavelets}\\
+		Die berühmtesten Wavelets der OMRA-Familie sind vermutlich die Daubechies-Wavelets. Sie besitzen die interessante Eigenschaft, dass sie theoretisch mit beliebig hoher Regularität konstruiert werden können. Die ursprüngliche Konstruktion findet sich in \cite{Daubechies1988}. \\
+		
+		\textbf{Coiflets}\\
+		R. Coifman schlug erstmals vor, Wavelets mit möglichst vielen verschwindenden Momenten zu konstruieren. Diese wurden erstmals von Daubechies \cite{Daubechies1990} \cite{Daubechies1992} konstruiert und Coiflets genannt. Genauer heißt ein orthonormales Wavelet $\psi$ mit kompaktem Träger Coiflet der Ordnung $N$, falls gilt:
+		\begin{align}
+				i) \int_{-\infty}^{\infty}x^n \psi(x) dx = 0 \text{ für alle } n=1...N-1,\\
+				ii) \int_{-\infty}^{\infty}x^n \phi(x) dx = \delta_n \text{ für alle } n=1...N-1,
+		\end{align} 
+		Eine Methode zur exakten Berechnung der Verfeinerungskoeffizienten, sowie einige exakte Koeffizienten findet man in \cite{CernaFinekNajzar2008}\\
+		
+		\textbf{Symmlets}\\
+		In \cite{Daubechies1990} wird zunächst gezeigt, dass es außer das Haar-Wavelet keine weiteres ORMA-Wavelet gibt, dass eine Symmetrie besitzt. Es gibt wohl aber Möglichkeiten 'symmetrischere' Wavelets zu konstruieren. Möglichst symmetrische Wavelets werden beispielsweise in ... konstruiert und Symmlets genannt.
+		
+		\subsection{Biorthogonale-Wavelets mit kompaktem Träger}
+		\label{BiOMRA}
+		Unsere Konstruktion von biorthogonalen Wavelets folgt im Großen und Ganzen der Konstruktion der OMRA-Wavelets. Der große Unterschied besteht darin, dass statt einer Skalierungsfunktion nun zwei verwendet werden, die unterschiedliche, sogenannte duale Multiskalenanalysen bilden sollen. Dann erhält man zwar keine orthonormale Waveletbasis mehr, immerhin jedoch zwei zueinander biorthogonale Waveletbasen. Genauer:
+		
+		\begin{definition} [dual]
+			Die Skalierungsfunktionen $\phi, \tilde{\phi}$ heißen zueinander dual, falls gilt: 
+			\begin{equation}
+				\skalar{\phi}{\tilde{\phi}(\cdot - k)}=\delta_{0,k}
+			\end{equation} 
+			Die zugehörigen MRAs $(V_j)_j, (\tilde{V}_j)_j$ heißen dann zueinander dual.
+		\end{definition} 
+		
+		Bemerkung: Daraus folgt, dass für ein festes $j$ gilt: $\skalar{\phi_{j,k}}{\tilde{\phi}_{j,\tilde{k}}}=\delta_{k,\tilde{k}}$\\
+		Achtung: Stimmt das überhaupt so?
+		
+		\begin{definition}[biorthogonal]
+			Zwei indizierte Systeme von Vektoren $(u_i)_i\in \mathbb{Z}$, $(v_i)_i\in \mathbb{Z}$ heißen zueinander biorthogonal, falls gilt $\skalar{u_i}{v_j}=\delta_{i,j}$.
+		\end{definition}
+		
+		Der folgende Satz aus \cite{CohenDaubechiesFeauveau}, übernommen aus \cite{Primbs2006}, garantiert nun biorthogonale Waveletbasen von $L^2(\mathbb{R})$ unter gewissen Voraussetzungen an die Skalierungsfunktionen:
+		
+		\begin{satz}
+			Seien $\phi, \tilde{\phi}$ zueinander duale Skalierungsfunktionen mit kompaktem Träger, die eine MRA erzeugen und deren Fouriertransformationen in der folgenden Art für $C,\epsilon>0$ beschränkt sind: 
+			\begin{align}
+			\hat{\phi}(\xi)\leq C(1+|\xi|)^{-0.5-\epsilon}, \hat{\tilde{\phi}}(\xi)\leq C(1+|\xi|)^{-0.5-\epsilon}, 
+			\end{align}
+			
+			dann bilden $\psi$ und $\tilde{\psi}$ mit:
+				\begin{align}
+				\psi = \sum_{k\in \mathbb{Z}}b_k \phi(2\cdot-k) \text{ mit } b_k=(-1)^k \tilde{a}_{1-k}\\
+				\tilde{\psi} = \sum_{k\in \mathbb{Z}}\tilde{b}_k \phi(2\cdot-k) \text{ mit } \tilde{b}_k=(-1)^k a_{1-k}
+				\end{align}
+			zueinander duale  (d.h. $\skalar{\psi_{j,k}}{\tilde{\psi}_{\tilde{j},\tilde{k}}}=\delta_{j,\tilde{j}}\delta_{k,\tilde{k}}$) Rieszbasen von $L^2(\mathbb{R})$.
+		\end{satz}
+		
+		Die folgende Methode zur Konstruktion von biorthogonalen Wavelets stammt aus \cite{CohenDaubechiesFeauveau}:\\
+		
+		\textbf{Biorthogonale Wavelets aus kardinalen B-Splines}\\
+			Als erste Skalierungsfunktion $\phi_d$ wird ein kardinaler B-Spline der Ordnung $d\in \mathbb{N}$ verwendet. Dieser besitzt viele nützliche Eigenschaften: 
+		\begin{itemize}
+			\item $\phi_d$ besitzt kompakten Träger: $supp(\phi_d)=[l_1,l_2]=[-\lfloor \frac{d}{2} \rfloor, \lceil \frac{d}{2} \rceil]$
+			\item Sie erzeugen (wie gewünscht) eine MRA. Die Verfeinerungsrelation lautet:
+				\begin{equation}
+					 \phi_d = \sum_{k=l_1}^{l_2} a_k \phi_d(2\cdot -k)  \text{ mit } a_k=2^{1-d} \binom{d}{k+\lfloor d/2 \rfloor} 
+				\end{equation} 
+		\end{itemize}
+		
+		Weiterhin sind alle $\phi_d$ normiert und symmetrisch. 
+		
+		In \cite{CohenDaubechiesFeauveau} werden wie folgt zu einem kardinalen B-Spline der Ordnung $d$ duale Skalierungsfunktionen erzeugt:\\
+		\begin{satz}	
+			Sei $\tilde{d}\in \mathbb{N}$ so gewählt, dass $\frac{\tilde{d}}{d}$ groß genug ist und die Summe $\tilde{d}+d$ gerade, dann ist 		
+			\begin{align}
+				\tilde{\phi}_{d,\tilde{d}} = \sum_{k\in \mathbb{Z}} \tilde{a}_k \tilde{\phi}_{d,\tilde{d}}(2\cdot -k) \intertext{mit}		
+				\tilde{a}_k=\sum_{n=0}^{\frac{d+\tilde{d}}{2}-1}\sum_{l=0}^{2n}2^{-\tilde{d}-2n}(-1)^{n+l}\binom{\tilde{d}}{k+\lfloor\frac{\tilde{d}}{2}\rfloor-l+n}
+				\binom{\frac{d+\tilde{d}}{2}-1+n}{n}\binom{2n}{l}
+			\end{align} 
+			eine duale Skalierungsfunktion zu $\phi_d$.\\
+			Sie besitzt kompakten Träger mit: $supp(\tilde{\phi})=[\tilde{l}_1,\tilde{l}_2]=
+			[-\tilde{d}-\lfloor \frac{d}{2} \rfloor+1, \tilde{d}+\lceil \frac{d}{2} \rceil -1]$
+		\end{satz}
+	
+		
+		\subsection{Biorthogonale-Wavelets auf einem Intervall}
+		\label{BiOMRAI}
+		Ziel ist es nun nicht mehr eine Wavelet-Basis für ganz $L^2(\mathbb{R})$ zu finden, sondern nur noch eine biorthogonale Wavelet-Basis von $L^2([0,1])$. Zwar könnte man die zuvor konstruierten Wavelets nutzen und am Rand einfach 'abschneiden', dies ist jedoch im Allgemeinen nicht wünschenswert, da beispielsweise nicht einmal die konstanten Funktionen durch die abgeschnittenen B-Splines reproduziert werden können.
+		
+		Zunächst wird dazu die Definition der MRA so erweitert, dass diese nicht nur aus Verschobenen und skalierten Funktionen der Skalierungsfunktion ensteht, sondern auch andere Funktionen enthalten kann:
+		
+		\begin{definition}[Multiskalenanalyse auf {[0,1]}]
+			Sei $\Phi_j:=\{\phi_{j,k}: \phi_{j,k}\in L^2([0,1], k\in \Delta_j\subset \mathbb{Z} )\}$ eine Menge von linear unabhängigen Funktionen. Die Folge endlichdimensionaler Räume $\{V^{[0,1]}_j\}_j$, wobei $V^{[0,1]}_j:=span(\Phi_j)$ heißt dann Multiskalenanalyse auf $L^2([0,1])$, falls gilt:\\
+				\begin{enumerate}
+					\item Die Räume sind geschachtelt:  $V_j\subset V_{j+1}$ für alle $j\ge0$
+					\item Die Räume $V_j$ liegen asymptotisch dicht in $L^2(\mathbb{R})$: $\overline{\bigcup_{j\in \mathbb{N}}V_j}=L^2(\mathbb{R})$.
+					\item Die Skalierungsfunktionen $\phi_{j,k}$ bilden eine Rieszbasis von $V_j$.
+				\end{enumerate}
+		\end{definition}
+		
+		
+		Es ist hierbei also nicht mehr explizit eine Zweiskalenmultiplikation gefordert. Fasst man die Skalierungsfunktionen $\phi_{j,k}$ in einen Spaltenvektor $\Phi_j$ zusammen so impliziert der erste Punkt eine Matrix-Verfeinerungsrelation derart, dass: $\Phi^T_j=\Phi^T_{j+1} M_j$.
+		
+		Seien $\{V^{[0,1]}_j\}_j$ und $\{\tilde{V}^{[0,1]}_j\}_j$ zwei Multiskalenanalysen auf $[0,1]$. Sie heißen zueinander dual, falls für jedes feste $j$ gilt:
+		$\skalar{\phi_{j,k}}{\tilde{\phi}_{j,\tilde{k}}}=\delta_{k,\tilde{k}}$\\
+	
+	\textbf{Aufbau der MRA auf [0,1]}\\
+	Unsere Basis $\Phi_j$ der MRA auf [0,1] soll aus drei Arten von Skalierungsfunktionen aufgebaut werden:\\
+	1) Innere Funktionen $\Phi^I_j=\{\phi^I_{j,k}: k\in \Delta_j \}$. Diese besitzen einen Träger $[a,b]\subset[0,1]$. \\
+	2) Linke Randfunktionen $\Phi^L_j=\{\phi^L_{j,k}: k=1,...n\}$. Sie verschwinden im rechten Bereich von $[0,1]$.\\
+	3) Rechte Randfunktionen $\Phi^R_j=\{\phi^R_{j,k}: k=1,...n\}$. Sie verschwinden im linken Bereich von $[0,1]$.\\
+
+	Sodass wir setzen: $\Phi_j=\Phi^I_j \cup \Phi^L_j \cup \Phi^R_j$.\\
+	Analog wird auch die Basis $\tilde{\Phi}_j$ der dualen MRA aussehen.\\
+		
+	Aufbauend auf bekannten biorthogonalen Skalierungsfunktionen (beispielsweise aus \ref{BiOMRA}) kann man die inneren Funktionen als vorherigen wählen.
+	Somit sind die inneren Funktionen, sowie die dazu dualen bekannt.
+	
+	Die inneren Funktionen reichen bereits aus um eine MRA auf $[0,1]$ zu definieren:
+	\begin{satz}
+		Sei $\phi\in L^2(\mathbb{R})$ eine Skalierungsfunktion einer MRA auf $L^2(\mathbb{R})$ mit $supp(\phi)=[l_1,l_2]$, dann ist für $j>J:=\frac{ln(l_2-l_1)}{ln(2)}$ und  
+		$V_j^I:=span \Phi_j^I$ die Folge der Räume $(V_j)_{j\ge J}$ eine MRA auf $L^2([0,1])$. (Beweis siehe \cite{Primbs2006}).
+	\end{satz}
+	
+	Die Schwierigkeit liegt dann in der Wahl der Randfunktionen, sodass die Eigenschaften der Multiskalenanalyse erfüllt werden und die notwendigen Dualitätsbeziehungen zwischen den Rand- und inneren Funktionen, sowie untereinander erfüllt sind. \\
+	
+	\textbf{1. Konstruktion:}\\
+	Seien $B^j_{k,d}$ die B-Splines der Ordnung $d$ auf dem Gitter $(\underbrace{0,...,0}_{d-mal}, \hspace*{0.1cm} \underbrace{2^{-j},2^{-j}\cdot 2,...,2^{-j}\cdot 2^{j-1}}_{2^{j-1} verschiedene Knoten}, \hspace*{0.1cm} \underbrace{0,...,0}_{d-mal})$. \\
+	Seien weiter $d\leq \tilde{d} \in \mathbb{N}_{\ge 2}$ mit $d+\tilde{d}$ gerade, so wählen wir als MRA auf $[0,1]$:\\
+		1) Innere Funktionen $\Phi^I_j=\{\phi^I_{j,k}: \lfloor\frac{d}{2}\rfloor +\tilde{d} -1 \leq k \leq 2^j -\lceil \frac{d}{2} \rceil - \tilde{d}-1 \}$.
+			mit  $\phi^I_{j,k}=2^\frac{j}{2}B_{k-\lceil \frac{d}{2}\rceil,d}$ \\				
+		2) Linke Randfunktionen $\Phi^L_j=\{\phi^L_{j,k}: k=1,...d+\tilde{d}-2\}$. 	mit  $\phi^L_{j,k}=2^\frac{j}{2}B_{k-d,d}$ \\
+		3) Rechte Randfunktionen $\Phi^R_j=\{\phi^R_{j,k}: k=1,...d+\tilde{d}-2\}$. mit  $\phi^I_{j,k}=2^\frac{j}{2}B_{2^j-k,d}$ \\
+	
+	Bemerkung: Man beachte, dass bei dieser Definition nur die ersten $d-1$ Funktionen echte Randfunktionen sind. Die Funktionen für $k=d,...,(d+\tilde{d}-2)$, sind eigentlich innere Funktionen, werden aber zu den Randfunktionen hinzugezählt. Gleiches gilt für die rechten Randfunktionen.
+	
+	Fasst man die Funktionen als Zeilenvektoren $\vec{\Phi^I_{j,k}}, \vec{\Phi^L_{j,k}}, \vec{\Phi^R_{j,k}}$ auf, so findet man eine Verfeinerungsmatrix $M_j$ derart, dass:\\
+	$(\vec{\Phi}^L_{j,k}, \vec{\Phi}^I_{j,k}, \vec{\Phi}^R_{j,k})=(\vec{\Phi}^L_{j+1,k}, \vec{\Phi}^I_{j+1,k}, \vec{\Phi}^R_{j+1,k}) \cdot M_j$.
+	Genaueres zu deren Aufbau findet man beispielsweise in \cite{Primbs2006}.
+	\\
+	\textbf{Konstruktion der Wavelets:}\\
+	Sei $(V_j)_j$ eine MRA auf $[0,1]$. Nun soll das Wavelet (genauer die Wavelets), wie zuvor, das orthogonale Komplement $W_j$ von $V_j$ in $V_{j+1}$ aufspannen ($V_{j+1}=V_j \oplus W_j$): 
+	\begin{equation}
+		W_j=\overline{span\{\psi_{j,k}\}}, \text{ j fest }
+	\end{equation}
+	Da die einzelnen Wavelets $\psi_{j,k}$ in $V_{j+1}$ liegen, existiert eine lineare Darstellung des Wavelets aus den Skalierungsfunktionen. Fasst man die einzelnen Wavelets und Skalierungsfunktionen als Einträge eines Vektors auf, so ergibt sich:
+	
+	\begin{align}
+		(\psi_{j,1},\cdots,\psi_{j,n})&=(\phi_{j,1},\cdots,\phi_{j,m})M_{j,1} \hspace*{1cm} j>j_0\\
+		bzw. \hspace*{2cm} \Psi_j^T&=\Phi_{j+1}^T M_{j,1} \hspace*{2cm} j>j_0
+	\end{align}
+	
+	$m$ ist hierbei die Anzahl der Basisfunktionen, die $V_{j+1}$ aufspannen, $n$ die Anzahl der Wavelets, die $W_j$ aufspannen. \\
+	
+	Die Konstruktion der Matrix $M_{j,1}$ hängt von der Wahl der gewählten Ebene $j$ und der Wahl der Skalierungsfunktionen ab. Die Berechnung der Matrix für obigen Fall findet sich in \cite{Primbs2006}. Wir wollen die Matrix einfach in unserer Datenbank speichern.
+	\newpage
+	\section{Eigenschaften von Wavelets}
+	
+	\section{Plotten der relevanten Funktionen}
+	\subsection{Punktauswertung verfeinerbarer Funktionen}
+	
+	Habe $\phi$ kompakten Träger, $supp(\phi) \subseteq [l_1,l_2]$ mit $l_1, l_2 \in \mathbb{N}$ und sei stetig (d.h. insbesondere $\phi(l_1)=0=\phi(l_2)$, dann gilt an allen ganzzahligen Punkten $x=l \in \mathbb{Z}$:
+	\begin{equation}
+		\phi(l)=\sum_{k=l_1}^{l_2}a_k \phi(2l-k)=\sum_{m=l_1+1}^{l_2-1}a_{2l-m}\phi(m) \text{ für alle } l_1+1\leq l \leq l_2-1\\
+	\end{equation}
+	Fasst man diese Bedingungen in einem Gleichungssystem zusammen, so erhält man ein Eigenwertproblem zum Eigenwert 1:
+	
+	\begin{equation}
+		\begin{pmatrix}
+		\phi(l_1+1)\\
+		\phi(l_1+2)\\
+		\vdots	\\
+		\phi(l_2-2)\\
+		\phi(l_2-1)
+		\end{pmatrix}
+		=
+		\begin{pmatrix}
+		a_{l_1+1} & a_{l_1} &	&	&	& 		&\\
+		a_{l_1+3} & a_{l_1+2} & a_{l_1+1} & a_{l_1} &	&	&\\
+		a_{l_1+5}& a_{l_1+4} & a_{l_1+3} & a_{l_1+2} & a_{l_1+1} & a_{l_1} \\
+		&	&	&	\ddots	&	\ddots	&	\ddots	&	\\
+		&	&	&		a_{l_2} & a_{l_2-1} & a_{l_2-2} & a_{l_2-3}\\
+		 &	&	&		 &  & a_{l_2} & a_{l_2-2}\\
+		\end{pmatrix}	
+		\begin{pmatrix}
+		\phi(l_1+1)\\
+		\phi(l_1+2)\\
+		\vdots	\\
+		\phi(l_2-2)\\
+		\phi(l_2-1)
+		\end{pmatrix}	
+	\end{equation}
+	Für die Skalierungsfunktionen gilt außerdem $\sum_{k\in \mathbb{Z}} \phi(x-k)=1 $ für alle $x \in \mathbb{R}$. Nehmen wir diese Bedingung auf, so erhalten wir das Gleichungssystem: 
+	\begin{equation}
+		\begin{pmatrix}
+			&	A-I \\
+			1 & \cdots & 1\\
+		\end{pmatrix}
+			\begin{pmatrix}
+		\phi(l_1+1)\\
+		\vdots	\\
+		\phi(l_2-1)
+		\end{pmatrix}
+		=
+		\begin{pmatrix}
+		0\\
+		\vdots\\
+		0\\
+		1
+		\end{pmatrix}
+	\end{equation}
+	Dahmen und Micceli haben gezeigt, dass dieses Gleichungssystem unter schwachen Voraussetzungen eindeutig lösbar ist.\\
+	
+	Die Funktionswerte von $\phi$ an allgemeinen dyadischen Punkten $x=2^{-j}l, j\ge 0, l\in \mathbb{Z}$ kann man rekursiv mit Hilfer der Verfeinerungsgleichung brechnen, denn
+	\begin{equation}
+		\phi(2^{-j}l)=\sum_{k=l_1} ^{l_2} a_k \phi(2^{1-j}l -k)=\sum_{k=l_1} ^{l_2} a_k \phi(2^{1-j}(l -2^{j-1}k))
+	\end{equation}
+	
+	Eine naive rekursive Berechnung führt zu hohem Rechenaufwand, da viele Werte mehrfach berechnet werden. Stattdessen empfiehlt es sich zunächst für $j=1$ alle Werte zu berechnen. Diese Werte können dann für $j=2$ genutzt werden. Dann berechnet man alle Werte für $j=3$ usw. So muss jeder Wert nur einmal berechnet werden.
+	
+	\textbf{Punktauswertung der Ableitungen}\\
+	
+	
+	
+	
+	\subsection{Punktauswertung der B-Splines}
+	 \begin{definition}[Normierter B-Spline]
+	 	Sei $y_i, ... , y_{i + m}$ eine Knotenfolge. Dann ist der normierte B-Spline erster Ordnung
+	 	durch
+	 	\begin{equation}
+	 		N_i^1(x) = \begin{cases}
+	 			1 &\mbox{, } y_i \leq x < y_{i + 1} \\
+	 			0 & \mbox{, } sonst
+	 		\end{cases}
+	 	\end{equation}
+	 	definiert.
+	 	Der normierte B-Spline $m$-ter Ordnung, $m \geq 1$ ist durch
+	 	\begin{equation}
+	 		N_i^m (x) = \begin{cases} 			
+	 			0 & \mbox{, } y_i=y_{i+m} \\
+	 			\frac{x - y_i}{y_{i + m - 1} - y_i} N_i^{m - 1} (x)	  	&\mbox{, } y_i<y_{i+m-1} \text{ und } y_{i+1}=y_{i+m}  \\
+	 			\frac{y_{ i + m} - x}{y_{i + m} - y_{i + 1}} N_{i + 1}^{m - 1} (x)  	&\mbox{, } y_i=y_{i+m-1}  \text{ und } y_{i+1}<y_{i+m}  \\
+	 			\frac{x - y_i}{y_{i + m - 1} - y_i} N_i^{m - 1} (x)	+\frac{y_{ i + m} - x}{y_{i + m} - y_{i + 1}} N_{i + 1}^{m - 1} (x)  		&\mbox{, } y_i<y_{i+m-1}  \text{ und } y_{i+1}<y_{i+m}  \\
+	 		\end{cases}
+	 	\end{equation}
+	 \end{definition}
+	 
+	 Die $\mu$-te Ableitung $^\mu N_i^m$ lässt sich rekursiv  folgendermaßen berechnen:
+	 \begin{equation}
+		 ^\mu N_i^m = (m-1) \cdot \begin{cases}
+			 0 &\mbox{, } y_i=y_{i+m+1}\\
+			 \vspace*{0.2cm}
+			 \frac{^{(\mu-1)}N_i^{m-1}}{y_{i+m-1}-y_i} & \mbox{, }  y_i<y_{i+m-1} \text{ und } y_{i+1}=y_{i+m}  \\
+			  \vspace*{0.2cm}
+			 -\frac{^{(\mu-1)}N_{i+1}^{m-1}}{y_{i+m}-y_{i+1}} & \mbox{, } 	y_i=y_{i+m-1}  \text{ und } y_{i+1}<y_{i+m}  \\
+			  \vspace*{0.2cm}
+			 \frac{^{(\mu-1)}N_i^{m-1}}{y_{i+m-1}-y_i}-\frac{^{(\mu-1)}N_{i+1}^{m-1}}{y_{i+m}-y_{i+1}}	&\mbox{, } y_i<y_{i+m-1}  \text{ und } y_{i+1}<y_{i+m}  \\	 
+		 \end{cases}
+	 \end{equation}
+	
+	Eine Herleitung der Formel findet man in etwa in \cite{LycheMorken}, auch wenn es scheint, dass ein paar Indices nicht ganz mit dieser Darstellung übereinstimmen.
+	
+	\section{Aufbau des Dateisystems}
+	
+	\section{Anhang}
+	
+		
+		
+				
+		\newpage		
+		\bibliography{WaveletDocumentation}
+		\vspace{0.5cm}
+
+
+	
+		
+\end{document}
