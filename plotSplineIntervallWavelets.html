@@ -12,7 +12,7 @@
 
 </style>
 <div class="chart"></div>
-test-File
+plotSplineIntervallWavelets
 <!--<script src="//d3js.org/d3.v3.min.js"></script>\\-->
 <script src="js/ext_libs/d3.js"></script>
 <script src="js/libs/math2.js"></script>
@@ -126,7 +126,7 @@ test-File
 			return null;
 		}
 		for(var i=0; i<scf.length; i++){
-			PsiInX=PsiInX + Mj1[i][k]*scf[i].eval(x); //evtl. k nicht i
+			PsiInX=PsiInX + Mj1[i][k]*scf[i].eval(x); 
 		}
 		return PsiInX;
 	}
@@ -141,10 +141,10 @@ test-File
  * 						Each object has the 'eval' function to evaluate the scaling-function in x
  */
 	function buildPrimalPrimbsScf(j,d){
-		var m = Math.pow(2,j)+d-1; //Anzahl der erzeugten Skalierungsfunktionen.
+		var m = Math.pow(2,j)+d-1; //Number of scaling-functions
 		var nodes = buildNodeGridForBSpline(d,j);
 		var scf = new Array(m);
-		//definiert das Objekt einer Primbs-scf
+		//Object of a primal Primbs scaling-function
 		function Obj( prop1, prop2, prop3 ) { 
     				return { 
        				 	d1 : prop1,
@@ -161,61 +161,137 @@ test-File
 		return scf;
 	}
 	
-	function buildLeftDualPrimbsScfI(d,dTilde){
-		var m = dTilde; //Anzahl der Randfunktionen siehe s.71
+	/** Computes the dual scaling functions for B-Splines as described by M.Primbs. See p.50. and CDF
+ *  (last modification: 27.12.16 Simon)
+ * 
+ *   @param{int} d order of B-Spline
+ *   @param{int} dTilde order of dual functions
+ *   @param{int} j level for which the B-Splines are wanted
+ * 
+ *   @return{object[]} scf returns all scaling-function as an array of objects. 
+ * 						Each object has the 'values' function to calculate values of the scaling-function in
+ */
+	function buildMiddleDualPrimbsScf(d,dTilde,j){
+		var m = Math.pow(2,j)-d-2*dTilde+3; //see p. 61
+		console.log("m",m);
+		var dmscf=new Array(m);
+		//Object of a middle dual scaling function (from Primbs)
+		function Obj3(d, dTilde, k,j) { 
+    				return { 
+    					d1 : d ,
+    					dTilde1 : dTilde,
+       				 	k1 : k, 
+       				 	j1 :j,
+        				values : function(){ return evaluateMiddleDualPrimbsScf(this.d1,this.dTilde1,this.k1,this.j1);}, 
+   					 }; 			
+			};
+			
+		for(var k=0; k<m; k++){		
+			dmscf[k] = new Obj3(d,dTilde,k,j);
+		}
+		return dmscf;
+	}
+	
+/** Computes values of dual scaling of B-Splines as described by M.Primbs. See p.50. and CDF
+ *  (last modification: 27.12.16 Simon)
+ * 
+ *   @param{int} d order of B-Spline
+ *   @param{int} dTilde order of dual functions
+ *   @param{int} j level for which the B-Splines are wanted
+ * 
+ *   @return{double[]} returns all calculated values 
+ */
+	function evaluateMiddleDualPrimbsScf(d,dTilde,k,j){
+		var coef =  genDualBSplineCoeffs(d, dTilde);
+		var values = iterativePointEvaluation2(coef[0],0, 8, 0);
+		//Translatierung um k (k=1...d+dTilde-2)?
+		console.log(values);
+		 for(var l=0; l<values.length; l++){
+			values[l][0]=values[l][0]+k;
+		}
+		console.log(values);
+		//Skalierung um 2 hoch -j
+		for(var l=0; l<values.length; l++){
+			values[l][0]=Math.pow(2,-j)*values[l][0];
+		}
+		console.log(values);
+		return values;	
+	}
+			
+/** Computes the dual left border scaling functions without border conditions as described by M.Primbs. See p.71.
+ *  (last modification: 27.12.16 Simon)
+ * 
+ *   @param{int} d order of B-Spline
+ *   @param{int} dTilde order of dual B-Spline
+ *   @param{int} j level for which the B-Splines are wanted
+ * 
+ *   @return{object[]} scf returns all scaling-function as an array of objects. 
+ * 					Each object has the 'eval' function to evaluate the scaling-function in x
+ */
+	function buildLeftDualPrimbsScfI(d,dTilde,j){
+		var m = dTilde; //Number of border-functions see p.71
 		var dscf = new Array(m);
-		
-		function Obj2(d, dTilde, phiTilde, k) { 
+		function Obj2(d, dTilde, phiTilde, k,j) { 
     				return { 
     					d1 : d ,
     					dTilde1 : dTilde,
        				 	phiTilde1 : phiTilde,
        				 	k1 : k, 
-        				eval : function(x){ return evaluateLeftDualPrimbsScf(this.d1,this.dTilde1,this.phiTilde1,this.k1+1,x); }, 
+       				 	j1 :j,
+        				eval : function(x){ return evaluateLeftDualPrimbsScfI(this.d1,this.dTilde1,this.phiTilde1,this.k1+1,Math.pow(2,j)*x); }, 
    					 }; 			
 			};
-		//generate coefficients of dual B-Spline functions
 		//calculate values of dual B-Spline function phiTilde - wenn wir nicht phiTildeuebergeben wuerden muessten wir jedes Mal alles rechnen.
 		var coef =  genDualBSplineCoeffs(d, dTilde);
-		var phiTilde = iterativePointEvaluation2(coef[0], coef[1], 10, 0);
-
+		var phiTilde = iterativePointEvaluation2(coef[0], coef[1], 8, 0);
+		console.log("phiTilde",phiTilde);
 		for(var k=0; k<m; k++){		
-			dscf[k] = new Obj2(d,dTilde,phiTilde,k);
+			dscf[k] = new Obj2(d,dTilde,phiTilde,k,j);
 		}	
 		return dscf;	
 	}
 	
-	//phiTilde muss auf aequidistantem gitter gegeben sein
-	//dadurch, dass phiTilde gegeben ist spart man sich das auswerten von iterativePointEvaluation in jedem Schritt
-	function evaluateLeftDualPrimbsScf(d, d_tilde, phiTilde, k,x) {
-	//calculate left and right support of dual B-Spline function
+
+/** Evaluates Left border functions without border conditions as described by M.Primbs. See p.71.
+ *	Values of one dual function phiTilde already must be given in an aequidistant grid.
+ *  (last modification: 31.12.16 Simon)
+ * 
+ *   @param{int} d order of B-Spline
+ *   @param{int} dTilde order of dual B-Spline
+ *   @param{double[]} phiTilde values of the dual B-Spline which is used to construct the other ones
+ * 	 @param{integer} k number of the searched border function, counted from left to right
+ * 	 @param{double} x value, which function value is searched.
+ * 
+ *   @return{double} y  function value of the border function
+ */
+	function evaluateLeftDualPrimbsScfI(d, d_tilde, phiTilde, k,x) {
+	//calculate left and right support of dual B-Spline border function
 		var l_1=-Math.floor(d/2)-d_tilde+1;
 		var l_2=Math.ceil(d/2)+d_tilde-1;
 		
-		//gitterweite der gegebenen Werte von phiTilde
+		//grid steps of phiTilde
 		var delta = phiTilde[1][0]-phiTilde[0][0];
-		console.log("delta",delta);
 		var y=0;		
 			if(x<0){
 				return 0;
 			}
 			else{
 				for(var n=k; n<l_2-l_1-1;n++){			
-					y += nchoosek(n,k) * phi_tilde(phiTilde, x + n + l_1 + 1);//hier richtiger Index...
+					y += nchoosek(n,k) * phi_tilde2(phiTilde, x + n + l_1 + 1);//hier richtiger Index...
 				}
 			}
 		return y;
 	}
-	//sucht iterativ den kleinsten moeglichen wert aus phiTilde raus, der berechnet wurde. verdammt ineffizient!!!
-	function phi_tilde(values,x){
-		for(var i=0; i<values.length; i++){
-			if(Math.abs(x-values[i][0])<0.001){
-				return values[i][1];
-			}
-		}
-		return 0;
-	}
-	//berechnet den Index, der am naechsten an einem x liegt, das berechnet wurde
+
+
+	/** Seaches an y-value for a x-value. The function values must be given in an aquidistant grid.
+ *  (last modification: 27.12.16 Simon)
+ * 
+ *   @param{double[]} values values of the function (must be given in an aequidistant grid)
+ *   @param{double} x value for which y is searched
+ * 
+ *   @return{double} y function-value of x
+ */
 	function phi_tilde2(values,x){
 		var delta = values[1][0]-values[0][0];
 		var index = Math.round((x-values[0][0])/delta);
@@ -226,7 +302,44 @@ test-File
 			return 0;
 		}
 	}
-
+	
+//Not finished!!! Problem is to calculate m[n][k]
+/** Computes the dual left border scaling functions without border conditions as described by M.Primbs. See p.71.
+ *  (last modification: 27.12.16 Simon)
+ * 
+ *   @param{int} d order of B-Spline
+ *   @param{int} dTilde order of dual B-Spline
+ *   @param{int} j level for which the B-Splines are wanted
+ * 
+ *   @return{object[]} scf returns all left border scaling-function as an array of objects. 
+ * 					Each object has the 'eval' function to evaluate the scaling-function in x
+ */
+	function buildLeftDualPrimbsScfII(d,dTilde,j){
+		var m = d-2; //Number of border-functions - see s.84
+		var dscf = new Array(m);
+		function Obj4(d, dTilde, phiL, k,j) { 
+    				return { 
+    					d1 : d ,
+    					dTilde1 : dTilde,
+       				 	phiL1 : phiL,
+       				 	k1 : k, 
+       				 	j1 :j,
+        				eval : function(x){ 
+        						var y=0;
+        						for(var n=k+1; n<d+2*k-1; n++){
+        							y+=M[n][k]*phiL[n-1].eval(2*x);
+        						}
+        						return y;}, 
+   					 }; 			
+			};
+		//build first part of left dual functions which also are necessary to 
+		//to construct the rest of the left scaling functions
+		dscf.push(buildLeftDualPrimbsScfI(d,dTilde,j));
+		for(var k=d-2; k>0; k--){		
+			dscf[k-1] = new Obj4(d,dTilde,dscf,k,j);
+		}	
+		return dscf;	
+	}
 
 /** Evaluates a function, given as an object with the function 'eval', in a grid
  *  (last modification: 22.12.16 Simon)
@@ -244,16 +357,24 @@ test-File
 		return points;
 	}
 	
+	
+	//Ploten der dualen mittleren Skalierungsfunktionen
 	if(false){
-		buildLeftDualPrimbsScf(3,5);
-		var values1=values4;
+		var d=2;
+		var dTilde=4;
+		var j=3;
+		var dscf=buildMiddleDualPrimbsScf(d,dTilde,j);
+		var values1=dscf[0].values();
+		var values2=dscf[0].values();
+		var values3=dscf[0].values();
 	}
-	//Ploten der dualen Skalierungsfunktionen
-	if(true){
+	
+	//Ploten der dualen linken SkalierungsfunktionenI
+	if(false){
 	var d=3;
 	var dTilde=5;
-	var j=3;
-	var dscf=buildLeftDualPrimbsScfI(d,dTilde);
+	var j=2;
+	var dscf=buildLeftDualPrimbsScfI(d,dTilde,j);
 	var grid = makeGrid(0,8,8024);
 	var values1 = evaluateObjectInGrid(dscf[0],grid);
 	var values2 = evaluateObjectInGrid(dscf[1],grid);
@@ -262,8 +383,8 @@ test-File
 	
 	
 	//Ploten der primalen Skalierungsfunktionen
-	if(false){
-	var d=2;
+	if(true){
+	var d=3;
 	var j=3;
 	var scf=buildPrimalPrimbsScf(j,d);
 	var grid = makeGrid(0,1,100);
@@ -281,9 +402,7 @@ test-File
 	var Mj1_1=[[-0.5303,0,0,0],[0.3977, -0.0884, 0, 0],[-0.0884, -0.1768, 0,0],[-0.0442, 0.5303, -0.0884,  0],
          [0, -0.1768, -0.1768, 0], [0, -0.0884, 0.5303, -0.0442],[0, 0, -0.1768, -0.0884],[0, 0, -0.0884, 0.3977],
          [0, 0, 0,  -0.5303]];
-	//HIER andere Matrix ausprobieren
-	//var x=0.5;
-	//var y = evaluateSIWaveletInX(j,k,scf,Mj1_1,x);
+
 	var params1 = [j,0,scf,Mj1_1];
 	var params2 = [j,1,scf,Mj1_1];
 	var params3 = [j,2,scf,Mj1_1];
@@ -318,23 +437,10 @@ test-File
 		for(var i=0; i< x.length; i++){
 			params2[params2.length -1 ] = x[i];
 			points[i]=[x[i], funct.apply(this, params2)];
-			//console.log(funct.apply(this, params));
-			//console.log(params);	
 		}
 		return points;
 	} 
 
-	
-	
-	//							   d,j
-	//var t= buildNodeGridForBSpline(d,2);
-	//var params1 = [d,t,1,0];
-	//params:[order, knots, 'verschiebung' , derivative]
-	//var params2 = [d,t,2,0];
-	//var params3 = [d,t,3,0];
-	//values1 = evaluateFunctionInGrid( buildPrimalPrimbsScf(j,d)[k].eval,params1,-1,5,1000);
-	//values2 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params2,-1,5,1000);
-	//values3 = evaluateFunctionInGrid(evaluateRthDerivOfBSplineInPointX,params3,-1,5,1000);
 	
 	plotInst1 = 0;
 	plotInst2 = 0;
@@ -366,7 +472,7 @@ test-File
 		return y;
 	}
 
-	// a general function to create a plot-instances
+	// a general function to create a plot-instance
 	function makePlotInst(target, values){
 		try{ 
 			plotInst = functionPlot({
@@ -386,11 +492,37 @@ test-File
 				alert(err);
 			}
 	}
+	//a general function to create a plot-instance with 3 functions in one plot
+	function makePlotInst3(target, valuesI, valuesII, valuesIII){
+		try{ 
+			plotInst = functionPlot({
+			target : target,
+			data : [{
+				points : valuesI,
+				fnType : 'points',
+				graphType : 'polyline',
+			},{
+				points : valuesII,
+				fnType : 'points',
+				graphType : 'polyline',
+			},{
+				points : valuesIII,
+				fnType : 'points',
+				graphType : 'polyline',
+			}]
+		});
 	
+			//returns the wavelet plot as object
+			return plotInst;
+				
+			}catch (err) {
+				console.log(err);
+				alert(err);
+			}
+	}
+	
+	//build three plots with values1, values2 and values3
 	makePlotInst('#plot1', values1);		
 	makePlotInst('#plot2', values2);		
 	makePlotInst('#plot3', values3);		
-
-	//console.log("test", evaluateBSplineInPointX(2,t,-1,0));
-	buildNodeGridForBSpline(2,2);
 </script>
