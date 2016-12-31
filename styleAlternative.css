@@ -1,0 +1,204 @@
+/* 	This style-sheet determines the global style
+	of the webpage.
+	(last modification: 31.12.16 Simon)
+*/
+
+/*universal-selector overwrites standard settings of the browser*/
+* {
+	margin: 0;
+	padding: 0;
+}
+
+div {
+	height: auto;
+	margin: 0;
+	padding: 0;
+	width: auto;
+}
+
+
+/*for older browsers*/
+header, nav, footer, aside, section {
+	display: block;
+}
+
+/* reset the font size in KaTeX to the normal size*/
+.katex {
+	font-size: 1em !important;
+}
+
+/*global settings*/
+p {
+	padding-left: 5px;
+}
+
+textarea {
+	resize: none;
+}
+/* setting of the der html-areas*/
+body {
+	/*font: normal  Arial, sans-serif;*/
+	text-align: center;
+	/*line-height: 120%;*/
+}
+
+nav ul {
+	margin: 0;
+}
+
+nav li {
+	text-align: center;
+	list-style: none;
+	width: 8em;
+}
+
+nav a:link {
+	text-decoration: none;
+}
+
+nav a:visited {
+	color: red;
+	text-decoration: none;
+}
+
+div a{
+	text-decoration:none;
+	color:black;
+}
+
+nav a:active {
+	/*  override the standard red with the
+		link-colour.*/
+	color: red;
+	text-decoration: none;
+}
+
+nav a:focus, nav a:hover{
+	color: red;
+	/*background-color: Lavender;*/
+}
+
+footer {
+	
+}
+
+
+/*setting of distinct elements*/
+#content {
+	width: 760px;
+	min-height: 100px;
+	height: auto;
+}
+
+#left-side-bar {
+	float: left;
+	width: 180px;
+}
+
+/*width: 760 - 180 - 180 px;*/
+#middle {
+	/*word-wrap: break-word;*/
+	margin-left: 180px;
+	margin-right: 30px;
+	width: 550px;
+}
+
+#header {
+	margin: 0 auto;
+	height: 151px;
+}
+
+#logo {
+	float: left;
+	padding: 0px 0px 0px 0px;
+	width: 207px;
+	height: 151px;
+}
+
+#title {
+	float: left;
+	padding-top: 40px;
+	font-size: 45pt;
+	text-align: center;
+	width: 460px;
+}
+
+#icon-introduction {
+	float: left;
+}
+
+#icon-wavelet-plots {
+	float: left;
+}
+
+#icon-database {
+	float: left;
+}
+
+#icon-information {
+	float: left;
+}
+
+#wrapper {
+	padding: 0px 0px 0px 0px;
+	width: 760px;
+	/* border: 2px solid red; */
+	margin: 0 auto;
+	text-align: left;
+}
+
+#topmenu {
+	/* background-color: #e6f9ff;*/
+	/*background-color: #cceeff;*/
+	margin-top: 5px;
+	margin-bottom: 10px;
+	background-color: #e6e6ff;
+	height: 20px;
+}
+
+#footer {
+	margin-top: 10px;
+	background-color: #e6e6ff;
+}
+
+#form-scf {
+	float: left;
+}
+#pic{
+	float: left;
+	clear: none;
+	padding:  5px 5px 5px 5px;
+}
+#text{}
+
+#OMRA-Wavelets{
+	padding: 5px 5px 5px 5px;
+	margin: 5px 5px 5px 5px;
+	text-align: left;
+	background-color:#E6E6FF;
+	border: 2px solid grey;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#BiOMRA-Wavelets{
+	padding: 5px 5px 5px 5px;
+	/* border: 2px solid red; */
+	margin: 5px 5px 5px 5px;
+	text-align: left;
+	border: 2px solid grey;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color:#E6E6FF;
+}
+
+#BiOMRAI-Wavelets{
+	padding: 5px 5px 5px 5px;
+	/* border: 2px solid red; */
+	margin: 5px 5px 5px 5px;
+	text-align: left;
+	background-color:#E6E6FF;
+	border: 2px solid grey;
+    border-radius: 5px;
+    overflow: hidden;
+}
