@@ -374,6 +374,26 @@ function zeros(n) {
 	return A;
 }
 
+/** Create a nxm-Matrix with all entries = 0.
+ * (last modification 18.12.16 Andreas) 
+ * 
+ *  @param{int} n size of the row-array.
+ *  @param{int} m size of the column-array.
+ * 
+ * 	@return{Array} A the matrix.
+ */
+function zeros(n, m) {
+	var A = new Array(n);
+	for (var i = 0; i < n; i++) {
+		A[i] = new Array(m);
+		for(var j = 0; j < m; j++) {
+			A[i][j] = 0;
+		}
+	}
+
+	return A;
+}
+
 /** Create a vector of length n with all entries = 0.
  * (last modification 17.5.16 Andreas) 
  * 
@@ -529,10 +549,10 @@ function conv(a,b){
 
 /**
 *	Write entries in blocks into a matrix.
-*	(last modification: 26.9.16 Andreas)
+*	(last modification: 18.12.16 Andreas)
 *
 *   @param{Array} A		the matrix to write to.
-*   @param{Array} B		the squared matrix to insert.
+*   @param{Array} B		the matrix to insert.
 *   
 *   @param{Integer} r1	row-index of the left upper box-entry.
 *   @param{Integer} c1	column-index of the left upper box-entry.
@@ -543,10 +563,11 @@ function conv(a,b){
 *   	.					.
 *   A[r2,c1]	...		A[r2,c2]
 */
-function setBlockMatrix(A,B,r1,c1){
+function setBlock(A,B,r1,c1){
 	var n = B.length;
+	var m = B[0].length;
 	for(var i = 0; i < n; i ++){
-		for(var j = 0; j < n; j ++){
+		for(var j = 0; j < m; j ++){
 			A[r1 + i][c1 + j] = B[i][j];
 		}
 	}

@@ -165,29 +165,29 @@ plotSplineIntervallWavelets
  *  (last modification: 27.12.16 Simon)
  * 
  *   @param{int} d order of B-Spline
- *   @param{int} dTilde order of dual functions
+ *   @param{int} d_tilde order of dual functions
  *   @param{int} j level for which the B-Splines are wanted
  * 
  *   @return{object[]} scf returns all scaling-function as an array of objects. 
  * 						Each object has the 'values' function to calculate values of the scaling-function in
  */
-	function buildMiddleDualPrimbsScf(d,dTilde,j){
-		var m = Math.pow(2,j)-d-2*dTilde+3; //see p. 61
+	function buildMiddleDualPrimbsScf(d,d_tilde,j){
+		var m = Math.pow(2,j)-d-2*d_tilde+3; //see p. 61
 		console.log("m",m);
 		var dmscf=new Array(m);
 		//Object of a middle dual scaling function (from Primbs)
-		function Obj3(d, dTilde, k,j) { 
+		function Obj3(d, d_tilde, k,j) { 
     				return { 
     					d1 : d ,
-    					dTilde1 : dTilde,
+    					d_tilde1 : d_tilde,
        				 	k1 : k, 
        				 	j1 :j,
-        				values : function(){ return evaluateMiddleDualPrimbsScf(this.d1,this.dTilde1,this.k1,this.j1);}, 
+        				values : function(){ return evaluateMiddleDualPrimbsScf(this.d1,this.d_tilde1,this.k1,this.j1);}, 
    					 }; 			
 			};
 			
 		for(var k=0; k<m; k++){		
-			dmscf[k] = new Obj3(d,dTilde,k,j);
+			dmscf[k] = new Obj3(d,d_tilde,k,j);
 		}
 		return dmscf;
 	}
@@ -196,15 +196,15 @@ plotSplineIntervallWavelets
  *  (last modification: 27.12.16 Simon)
  * 
  *   @param{int} d order of B-Spline
- *   @param{int} dTilde order of dual functions
+ *   @param{int} d_tilde order of dual functions
  *   @param{int} j level for which the B-Splines are wanted
  * 
  *   @return{double[]} returns all calculated values 
  */
-	function evaluateMiddleDualPrimbsScf(d,dTilde,k,j){
-		var coef =  genDualBSplineCoeffs(d, dTilde);
+	function evaluateMiddleDualPrimbsScf(d,d_tilde,k,j){
+		var coef =  genDualBSplineCoeffs(d, d_tilde);
 		var values = iterativePointEvaluation2(coef[0],0, 8, 0);
-		//Translatierung um k (k=1...d+dTilde-2)?
+		//Translatierung um k (k=1...d+d_tilde-2)?
 		console.log(values);
 		 for(var l=0; l<values.length; l++){
 			values[l][0]=values[l][0]+k;
@@ -222,31 +222,31 @@ plotSplineIntervallWavelets
  *  (last modification: 27.12.16 Simon)
  * 
  *   @param{int} d order of B-Spline
- *   @param{int} dTilde order of dual B-Spline
+ *   @param{int} d_tilde order of dual B-Spline
  *   @param{int} j level for which the B-Splines are wanted
  * 
  *   @return{object[]} scf returns all scaling-function as an array of objects. 
  * 					Each object has the 'eval' function to evaluate the scaling-function in x
  */
-	function buildLeftDualPrimbsScfI(d,dTilde,j){
-		var m = dTilde; //Number of border-functions see p.71
+	function buildLeftDualPrimbsScfI(d,d_tilde,j){
+		var m = d_tilde; //Number of border-functions see p.71
 		var dscf = new Array(m);
-		function Obj2(d, dTilde, phiTilde, k,j) { 
+		function Obj2(d, d_tilde, phiTilde, k,j) { 
     				return { 
     					d1 : d ,
-    					dTilde1 : dTilde,
+    					d_tilde1 : d_tilde,
        				 	phiTilde1 : phiTilde,
        				 	k1 : k, 
        				 	j1 :j,
-        				eval : function(x){ return evaluateLeftDualPrimbsScfI(this.d1,this.dTilde1,this.phiTilde1,this.k1+1,Math.pow(2,j)*x); }, 
+        				eval : function(x){ return evaluateLeftDualPrimbsScfI(this.d1,this.d_tilde1,this.phiTilde1,this.k1+1,Math.pow(2,j)*x); }, 
    					 }; 			
 			};
 		//calculate values of dual B-Spline function phiTilde - wenn wir nicht phiTildeuebergeben wuerden muessten wir jedes Mal alles rechnen.
-		var coef =  genDualBSplineCoeffs(d, dTilde);
+		var coef =  genDualBSplineCoeffs(d, d_tilde);
 		var phiTilde = iterativePointEvaluation2(coef[0], coef[1], 8, 0);
 		console.log("phiTilde",phiTilde);
 		for(var k=0; k<m; k++){		
-			dscf[k] = new Obj2(d,dTilde,phiTilde,k,j);
+			dscf[k] = new Obj2(d,d_tilde,phiTilde,k,j);
 		}	
 		return dscf;	
 	}
@@ -257,7 +257,7 @@ plotSplineIntervallWavelets
  *  (last modification: 31.12.16 Simon)
  * 
  *   @param{int} d order of B-Spline
- *   @param{int} dTilde order of dual B-Spline
+ *   @param{int} d_tilde order of dual B-Spline
  *   @param{double[]} phiTilde values of the dual B-Spline which is used to construct the other ones
  * 	 @param{integer} k number of the searched border function, counted from left to right
  * 	 @param{double} x value, which function value is searched.
@@ -283,12 +283,11 @@ plotSplineIntervallWavelets
 		return y;
 	}
 
-
-	/** Seaches an y-value for a x-value. The function values must be given in an aquidistant grid.
+	/** Searches an y-value for a x-value. The function values must be given in an equidistant grid.
  *  (last modification: 27.12.16 Simon)
  * 
- *   @param{double[]} values values of the function (must be given in an aequidistant grid)
- *   @param{double} x value for which y is searched
+ *   @param{double[]} values	values of the function (must be given in an aequidistant grid)
+ *   @param{double} x 			value for which y is searched
  * 
  *   @return{double} y function-value of x
  */
@@ -308,19 +307,19 @@ plotSplineIntervallWavelets
  *  (last modification: 27.12.16 Simon)
  * 
  *   @param{int} d order of B-Spline
- *   @param{int} dTilde order of dual B-Spline
+ *   @param{int} d_tilde order of dual B-Spline
  *   @param{int} j level for which the B-Splines are wanted
  * 
  *   @return{object[]} scf returns all left border scaling-function as an array of objects. 
  * 					Each object has the 'eval' function to evaluate the scaling-function in x
  */
-	function buildLeftDualPrimbsScfII(d,dTilde,j){
+	function buildLeftDualPrimbsScfII(d,d_tilde,j){
 		var m = d-2; //Number of border-functions - see s.84
 		var dscf = new Array(m);
-		function Obj4(d, dTilde, phiL, k,j) { 
+		function Obj4(d, d_tilde, phiL, k,j) { 
     				return { 
     					d1 : d ,
-    					dTilde1 : dTilde,
+    					d_tilde1 : d_tilde,
        				 	phiL1 : phiL,
        				 	k1 : k, 
        				 	j1 :j,
@@ -334,13 +333,141 @@ plotSplineIntervallWavelets
 			};
 		//build first part of left dual functions which also are necessary to 
 		//to construct the rest of the left scaling functions
-		dscf.push(buildLeftDualPrimbsScfI(d,dTilde,j));
+		dscf.push(buildLeftDualPrimbsScfI(d,d_tilde,j));
 		for(var k=d-2; k>0; k--){		
-			dscf[k-1] = new Obj4(d,dTilde,dscf,k,j);
+			dscf[k-1] = new Obj4(d,d_tilde,dscf,k,j);
 		}	
 		return dscf;	
 	}
-
+ 
+ 	/**
+	*	Setup Mj1 transform matrix with respect to nonperiodic spline wavelet bases on [0,1].
+	*	(last modification: 3.1.17 Andreas)
+	*   
+	*  @param{Integer}   d				primal (spline) order, d>=2
+	*  @param{Integer}   d_tilde		dual order, d_tilde>=2
+	*  @param{Integer}   s0				primal boundary condition order at x=0
+	*  @param{Integer}   s1				primal boundary condition order at x=1
+	*  @param{Integer}   j				level in which to transform
+	*
+	*  @return{Array}    M				transformation matrix
+	*/
+	function Mj1(d,d_tilde,s0,s1,j){
+		
+		if(d != 2){
+			console.log("d != 2 not supported");
+		}
+		
+		if(d_tilde != 2){
+			console.log("d_tilde != 2 not supported");
+		}
+		
+		if(s0<0 || s0>1){
+	    	console.log("at the moment, we only support 0<=s0<=1!");
+		}
+	
+		if(s1<0 || s1>1){
+		    console.log("at the moment, we only support 0<=s1<=1!");
+		}
+	
+		if(s0+s1<=1){
+		    if(j<2){
+		        console.log("j too small, j>=2 for these boundary conditions!")
+		    }
+		}else{
+		    if(j<3){
+		        console.log("j too small, j>=3 for these boundary conditions!")
+		    }
+		}
+		
+		var M = zeros(Math.pow(2,j+1)+1-(s0+s1), Math.pow(2,j));
+		
+		if(s0==0){
+			setBlock(M, [[-3/4], [9/16], [-1/8], [-1/16]], 0, 0);
+		}else{
+			setBlock(M, [[5/8], [-3/4], [-1/4], [1/4], [1/8]], 0, 0);
+	    }
+		for(var k = 2; k < Math.pow(2,j); k++){
+			setBlock(M, [[-1/8], [-1/4], [3/4], [-1/4], [-1/8]],
+		    		2-s0+2*(k - 2) - 1, k - 1);
+		}
+		
+		if(s1==0){
+			setBlock(M, [[-1/16], [-1/8], [9/16], [-3/4]], 
+					M.length - 3 - 1, M[0].length - 1);
+		}else{
+			setBlock(M, [[1/8], [1/4], [-1/4], [-3/4], [5/8]],
+					M.length - 4 - 1 , M[0].length - 1);
+		}
+		
+		M = numeric.mul(M, 1/Math.sqrt(2));
+		return M;
+	}
+	
+	/**
+	*	Setup Mj1t transform matrix with respect to nonperiodic spline wavelet bases on [0,1].
+	*	(last modification: 3.1.17 Andreas)
+	*   
+	*  @param{Integer}   d				primal (spline) order, d>=2
+	*  @param{Integer}   d_tilde		dual order, d_tilde>=2
+	*  @param{Integer}   s0				primal boundary condition order at x=0
+	*  @param{Integer}   s1				primal boundary condition order at x=1
+	*  @param{Integer}   j				level in which to transform
+	*
+	*  @return{Array}    M				transformation matrix
+	*/
+	function Mj1t(d,d_tilde,s0,s1,j){
+		
+		if(d != 2){
+			console.log("d != 2 not supported");
+		}
+		
+		if(d_tilde != 2){
+			console.log("d_tilde != 2 not supported");
+		}
+		
+		if(s0<0 || s0>1){
+	    	console.log("at the moment, we only support 0<=s0<=1!");
+		}
+	
+		if(s1<0 || s1>1){
+		    console.log("at the moment, we only support 0<=s1<=1!");
+		}
+	
+		if(s0+s1<=1){
+		    if(j<2){
+		        console.log("j too small, j>=2 for these boundary conditions!")
+		    }
+		}else{
+		    if(j<3){
+		        console.log("j too small, j>=3 for these boundary conditions!")
+		    }
+		}
+		
+		var M = zeros(Math.pow(2,j+1)+1-(s0+s1), Math.pow(2,j));
+		
+		if(s0==0){
+			setBlock(M, [[-1],[2],[-1]], 0, 0);
+		}else{
+			setBlock(M, [[2],[-1]], 0, 0);
+	    }
+		for(var k = 2; k < Math.pow(2,j); k++){
+			setBlock(M, [[-1],[2],[-1]],
+		    		3-s0+2*(k - 2) - 1, k - 1);
+		}
+		
+		if(s1==0){
+			setBlock(M, [[-1], [2], [-1]], 
+					M.length - 2 - 1, M[0].length - 1);
+		}else{
+			setBlock(M, [[-1],[2]],
+					M.length - 1 - 1 , M[0].length - 1);
+		}
+		
+		M = numeric.mul(M, 1/Math.sqrt(2));
+		return M;
+	}
+	
 /** Evaluates a function, given as an object with the function 'eval', in a grid
  *  (last modification: 22.12.16 Simon)
  * 
@@ -358,57 +485,74 @@ plotSplineIntervallWavelets
 	}
 	
 	
-	//Ploten der dualen mittleren Skalierungsfunktionen
+	//Plotten der dualen mittleren Skalierungsfunktionen
 	if(false){
 		var d=2;
-		var dTilde=4;
+		var d_tilde=4;
 		var j=3;
-		var dscf=buildMiddleDualPrimbsScf(d,dTilde,j);
+		var dscf=buildMiddleDualPrimbsScf(d,d_tilde,j);
 		var values1=dscf[0].values();
 		var values2=dscf[0].values();
 		var values3=dscf[0].values();
 	}
 	
-	//Ploten der dualen linken SkalierungsfunktionenI
+	//Plotten der dualen linken SkalierungsfunktionenI
 	if(false){
-	var d=3;
-	var dTilde=5;
-	var j=2;
-	var dscf=buildLeftDualPrimbsScfI(d,dTilde,j);
-	var grid = makeGrid(0,8,8024);
-	var values1 = evaluateObjectInGrid(dscf[0],grid);
-	var values2 = evaluateObjectInGrid(dscf[1],grid);
-	var values3 = evaluateObjectInGrid(dscf[2],grid);
+		var d=3;
+		var d_tilde=5;
+		var j=2;
+		var dscf=buildLeftDualPrimbsScfI(d,d_tilde,j);
+		var grid = makeGrid(0,8,8024);
+		var values1 = evaluateObjectInGrid(dscf[0],grid);
+		var values2 = evaluateObjectInGrid(dscf[1],grid);
+		var values3 = evaluateObjectInGrid(dscf[2],grid);
 	}
 	
 	
-	//Ploten der primalen Skalierungsfunktionen
+	//Plotten der primalen Skalierungsfunktionen
 	if(true){
-	var d=3;
-	var j=3;
-	var scf=buildPrimalPrimbsScf(j,d);
-	var grid = makeGrid(0,1,100);
-	console.log(grid);
-	var values1 = evaluateObjectInGrid(scf[0],grid);
-	var values2 = evaluateObjectInGrid(scf[1],grid);
-	var values3 = evaluateObjectInGrid(scf[2],grid);
+		var d=3;
+		var j=3;
+		var scf=buildPrimalPrimbsScf(j,d);
+		var grid = makeGrid(0,1,100);
+		console.log(grid);
+		var values1 = evaluateObjectInGrid(scf[0],grid);
+		var values2 = evaluateObjectInGrid(scf[1],grid);
+		var values3 = evaluateObjectInGrid(scf[2],grid);
 	}
 	
+	//Plotten der k-ten Wavelets (dafuer muessen vorher die primalen Skalierungsfunktionen berechnet worden sein!)
+	if(true){
+		//var k = 0;
+		var d = 2;
+		var j = 3;
+		var scf=buildPrimalPrimbsScf(j,d);
+		j = 2;
+		var d_tilde = 2;
 		
-	//Ploten der k-ten Wavelets (dafuer muessen vorher die primalen Skalierungsfunktionen berechnet worden sein!)
-	if(false){
-	var k=0;
-	//Matrix fuer d=2,dtilde=2,j=3
-	var Mj1_1=[[-0.5303,0,0,0],[0.3977, -0.0884, 0, 0],[-0.0884, -0.1768, 0,0],[-0.0442, 0.5303, -0.0884,  0],
-         [0, -0.1768, -0.1768, 0], [0, -0.0884, 0.5303, -0.0442],[0, 0, -0.1768, -0.0884],[0, 0, -0.0884, 0.3977],
-         [0, 0, 0,  -0.5303]];
-
-	var params1 = [j,0,scf,Mj1_1];
-	var params2 = [j,1,scf,Mj1_1];
-	var params3 = [j,2,scf,Mj1_1];
-	var values1 = evaluateFunctionInGrid(evaluateSIWaveletInX,params1,0,1,1000);
-	var values2 = evaluateFunctionInGrid(evaluateSIWaveletInX,params2,0,1,1000);
-	var values3 = evaluateFunctionInGrid(evaluateSIWaveletInX,params3,0,1,1000);
+		//Matrix fuer d=2,d_tilde=2,j=2
+		/* var Mj1_1 = [[-0.5303,0,0,0],
+		             [0.3977, -0.0884, 0, 0],
+		             [-0.0884, -0.1768, 0,0],
+		             [-0.0442, 0.5303, -0.0884,  0],
+	         		 [0, -0.1768, -0.1768, 0],
+	         		 [0, -0.0884, 0.5303, -0.0442],
+	         		 [0, 0, -0.1768, -0.0884],
+	         		 [0, 0, -0.0884, 0.3977],
+	         		 [0, 0, 0,  -0.5303]];
+		 */
+		// boundary conditions
+		var s0 = 0;
+		var s1 = 0;
+		
+		var Mj1_1 =  Mj1(d,d_tilde,s0,s1,j);
+	
+		var params1 = [j,0,scf,Mj1_1];
+		var params2 = [j,1,scf,Mj1_1];
+		var params3 = [j,2,scf,Mj1_1];
+		var values1 = evaluateFunctionInGrid(evaluateSIWaveletInX,params1,0,1,1000);
+		var values2 = evaluateFunctionInGrid(evaluateSIWaveletInX,params2,0,1,1000);
+		var values3 = evaluateFunctionInGrid(evaluateSIWaveletInX,params3,0,1,1000);
 	}
 
 	function makeGrid(start,end,count){
@@ -419,9 +563,6 @@ plotSplineIntervallWavelets
 		};
 		return x;
 	}
-	
-
-
 	
 	// test of a general evaluation in grid function
 	/*  Evaluate a function on grid points specified by [start, end, count]
@@ -439,13 +580,11 @@ plotSplineIntervallWavelets
 			points[i]=[x[i], funct.apply(this, params2)];
 		}
 		return points;
-	} 
-
+	}
 	
 	plotInst1 = 0;
 	plotInst2 = 0;
 	plotInst3 = 0;
-	
 		
 	function evaluateRthDerivOfBSplineInPointX(d,t,k,r,x){
 		//return 0 if the order of derivate is bigger than the spline-order
@@ -522,7 +661,22 @@ plotSplineIntervallWavelets
 	}
 	
 	//build three plots with values1, values2 and values3
-	makePlotInst('#plot1', values1);		
+	/* makePlotInst('#plot1', values1);		
 	makePlotInst('#plot2', values2);		
-	makePlotInst('#plot3', values3);		
+	makePlotInst('#plot3', values3); */		
+	
+	makePlotInst3('#plot1', values1, values2, values3);
+	
+	/**
+	*	Test of Mj1 in the case d = 2, d_tilde = 2, j = 3
+	*	without boundary conditions
+	*/
+/* 	var d = 2;
+	var d_tilde = 2;
+	var j = 2;
+	var s0 = 0;
+	var s1 = 0;
+	var A = Mj1(d,d_tilde,s0,s1,j);
+	printMatrix(A); */
+	
 </script>
