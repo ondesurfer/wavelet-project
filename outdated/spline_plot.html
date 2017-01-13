@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<!-- Date: 2016-04-26 -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Wavelet Plot</title>
+<meta name="author" content="Simon" />
+<meta name="author" content="Andreas" />
+<!--include scripts and libraries-->
+<script src="js/ext_libs/d3.js"></script>
+<script src="js/libs/math2.js"></script>
+<script src="js/libs/matrixOperations.js"></script>
+<script src="js/ext_libs/function-plot.js"></script>
+<script src="js/numeric-1.2.6.js"></script>
+<script src="js/libs/gauss2.js"></script>
+
+</head>
+<body>
+
+	<!-- Default values: 
+    	x: [0,1,2,2, 2,5,5,5, 5,6,7,8]
+		y: [1,2,2,2, 2,0,0,0, 0,-1,-1,0] -->
+
+	<!-- <p>Interval 1:
+				<input	id="input-interval1"
+						type="text"
+						value="[0,1], [1,2], [2,2], [2,2]"
+						maxlength = "100"/>
+		</p>
+		<p>Interval 2:
+				<input	id="input-interval2"
+						type="text"
+						value="[2,2], [5,0], [5,0], [5,0]"
+						maxlength = "100"/>
+		</p>
+		<p>Interval 3:
+				<input	id="input-interval3"
+						type="text"
+						value="[5,0], [6,-1], [7,-1], [8,0]"
+						maxlength = "100"/>
+		</p> -->
+
+	<p>
+		xValues : <input id="input-splineValuesX" type="text"
+			value="0,1,2,2,2,5,5,5,5,6,7,8" maxlength="100" />
+	</p>
+	<p>
+		yValues : <input id="input-splineValuesY" type="text"
+			value="1,2,2,2,2,0,0,0,0,-1,-1,0" maxlength="100" />
+	</p>
+
+	<p>
+	<form id="draw_field">
+		<input type="submit" value="Draw" />
+	</form>
+	</p>
+
+	<div id="plot"></div>
+
+	<p>
+		Plot library: <a href="https://github.com/maurizzzio/function-plot">
+			https://github.com/maurizzzio/function-plot </a>
+	</p>
+
+	<script>
+		var plotInstance;
+		var polyDegree = 3;
+		var m = polyDegree + 1;
+
+		function draw() {
+			var splineValuesX = document
+					.getElementById('input-splineValuesX').value;
+			splineValuesX = splineValuesX.split(',').map(Number);
+			console.log(splineValuesX);
+
+			var splineValuesY = document
+					.getElementById('input-splineValuesY').value;
+			splineValuesY = splineValuesY.split(',').map(Number);
+			console.log(splineValuesY);
+
+			var numberOfIntervals = splineValuesX.length / m;
+
+			var a = computeCubicSplineCoeffs(splineValuesX, splineValuesY);
+
+			// create the data to plot
+			var dataToPlot = [];
+			var splineCoeffs = new Array(m);
+			// nSamples = floor(samplesPropConst * interval-length)
+			var nSamples;
+			var samplesPropConst = 100;
+			var intervalLength;
+			var step = 0; // step size per interval
+
+			for (var i = 0; i < numberOfIntervals; i++) {
+				for (var j = 0; j < m; j++) {
+					splineCoeffs[j] = a[i * m + j];
+				}
+
+				intervalLength = Math.abs(splineValuesX[(i + 1) * m - 1]
+						- splineValuesX[i * m]);
+				nSamples = Math.floor(samplesPropConst * intervalLength);
+				step = intervalLength / nSamples;
+				nSamples++;
+				var values = createArray(nSamples, 2);
+
+				for (var j = 0; j < nSamples; j++) {
+					values[j][0] = splineValuesX[i * m] + j * step;
+					values[j][1] = horner(splineCoeffs, values[j][0]); // here could be the extended horner scheme for evaluation of derivative-points
+					// the extended horner scheme can be found in SCHUMAKER "Spline Functions - Basic Theory" p.105 Remark 3.1
+					//console.log(values[i][1]);
+				}
+				console.log(coeffsToStringRepresentation(splineCoeffs));
+
+				dataToPlot[i] = {
+					points : values,
+					fnType : 'points',
+					graphType : 'polyline'
+				};
+
+			}
+
+			// add the control points to the plot
+			for (var i = 0; i < splineValuesX.length; i++) {
+				dataToPlot[i + numberOfIntervals] = {
+					points : [ [ splineValuesX[i], splineValuesY[i] ] ],
+					fnType : 'points',
+					graphType : 'scatter',
+					color : 'pink'
+				};
+			}
+
+			try {
+				var plotInst = functionPlot({
+					target : '#plot',
+					xDomain: [ 0, 10 ], 
+					data : dataToPlot
+				});
+
+				//return the wavelet plot as object
+				return plotInst;
+
+			} catch (err) {
+				console.log(err);
+				alert(err);
+			}
+		}
+
+		//add the draw-function to the draw-button
+		document.getElementById('draw_field').onsubmit = function(event) {
+			event.preventDefault();
+			//draw once and save the graph as object
+			plotInstance = draw();
+		};
+	</script>
+</body>
+</html>
+

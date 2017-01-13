@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<!-- Date: 2016-04-26 -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Wavelet Plot</title>
+		<meta name="author" content="Simon" />
+		<meta name="author" content="Andreas" />
+		<!--include scripts and libraries-->
+		<script src="js/d3.js"></script>
+		<script src="js/math.js"></script>
+		<script src="js/math2.js"></script>
+		<script src="js/mask.js"></script>
+		<script src="js/matrixOperations.js"></script>
+		<script src="js/pointEvaluation.js"></script>
+		<script src="js/pointEvaluation2.js"></script>
+		<script src="js/function-plot.js"></script>
+		<script src="js/numeric-1.2.6.js"></script>
+		<script src="js/gauss2.js"></script>
+
+		<style>
+			input[type=text] {
+				width: 50px;
+			}
+			input {
+				padding: 6px;
+			}
+			body, html, input {
+				font-family: sans-serif;
+				font-size: 11pt;
+			}
+			daub_field {
+				margin: 20px 0;
+			}
+		</style>
+	</head>
+	<body>
+		
+		Skalierungsfunktion:
+		<p></p>
+		<select id="selection1" size="5"> 
+    	 	<option value="BF">Box Function</option> 
+    	 	<!-- <option value="9">Hat Function</option> 
+    	 	<option value ="10">Quadratic B-Spline</option>  -->
+    	 	<option value ="BS">B-Spline</option> 
+    	 	<option value="DG" selected>Daubechies-2N-Generator</option>  
+    	 </select>
+    	 
+    	 <table>
+			  <tr>
+			    <td>
+			    	<form id="daub_field">
+						<label for="eq">Daubechies Number N:</label>
+						<input type="text" id="eq" size="4" value="3" >
+					 </form>
+				</td>
+			    <td>	
+			    </td>
+			  </tr>
+			  <tr>
+			    <td>
+			    	<form id="spline_order">
+						<label for="m">Spline Order:</label>
+						<input type="text" id="m" size="4" value="2" >
+					 </form>
+			    </td>
+			    <td>
+					<form id="vanishing moments">
+						<label for="mt">Vanishing Moments:</label>
+						<input type="text" id="mt" size="4" value="2" >
+					 </form>	    	
+			    </td>
+			  </tr>
+			  <tr>
+			    <td>
+			    	<form id="derivation_field">
+						<label for="eq1">Derivation Order:</label>
+						<input type="text" id="eq1" value="0" size="4">
+					</form>	
+				</td>
+			    <td>	
+			    </td>
+			  </tr>
+			</table> 
+		<p>
+    	 	Wavelet-Plot:
+    		<input type="checkbox" id="wavelet_on" value="false">
+    	</p>
+    	 
+    	<form id="draw_field"> 
+			<input type="submit" value="Draw" />
+		</form>
+    
+		<div id="plot"></div>
+		
+		<p>
+			Plot library:
+			<a href="https://github.com/maurizzzio/function-plot">
+				https://github.com/maurizzzio/function-plot
+			</a>
+		</p>
+
+		<script>
+			//Wavelet-coefficients (from wikipedia):
+			var a = new Array();
+			//Coefficients of the box function
+			a[1]=[1,1];
+			
+			//Einfachste Maske eines dualen Generators
+			//allerdings nicht stetig...
+			//a[1]=[-1/4, 1/2, 3/2, 1/2, -1/4];
+			
+			//CDF(2,4)-Generator
+			// a[1]=[3/64, -3/32, -1/4, 19/32, 45/32, 19/32,
+			// -1/4, -3/32, 3/64];
+			
+			//CDF(1,3)-Generator
+			//a[1] = [-1/8, 1/8, 1, 1, 1/8, -1/8];
+			
+			a[2] = [(1 + Math.sqrt(3)) / 4, ((3 + Math.sqrt(3)) / 4), 
+				(3 - Math.sqrt(3)) / 4, (1 - Math.sqrt(3)) / 4];
+			a[3] = [0.47046721, 1.14111692, 0.650365, -0.19093442, 
+				-0.12083221, 0.0498175];
+
+			//it seems that a[4] is a little bit wrong!
+			a[4] = [0.32580343, 1.01094572, 0.8922014, -0.03967503, 
+				-0.26450717, 0.0436163, 0.0465036, -0.01498699];
+			a[5] = [0.22641898, 0.85394354, 1.02432694, 0.19576696, 
+				-0.34265671, -0.04560113, 0.10970265, -0.0088268, -0.01779187, 
+					0.0047174279];
+			a[6] = [0.1577424300000, 0.6995038100000, 1.0622637600000, 
+				0.4458313200000, -0.3199866000000, -0.1835180600000, 
+				0.1378880900000, 0.0389232100000, -0.0446637500000, 
+				0.0007832511520, 0.0067560623600, -0.0015235338100];
+
+			a[7] = [0.1100994300000, 0.5607912800000, 1.0311484900000, 
+				0.6643724800000, -0.2035138200000, -0.3168350100000, 
+				0.1008467000000, 0.1140034500000, -0.0537824500000, 
+				-0.0234399400000, 0.0177497900000, 0.0006075149950, 
+				-0.0025479047200, 0.0005002268530];
+
+			a[8] = [0.0769556200000, 0.4424672500000, 0.9554861500000, 
+				0.8278165300000, -0.0223857400000, -0.4016586300000, 
+				0.0006681940920, 0.1820763600000, -0.0245639000000, 
+				-0.0623502100000, 0.0197721600000, 0.0123688400000, 
+				-0.0068877192600, -0.0005540045490, 0.0009552297110, 
+				-0.0001661372610];
+				
+			//Coefficients of the hat function
+			//a[9]=[0.5,1,0.5];
+			
+			//Quadratic B-Spline
+			//a[10]=[0.25,0.75,0.75,0.25];
+			
+			//Coefficients of the box function
+			//a[10]=[1, 1];
+			
+			//Coefficients of the hat function
+			//hf = [1, 1/2, 1];
+			
+			//save the following globally:
+			//    c			the temporary used refinement-coefficients
+			//    values 	the corresponding computed wavelet values
+			//	  N_max		the maximal 1/2^N-step-size of the x-lattice
+			//	  N_0		the 1/2^N-step-size for iteration
+			//	  M			the number of equidistant x-lattice-points in the
+ 			//				plot-area
+ 			//	  plot		the plot instance
+			var c;	//coefficients of the choosen scaling function
+			var c_start = 0;
+			var c_tilde;	//coefficients of the dual scaling function
+			var c_tilde_start = 0;
+			var mu;	//derivation order
+			var m;	//BSpline order
+			var mt;	//number of vanishing moments
+			var values;
+			var N_0 = 14;
+			//var N_max = 17;
+			var M = 300;
+			var plotInstance;
+			var type_nr=document.getElementById('selection1').value;
+			//sollten den plot loeschen, wenn sich das global aendert.
+			
+			function draw() {
+				
+					try{ 
+						var type_nr = document.getElementById('selection1').value;
+						var wavelet_on = document.getElementById('wavelet_on').checked;
+						mu = parseInt(document.getElementById('eq1').value);
+						
+						//Extra-request for Daubechies-wavelets
+						if(type_nr == "BF"){
+							c = a[1];
+							c_start = 0;
+							c_tilde_start = 0;
+							c_tilde = c;
+						}
+						else if(type_nr == "DG"){
+							c = a[document.getElementById('eq').value];
+							c_start = 0;
+							c_tilde_start = 0;
+							c_tilde = c;	
+						}
+						//Extra-request for B-Splines
+						else if(type_nr == "BS"){
+							m = parseInt(document.getElementById('m').value);
+							mt = parseInt(document.getElementById('mt').value);
+							c = genBSplineCoeffs(m)[0];
+							c_start = genBSplineCoeffs(m)[1];
+							c_tilde = genDualBSplineCoeffs(m, mt)[0];
+							c_tilde_start = genDualBSplineCoeffs(m, mt)[1];
+							c_tilde_start = 0;
+							console.log("Spline Order: " + m);
+						}
+						else{
+							console.log("no specified type");
+						}
+						console.log("Derivative order: " + mu);
+						console.log("Coefficients: " + c);
+						
+						if(wavelet_on){
+							console.log("c",c);
+							console.log("c_start",c_start);
+							console.log("c_tilde",c_tilde);
+							console.log("c_tilde_start",c_tilde_start);
+							values = waveletPointEvaluation(c, c_start, c_tilde, c_tilde_start, N_0);
+						}
+						else{
+							values = iterativePointEvaluation2(c, c_start, N_0, 
+								mu);
+							//printMatrix(values);
+						}
+						var plotInst = functionPlot({
+							target : '#plot',
+							data : [{
+								points : filter(-100,+100,values,700),
+								fnType : 'points',
+								graphType : 'polyline',
+							}]
+						});
+					
+					//return the wavelet plot as object
+					return plotInst;
+					
+				}catch (err) {
+					console.log(err);
+					alert(err);
+				}
+			}
+			
+			//add the selection of the function to plot
+			document.getElementById('selection1').onchange = function(event) {
+				event.preventDefault();
+				type_nr = document.getElementById('selection1').value;
+				// var daub_field2 = document.getElementById('daub_field2');
+				if(type_nr == "DG"){
+					 daub_field.style.visibility = "visible";
+				}
+				else{
+					daub_field.style.visibility = "hidden";
+				}
+			};
+			
+			//add the draw-function to the draw-button
+			document.getElementById('draw_field').onsubmit = function(event) {
+				event.preventDefault();
+				//draw once and save the graph as object
+				plotInstance = draw();
+				plotInstance.on("during:draw", zoomFilter);
+			};
+			
+			function zoomAdaption() {
+				//"this" has to be an instance of functionPlot
+				//xDomain : domain of the x-values ,
+				//points: the used points from the previous plot
+				var xDomain = this.options.xDomain;
+
+				//compute the new values... 
+				//!!!Attention!!! take care of the x-boundery-values
+				//before zooming
+				var N = getN(xDomain[0], xDomain[1], M);
+				
+				if(N > N_max){
+					console.log("from this level onwards the results become incorrect");
+					//plot.options.disableZoom = true;
+				}
+				else{
+					//plot.options.disableZoom = false;
+					var result = recursivePointEvaluation2(c, xDomain[0],
+						xDomain[1], values, N);
+					//...and save globally:
+					values = result[0];
+					//console.log("the new values:", result[1]);
+					//values=[[1,1],[2,1],[3,1],[4,1]];
+					//give the new values to the plot-object:
+					this.options.data[0].points = result[1];
+				}
+			}
+			
+			//must be invoked by a FunctionPlot object!
+			function zoomFilter(){
+				var xDomain=this.options.xDomain;	
+				var newPoints=filter(xDomain[0],xDomain[1],values,700);
+				console.log("hallo");
+				if(newPoints==undefined){
+					alert("No more detailled points available. Please zoom out.");
+				}else{		
+        			this.options.data[0].points= newPoints;
+        			console.log("newPoints",newPoints);
+        		}  		
+   			}
+		
+		</script>
+	</body>
+</html>
+
