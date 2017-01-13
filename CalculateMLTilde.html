@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+	.chart div {
+		font: 10px sans-serif;
+		background-color: steelblue;
+		text-align: right;
+		padding: 3px;
+		margin: 1px;
+		color: white;
+	}
+
+</style>
+<div class="chart"></div>
+test-File
+<!--<script src="//d3js.org/d3.v3.min.js"></script>\\-->
+<script src="js/ext_libs/d3.js"></script>
+<script src="js/libs/math2.js"></script>
+<script src="js/libs/mask.js"></script>
+<script src="js/libs/matrixOperations.js"></script>
+<script src="js/htmlElementFunctions2.js"></script>
+<script src="js/libs/pointEvaluation.js"></script>
+<script src="js/libs/gauss2.js"></script>
+<!-- load http://maurizzzio.github.io/function-plot/ -->
+<script src="js/ext_libs/function-plot.js"></script>
+<script src="js/ext_libs/numeric-1.2.6.js"></script>
+
+<body>
+	<div id="plot1"> </div>
+	<div id="plot2"> </div>
+	<div id="plot3"> </div>
+</body>
+
+<script>
+	
+	
+	//baut Matrix B_1
+	function buildB1(d){
+		var B1= createArray(2*(d-1),d-1);
+		var t= buildNodeGridForBSpline2(d);
+
+		for(var l=0; l<2*(d-1); l++){
+			for(var k=1; k<d; k++){
+				//console.log(l,k-1);
+				B1[l][k-1]=evaluateBSplineInPointX(d,t,k,l/2);
+			}
+		}
+		//console.log("Die Matrix B1", B1);
+		return B1;
+	}
+
+	
+	
+	//baut Matrix B_2
+	function buildB2(d){
+		var B2= createArray(2*(d-1),2*(d-1));
+		var t= buildNodeGridForBSpline2(d);
+		//var t = [0,0,0,1,2,3,4,5];
+		console.log("t",t);
+		console.log("B2", B2);
+		for(var l=0; l<2*(d-1); l++){
+			for(var k=1; k<2*(d-1)+1; k++){
+				B2[l][k-1]=evaluateBSplineInPointX(d,t,k,l);
+			}
+		}
+		console.log("Die Matrix B2", B2);
+		return B2;
+	}
+	
+	//baue den linken Teil der ML-Matrix wie auf S.57 unten beschrieben
+	function buildLeftPartOfML(B1,B2){
+		var B2inv=numeric.inv(B2);
+		var MLleft=numeric.dot(B2inv,B1);
+		console.log("MLleft",MLleft);
+		return MLleft;
+	}
+	//var d=3;
+	//var dtilde=5;
+	//var leftPart = buildLeftPartOfML(buildB1(d),buildB2(d));
+	//buildML(leftPart,d,dtilde);
+	
+	//baue MLMatrix wie aus S.60 oben beschrieben
+	function buildML(MLleft,d,dtilde){
+		var ak= genBSplineCoeffs(d);
+		console.log(ak);
+		var ML = createArray(3*dtilde+2*d-5,d+dtilde-2);
+		
+		for(var n=1; n < 2*d-1; n++){
+			for(var k=1; k<d; k++){
+				ML[n-1][k-1]=MLleft[n-1][k-1];
+			}			
+		}
+		for(var k=d; k<d+dtilde-1; k++){
+			for(var n=2*k-d; n<2*k+1 ; n++){
+				ML[n-1][k-1]=ak[0][n+d-2*k];
+			}			
+		}
+		console.log("ML",ML);
+		return ML;
+	}
+	
+	
+	//berechne alpha_0,r wie auf S.72 beschrieben
+	function alpha_0r(r,d){
+		if(r==0){
+			return 1;
+		}
+		else{
+			var a = genBSplineCoeffs(d);
+			var sum1=0;
+			for(var k=0; k<a[0].length; k++){ 
+				var sum2=0;
+				for(var s=0; s<=r-1; s++){
+					sum2=sum2+nchoosek(r,s)*Math.pow(k+a[1],r-s)*alpha_0r(s,d);
+				}
+				sum1=sum1+a[0][k]*sum2;
+			}
+			var result=(1/(Math.pow(2,r+1)-2))*sum1;	
+			return result;
+		}
+	}
+	
+	//baue DTilde1 wie auf S.72 beschrieben
+	function buildDTilde1(d,dTilde){
+		var DTilde1= createArray(dTilde,dTilde);
+		for(var r=0; r<dTilde; r++){
+			for(var j=0; j<dTilde; j++){
+				DTilde1[r][j]=nchoosek(r,j)*alpha_0r(r-j,d);
+			}
+		}
+		return DTilde1;
+	}
+	
+	//baue DTilde wie auf S.72 beschrieben
+	function buildDTilde(d,dTilde){
+		var DTilde1=buildDTilde1(d,dTilde);
+		var DTilde2= createArray(dTilde,dTilde);
+		var lTilde_1=-Math.floor(d/2)-dTilde+1;
+		for(var j=0; j<dTilde; j++){
+			for(var n=0; n<dTilde; n++){
+				DTilde2[j][n]=Math.pow(-1,n)*nchoosek(j,n)*Math.pow((-lTilde_1-1),j-n);
+			}
+		}
+		//console.log("DTilde2",DTilde2);
+		
+		var DTilde3=createArray(dTilde,dTilde);
+		for(var n=0; n<dTilde; n++){
+			for(var l=0; l<dTilde; l++){
+				DTilde3[n][l]=0;
+				for(var k=0; k<=l; k++){
+					DTilde3[n][l]+=nchoosek(l,k)*Math.pow(-1,l+k)*Math.pow(k,n);	
+				}
+			}
+		}
+		//console.log("DTilde3",DTilde3);
+		var DTilde=numeric.dot(numeric.dot(DTilde1,DTilde2),DTilde3);
+		//console.log("DTilde",DTilde);
+		return DTilde;
+	}
+	
+	buildDTilde(3,5);
+	
+	function buildMuTilde(d,dTilde){
+		var mu = createArray(3*dTilde+d-3, dTilde);
+		for(var n=0; n<=3*dTilde+d-4;n++){
+			for(var k=0; k<=dTilde-1; k++){
+				if(n<dTilde && k==n){ mu[n][k]=Math.pow(2,-k);}
+				else if(n>(dTilde-1)){mu[n][k]=beta_nk(n+Math.ceil(d/2)-2,k,d,dTilde);} // hier d statt dTilde
+				else{mu[n][k]=0;}
+			}
+		}
+		return mu;
+	}
+	//console.log("test", beta_nk((3*5+3-2)+Math.ceil(3/2)-1,2,3,5));
+	//berechnet alpha_q,k wie auf S.72 beschrieben.
+	function alpha_qk(q,k,d){
+		var sum=0;
+		for(var j=0;j<=k;j++){
+			sum+=nchoosek(k,j)*Math.pow(q,j)*alpha_0r(k-i,d);
+		}
+		return sum;
+	}
+	//berechnet beta_n,k wie auf S.72 beschrieben.
+	function beta_nk(n,k,d,dTilde){
+		var aTilde=genDualBSplineCoeffs(d, dTilde);
+		console.log("aTilde",aTilde);
+		var lTilde_1=-Math.floor(d/2)-dTilde+1;
+		var lTilde_2=Math.ceil(d/2)+dTilde-1;
+		var sum=0;
+		console.log("q=",Math.ceil((n-lTilde_2)/2),"q muss kleiner gleich sein als",-lTilde_1-1);
+		console.log("n=",n,"lTilde_2=",lTilde_2);
+		for(var q=Math.ceil((n-lTilde_2)/2); q<=-lTilde_1-1;q++){
+			sum+=alpha_qk(q,k,d)*aTilde[0][n-2*q-aTilde[1]]; //evtl. falscher index jetzt nicht mehr
+			//console.log("koeffizient",aTilde[0][n-2*q-aTilde[1]]);
+		}
+		return sum;
+	}
+	
+	//console.log("Mu",buildMuTilde(3,5));
+	
+	
+	//baue J_dTilde bzw. J_n wie auf S.73 gefordert und S.44 erklaert
+	function buildJ_n(n){
+		var J_n = createArray(n,n);
+		for(var k1=1;k1<=n;k1++){
+			for(var k2=1; k2<=n; k2++){
+				if(k1==n+1-k2){ J_n[k1-1][k2-1]=1;}
+				else{J_n[k1-1][k2-1]=0;}
+			}
+		}
+		return J_n;
+	}
+	
+	//setze Matrix aus zwei einzelnen Matrizen auf der Diagonalen zusammen. vgl. S.44
+	function diagOfTwoMatrices(A,B){
+		var rA = A.length; //number of rows of matrix A
+		var cA = A[0].length;
+		var rB = B.length;
+		var cB = B[0].length;
+		var result = createArray(rA+rB,cA+cB);
+		//oberer linker Block
+		for(var r=0; r<rA; r++){
+			for(var c=0; c<cA;c++){
+				result[r][c]=A[r][c];
+			}
+		}
+		//oberer rechter Block
+		for(var r=0; r<rA; r++){
+			for(var c=0; c<cB;c++){
+				result[r][cA+c]=0;
+			}
+		}
+		//unterer linker Block
+		for(var r=0; r<rB; r++){
+			for(var c=0; c<cA;c++){
+				result[rA+r][c]=0;
+			}
+		}
+		//unterer rechter Block
+		for(var r=0; r<rB; r++){
+			for(var c=0; c<cB;c++){
+				result[rA+r][cA+c]=B[r][c];
+			}
+		}
+		return result;
+	}
+	
+	/*function buildIdMatrix(dim){
+		var result = createArray(dim,dim);
+		for(var k=0; k<dim; k++){
+			for(var l=0; l<dim; l++){
+				if(k==l){result[k][l]=1;}
+				else{result[k][l]=0;}
+			}
+		}
+		return result;
+	}
+	printMatrix(buildIdMatrix(4));
+	printMatrix(buildJ_n(5));
+	
+	function transposeMatrix(A){
+		var rA = A.length; //number of rows of matrix A
+		var cA = A[0].length;
+		var result = createArray(cA,rA);
+		for(r=0; r<rA; r++){
+			for(c=0; c<cA; c++){
+				result[c][r]=A[r][c];
+			}
+		}
+		return result;
+	}*/
+
+	//build first part of MTildeL as described at page 73
+	function buildMTildeLI(d,dTilde){
+		var JdTilde=buildJ_n(dTilde);
+		printMatrix(JdTilde,"JdTilde");
+		var DTildeTrans=numeric.transpose(buildDTilde(d,dTilde));
+		printMatrix(DTildeTrans,"DTildeTrans");
+		var prod=numeric.dot(JdTilde,DTildeTrans);
+		printMatrix(prod,"prod");
+		var dia=diagOfTwoMatrices(prod,numeric.identity(d+2*dTilde-3));
+		printMatrix(dia,"diagOfTwoMatrices");
+		var muTilde=buildMuTilde(d,dTilde);
+		printMatrix(muTilde,"muTilde");
+		var DTildeMinusT=numeric.inv(DTildeTrans);
+		printMatrix(DTildeTrans,"DTildeTrans");
+		
+		var result = numeric.dot(numeric.dot(numeric.dot(dia,muTilde),DTildeMinusT),JdTilde);
+		printMatrix(result,"result");
+		return result ;	
+	}
+	buildMTildeLI(3,5);
+	
+</script>
