@@ -271,7 +271,6 @@ plotSplineIntervallWavelets
 		var l_2=Math.ceil(d/2)+d_tilde-1;
 		
 		//grid steps of phiTilde
-		var delta = phiTilde[1][0]-phiTilde[0][0];
 		var y=0;		
 			if(x<0){
 				return 0;
@@ -516,7 +515,7 @@ plotSplineIntervallWavelets
 	}
 	
 	//Plotten der dualen linken SkalierungsfunktionenII
-	if(true){
+	if(false){
 		var d=3;
 		var d_tilde=5;
 		var j=2;
@@ -541,11 +540,11 @@ plotSplineIntervallWavelets
 	}
 	
 	//Plotten der k-ten Wavelets (dafuer muessen vorher die primalen Skalierungsfunktionen berechnet worden sein!)
-	if(false){
-		var d = 3;
-		var d_tilde = 5;
+	if(true){
+		var d = 2;
+		var d_tilde = 2;
 		//smallest j which is possible - later it will be saved in the database
-		var j = 5;
+		var j = 3;
 		var scf=buildPrimalPrimbsScf(j,d);
 		
 		
@@ -559,6 +558,7 @@ plotSplineIntervallWavelets
 	         		 [0, 0, -0.1768, -0.0884],
 	         		 [0, 0, -0.0884, 0.3977],
 	         		 [0, 0, 0,  -0.5303]]; 
+	     var Mj1_2_2_2b =[[1.06066017177982,0,0,0],[-0.795495128834866,0.176776695296637,0,0],[0.176776695296637,0.353553390593274,0,0],[0.0883883476483185,-1.06066017177982,0.176776695296637,0],[0,0.353553390593274,0.353553390593274,0],[0,0.176776695296637,-1.06066017177982,0.0883883476483185],[0,0,0.353553390593274,0.176776695296637],[0,0,0.176776695296637,-0.795495128834866],[0,0,0,1.06066017177982]];
 	     //Matrix fuer d=3, d_tilde=5, j=5
 	     var Mj1_3_5_5 = [[-0.265,-0,-0,-0,-0,-0,-0,-0,-0,-0,-0,-0,-0,-0,-0,-0],
 	     [0.419,0.087,-0.0483,-0,-0,-0,-0,-0,-0,-0,-0,-0,-0,-0,-0,-0],
@@ -618,7 +618,7 @@ plotSplineIntervallWavelets
 		 
 		
 		//var Mj1_1 =  Mj1(d,d_tilde,s0,s1,j);
-		var Mj1_1=Mj1_3_5_5b;
+		var Mj1_1=Mj1_2_2_2b;
 		
 		var params1 = [j,0,scf,Mj1_1];
 		var params2 = [j,1,scf,Mj1_1];
