@@ -375,18 +375,18 @@ function zeros(n) {
 }
 
 /** Create a nxm-Matrix with all entries = 0.
- * (last modification 18.12.16 Andreas) 
+ * (last modification 16.1.17 Andreas) 
  * 
- *  @param{int} n size of the row-array.
- *  @param{int} m size of the column-array.
+ *  @param{int} m size of the row-array.
+ *  @param{int} n size of the column-array.
  * 
  * 	@return{Array} A the matrix.
  */
-function zeros(n, m) {
-	var A = new Array(n);
-	for (var i = 0; i < n; i++) {
-		A[i] = new Array(m);
-		for(var j = 0; j < m; j++) {
+function zeros(m, n) {
+	var A = new Array(m);
+	for (var i = 0; i < m; i++) {
+		A[i] = new Array(n);
+		for(var j = 0; j < n; j++) {
 			A[i][j] = 0;
 		}
 	}
@@ -524,7 +524,7 @@ function onemtwom(start,n,m){
  *  (last modification: 12.5.16 Andreas)
  * 
  *   @param{Array} a the first vector.
- * 	 @param{Array} b the second vector.
+ *   @param{Array} b the second vector.
  * 
  *   @param{Array} c the convolution of a and b.
  */
@@ -549,7 +549,7 @@ function conv(a,b){
 
 /**
 *	Write entries in blocks into a matrix.
-*	(last modification: 18.12.16 Andreas)
+*	(last modification: 16.1.17 Andreas)
 *
 *   @param{Array} A		the matrix to write to.
 *   @param{Array} B		the matrix to insert.
@@ -564,10 +564,10 @@ function conv(a,b){
 *   A[r2,c1]	...		A[r2,c2]
 */
 function setBlock(A,B,r1,c1){
-	var n = B.length;
-	var m = B[0].length;
-	for(var i = 0; i < n; i ++){
-		for(var j = 0; j < m; j ++){
+	var m = B.length;
+	var n = B[0].length;
+	for(var i = 0; i < m; i ++){
+		for(var j = 0; j < n; j ++){
 			A[r1 + i][c1 + j] = B[i][j];
 		}
 	}
@@ -579,7 +579,7 @@ function setBlock(A,B,r1,c1){
 *   @param{Array}	A		reference matrix.
 *   @param{Array}	B		matrix to be checked.
 *   
-*   @param{bool}	t		true iff A*B = Id
+*   @param{bool}	t		true iff A*B = Id.
 */
 function checkInversity(A,B){
 	var t = false;
@@ -598,4 +598,78 @@ function checkInversity(A,B){
 	}
 	
 	return t;
+}
+
+/** 
+*	Compute the kronecker-product of two matrices.
+* 	(last modification: 16.1.17 Andreas)
+* 
+*   @param{Array}	A	matrix.
+*   @param{Array}	B	another matrix.
+*   
+*   @param{Array}	A kron B
+*/
+function kron(A, B){
+	var m1 = A.length;
+	var n1 = A[0].length;
+	var m2 = B.length;
+	var n2 = B[0].length;
+	var M = zeros(m1 * m2, n1 * n2);
+	for(var i1 = 0; i1 < m1; i1 ++){
+		for(var j1 = 0; j1 < n1; j1 ++){
+			for(var i2 = 0; i2 < m2; i2 ++){
+			    for(var j2 = 0; j2 < n2; j2 ++){
+				    M[i2 + m2*i1][j2  + n2*j1] = A[i1][j1]*B[i2][j2];
+			    }
+			}
+	  
+		}
+	}
+	return M;
+}
+
+/** 
+*	Concatenate all column-vectors in a matrix to one vector.
+* 	(last modification: 16.1.17 Andreas)
+* 
+*   @param{Array}	A	matrix.
+*   
+*   @param{Array}	v	vector.
+*/
+function col(A){
+	var m = A.length;
+	var n = A[0].length;
+	var v = new Array(m*n);
+	for(var i = 0; i < m; i ++){
+		for(var j = 0; j < n; j ++){
+			v[i+j*m] = A[i][j];
+		}
+	}
+	return v;
+}
+
+/** 
+*	The inverse operation to col.
+* 	(last modification: 16.1.17 Andreas)
+* 
+*   @param{Array}	v	vector.
+*   @param{Integer}	m	number of rows of the resulting matrix.
+*   
+*   @param{Array}	M	matrix.
+*/
+function recol(v, m){
+	var n = v.length;
+	if(n % m != 0){
+		throw "n is not divisible by m!";
+	}
+	var n1 = n/m;
+	var M = zeros(m,m);
+	
+	for(var i = 0; i < m; i ++){
+		for(var j = 0; j < n1; j ++){
+			M[i][j] = v[i+j*m];
+	  
+		}
+	}
+	return M;
 }

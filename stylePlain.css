@@ -41,7 +41,7 @@ nav ul {
 nav li {
 	text-align: center;
 	list-style: none;
-	width: 8em;
+	width: 10em;
 }
 
 nav a:link {
@@ -109,7 +109,7 @@ footer {
 
 #title {
 	float: left;
-	padding-top: 40px;
+	/*padding-top: 40px;*/
 	font-size: 45pt;
 	text-align: center;
 	width: 460px;
