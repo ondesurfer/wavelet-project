@@ -133,13 +133,14 @@ function updateScfList() {
 			document.getElementById('select-spline-order').value ];
 	var str =  genFilterString(cond);
 	var newstr = "SELECT * FROM BiMRA WHERE " + str;
+	console.log(newstr);
 	var currentdb = db.exec(newstr);
 	
 	fillList(document.getElementById('select-primal-scfs'), currentdb);
 }
 /**
  * updates the list containing the dual scaling functions fitting to the choosen
- * scf (last modification: 26.7.16 Simon)
+ * scf (last modification: 22.1.17 Andreas)
  * 
  * @param id
  *            ID of the main scaling function

@@ -16,14 +16,11 @@ function setHtmlFunctions() {
 	document.getElementById('input-exactness-poly-approx').onchange = updateLists;
 	document.getElementById('select-critical-hoelder-exponent').onchange = updateLists;
 	document.getElementById('select-critical-sobolev-exponent').onchange = updateLists;
-	document.getElementById('select-spline-order').onchange = updateLists;
-
+	
 	// cleans the info field and the function plot if the choosen
 	// scalingfunction is changed
 	document.getElementById('select-primal-scfs').onchange = function() {
 		cleanPlotAndInfo();
-		updateDualScfList(this.value);
-
 	};
 
 	// adds the showInformation function to the showInformation button
@@ -47,7 +44,6 @@ function setHtmlFunctions() {
 	document.getElementById('button-plot-wavelet').onclick = function() {
 		// Fehlerabfrage noetig!!
 		var c_t = getCoeffs(document.getElementById('select-primal-scfs').value);
-		var d_t = getCoeffs(document.getElementById('select-dual-scfs').value);
 		// calculates the new derivative values and saves it globally
 		valuesWav = waveletPointEvaluation(c_t[0], c_t[1], d_t[0], d_t[1], 13);
 
@@ -100,9 +96,14 @@ document.getElementById('select-derivative-order').value = "";
 	plotInstance1.draw();
 	plotInstance2.draw();
 	cleanWaveletPlot();
-	document.getElementById('select-dual-scfs').length = 0;
 	var referenceLink = document.getElementById('link-reference');
 	referenceLink.text = "";
+}
+
+/**
+ * loadWaveletDB() in dbMethods.js needs a function "updateDualScfList()"
+ */
+function updateDualScfList() {
 }
 
 /**
@@ -117,7 +118,6 @@ function updateScfList() {
 	limitInt(document.getElementById('input-exactness-poly-approx'));
 	limitFloat(document.getElementById('select-critical-hoelder-exponent'));
 	limitFloat(document.getElementById('select-critical-sobolev-exponent'));
-	limitInt(document.getElementById('select-spline-order'));
 	
 	cond[0] = [ document.getElementById('select-orthogonal-translates').name,
 			document.getElementById('select-orthogonal-translates').value ];
@@ -129,56 +129,21 @@ function updateScfList() {
 			document.getElementById('select-critical-hoelder-exponent').value ];
 	cond[4] = [ document.getElementById('select-critical-sobolev-exponent').name,
 			document.getElementById('select-critical-sobolev-exponent').value ];
-	cond[5] = [ document.getElementById('select-spline-order').name,
-			document.getElementById('select-spline-order').value ];
 	var str =  genFilterString(cond);
 	var newstr = "SELECT * FROM OMRA WHERE " + str;
 	var currentdb = db.exec(newstr);
 	
 	fillList(document.getElementById('select-primal-scfs'), currentdb);
 }
-/**
- * updates the list containing the dual scaling functions fitting to the choosen
- * scf (last modification: 26.7.16 Simon)
- * 
- * @param id
- *            ID of the main scaling function
- */
-function updateDualScfList(id) {
-	cleanWaveletPlot();
-	var command1 = "SELECT ID_of_dual_function FROM OMRA WHERE ID ="
-			+ id;
-	var str = db.exec(command1)[0].values[0][0];
-
-	if (str != undefined) {
-		var noAr = stringToNoArray(str);
-		var command2 = "SELECT * FROM OMRA WHERE";
-		for (var i = 0; i < noAr.length - 1; i++) {
-			command2 += " ID = " + noAr[i] + " OR";
-		}
-		command2 += " ID = " + noAr[noAr.length - 1];
-		// console.log(command2);
-		var currentdb = db.exec(command2);
-		fillList(document.getElementById('select-dual-scfs'), currentdb);
-	}
-	// if no dual-scf is found, the list is set empty
-	else {
-		console.log("no dual scalingfunction in database");
-		document.getElementById('select-dual-scfs').length = 0;
-	}
-}
 
 /**
- * updates the scf-list and the dual-scf-list
- * (last modification: 8.8.16 Andreas)
+ * updates the scf-list
+ * (last modification: 22.1.17 Andreas)
  * 
  */
 function updateLists(){
 	updateScfList();	
 	var id = document.getElementById('select-primal-scfs').value;
-	if(id != ""){
-		updateDualScfList(id);
-	}
 }
 
 /**
