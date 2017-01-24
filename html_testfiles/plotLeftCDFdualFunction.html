@@ -61,27 +61,28 @@ function calculateLeftDualCDFPointValues(i,d, d_tilde) {
 	//generate coefficients of dual B-Spline functions
 	var coef =  genDualBSplineCoeffs(d, d_tilde);
 	//calculate values of dual B-Spline functions
-	values1 = iterativePointEvaluation2(coef[0], coef[1], 8, 0);
-	
-	//var i = d+d_tilde-2-k;
+	var values1 = iterativePointEvaluation2(coef[0], coef[1], 9, 0);
+	var delta = values1[1][0]-values1[0][0];
+	var supp = d+2*d_tilde-3-i; //see p.71
+	console.log("supp", supp);
 	
 	//calculate left and right support of dual B-Spline function
 	var l_1=-Math.floor(d/2)-d_tilde+1;
 	var l_2=Math.ceil(d/2)+d_tilde-1;
 	
 	//initial new Array for new border-function values	
-	var values2 = createArray(values1.length,2);
+	var values2 = createArray(supp/delta + 1,2);
 	for(var j=0;j<values2.length;j++){
-		values2[j][0] = values1[j][0];
+		values2[j][0] = j*delta;
 		values2[j][1] = 0;
-		
 		
 		if(values2[j][0]<0){
 			values2[j][1] =0;
+			console.log("errror");
 		}
 		else{
 			for(var n=i; n<l_2-l_1-1;n++){
-				values2[j][1] += nchoosek(n,i) * findValue(values1,values1[j][0] + n + l_1 + 1);//hier richtiger Index...
+				values2[j][1] += nchoosek(n,i) * findValue(values1,values2[j][0] + n + l_1 + 1);//hier richtiger Index...
 			}
 		}
 	}
@@ -92,7 +93,7 @@ function calculateLeftDualCDFPointValues(i,d, d_tilde) {
 /** For input function-values given in a aequidistant grid, this method finds the corresponding y-value of 
  *	the x-value. x values not given in the input values, are supposed to be 0
  * 
- *  (last modification: 19.1.16 Simon)
+ *  (last modification: 23.1.16 Simon)
  * 
  *  @param{values}	   values 			input values (of the function)
  *  @param{double}		x				x, whose y-value is searched
@@ -104,10 +105,17 @@ function calculateLeftDualCDFPointValues(i,d, d_tilde) {
 function findValue(values,x){
 		var delta = values[1][0]-values[0][0];
 		var index = Math.round((x-values[0][0])/delta);
-		if(Math.abs(index-((x-values[0][0])/delta))>0.0000000001){
-			console.log("values approximated");
+		if(index<0||index>=values.length){
+			return 0;
 		}
-		if(index<values.length){
+		if(Math.abs(values[index][0]-x)>delta){
+			console.log("alles falsch");
+			return undefined;
+		}
+		if(Math.abs(values[index][0]-x)>0.0001){
+			//console.log("values approximated, error =", Math.abs(values[index][0]-x) );
+		}
+		if(index>=0&&index<values.length){
 			return values[index][1];
 		}
 		else{
@@ -126,7 +134,9 @@ function findValue2(values,x){
 	return 0;
 }
 
-values2=calculateLeftDualCDFPointValues(3,3,5);
+//Plot hier: 0 1 2 3 4 5
+//Plot Prim: 6 5 4 3 2 -
+values2=calculateLeftDualCDFPointValues(1,3,5);
 
 	
 	// a general function to create a plot-instances
