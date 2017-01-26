@@ -98,6 +98,41 @@ function loadWaveletDB(){
 		start();
 }
 
+/** 
+ *  Load the database named './wavelet_database.sqlite' (without updating list-elements)
+ *  (must exist in the same folder as the html-file) in a new thread.
+ *  (last modification: 26.1.17 Andreas)
+ */
+function loadWaveletDB1(){
+		//builds an HttpRequest on 'theUrl' and runs the 'callback' function with the content of the HttpRequest response
+		function httpGetAsync(theUrl, callback){
+   			var xmlHttp = new XMLHttpRequest();
+   			xmlHttp.responseType = 'arraybuffer';
+   			 
+    		xmlHttp.onreadystatechange = function() { 
+    			//if the XMLHttpRequest was successful run the callback function with the response
+        		if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+            		callback(xmlHttp.response);
+    			}
+    		};
+    		xmlHttp.open("GET", theUrl, true); // true bedeutet, dass onreadystate in neuem thread aufgerufen wird
+    		xmlHttp.send(null);
+		}
+		 
+		//constructs the callback function and runs the HttpRequest
+		function start(){			
+			
+			var callback = function(str){
+				var uInt8Array = new Uint8Array(str);
+				// do not use a 'var' here! So the database is saved as an global document. attribute
+  				db = new SQL.Database(uInt8Array);
+			};
+			httpGetAsync('./wavelet_database.sqlite', callback);				
+		}
+		
+		start();
+}
+
 /**
  * Generates an SQL command for searching items in the database, complying the
  * condition given in the 'cond' Array. (last modification: 8.8.16 Andreas)

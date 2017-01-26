@@ -1,6 +1,6 @@
 /**
  *	This file contains the method to add the functions to some html elements on
- * 	the Fwavelet-plot.html file
+ * 	the BiMRAI.html file
  * 
  * 	Dependencies:
  * 	sql.js, d3.js, function-plot.js, math.js, numeric-1.2.6.js, math2.js,
