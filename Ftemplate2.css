@@ -1,0 +1,10 @@
+ button.typebutton { 
+ 	background:none;
+ 	border:none;
+ 	color: #5400EE;
+ }
+ button.typebutton:hover {
+    /*background-color: #4CAF50; *//* Green */
+    color: red;
+    cursor: pointer;
+}

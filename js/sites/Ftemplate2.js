@@ -8,18 +8,38 @@
 
 function setHtmlFunctions() {
 	var type_column = db.exec("SELECT type FROM OMRA")[0].values;
+	var name_column = db.exec("SELECT name FROM OMRA")[0].values;
 	var types = new Array();
-	var type_tmp = type_column[1][0];
+	var type_tmp = type_column[0][0];
 	var string_list = "";
-	
-	for (var i = 0; i < type_column.length; i++) {
-		if(type_tmp != type_column[i][0]){
-			types.push(type_column[i][0]);
-			type_tmp = type_column[i][0];
-			string_list += type_column[i][0] + "<br>";
-		}
+	var j = 0;
+	types.push(type_column[j][0]);
+	string_list +=  "<button class='typebutton' id ="
+	+ type_column[j][0]+">"+type_column[j][0]+"</button>" 
+	+ "<u1 class ='hidden list' style='display: block'; id ="
+	+ type_column[j][0] + "list>";
+	while(type_tmp == type_column[j][0]){
+		console.log(type_tmp);
+		string_list += "<li class ='type-list-element'>"+name_column[j][0]+"</li>";
+		j++;
 	}
-	console.log(types[0]);
+	for (var i = j; i < type_column.length - j + 1; j++) {
+		if(type_tmp != type_column[j][0]){
+			string_list += "</u1><br>";
+			types.push(type_column[j][0]);
+			type_tmp = type_column[j][0];
+			string_list +=  "<button class='typebutton' id ="
+			+ type_column[j][0]+">"+type_column[j][0]+"</button>" 
+			+ "<u1 class ='hidden list' style='display: block'; id ="
+			+ type_column[j][0] + "list>";
+		}
+		string_list += "<li class ='type-list-element'>"+name_column[j][0]+"</li>";
+	}
+	if(type_column.length - j + 1 > 0){
+		string_list += "</u1><br>";
+	}
+	//console.log(type_tmp+"list");
+	//document.getElementById(type_tmp+'list').innerHTML = "<li class ='type-list-element'>"+name_column[0][0]+"</li>";
 	
 	document.getElementById('type_list').innerHTML = string_list;
 	
