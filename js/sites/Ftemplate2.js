@@ -10,38 +10,71 @@ function setHtmlFunctions() {
 	var type_column = db.exec("SELECT type FROM OMRA")[0].values;
 	var name_column = db.exec("SELECT name FROM OMRA")[0].values;
 	var types = new Array();
-	var type_tmp = type_column[0][0];
-	var string_list = "";
-	var j = 0;
-	types.push(type_column[j][0]);
-	string_list +=  "<button class='typebutton' id ="
-	+ type_column[j][0]+">"+type_column[j][0]+"</button>" 
-	+ "<u1 class ='hidden list' style='display: block'; id ="
-	+ type_column[j][0] + "list>";
-	while(type_tmp == type_column[j][0]){
-		console.log(type_tmp);
-		string_list += "<li class ='type-list-element'>"+name_column[j][0]+"</li>";
-		j++;
-	}
-	for (var i = j; i < type_column.length - j + 1; j++) {
-		if(type_tmp != type_column[j][0]){
-			string_list += "</u1><br>";
-			types.push(type_column[j][0]);
-			type_tmp = type_column[j][0];
-			string_list +=  "<button class='typebutton' id ="
-			+ type_column[j][0]+">"+type_column[j][0]+"</button>" 
-			+ "<u1 class ='hidden list' style='display: block'; id ="
-			+ type_column[j][0] + "list>";
+	var type_tmp = "";
+	
+	var type_list = document.getElementById("type_list");
+	
+	for (var i = 0; i < type_column.length; i++) {
+		if(type_tmp != type_column[i][0]){
+			types.push(type_column[i][0]);
+			type_tmp = type_column[i][0];
+			
+			var button = document.createElement("BUTTON");
+			button.classList.add('typebutton');
+			
+			var button_text = document.createTextNode(type_column[i][0]);
+			button.appendChild(button_text);
+			button.id = type_column[i][0]+"button";
+			
+			var type_list_entry = document.createElement("u1");
+			type_list_entry.id = type_column[i][0] + "list";
+			type_list_entry.style.display = "none";
+			var br = document.createElement("br");
+			//type_list_entry.style = "hidden";
+			type_list.appendChild(button); 
+			type_list.appendChild(type_list_entry);
+			type_list.appendChild(br);
 		}
-		string_list += "<li class ='type-list-element'>"+name_column[j][0]+"</li>";
+		
+		var list_item = document.createElement("li");
+		var list_item_text = document.createTextNode(name_column[i][0]);
+		list_item.appendChild(list_item_text);
+		var list = document.getElementById(type_column[i][0] + "list");
+		list.appendChild(list_item);
 	}
-	if(type_column.length - j + 1 > 0){
-		string_list += "</u1><br>";
+	
+	// add hide/show-action to the buttons
+	for (var i = 0; i < types.length; i++) {
+		var button = document.getElementById(types[i] + "button");
+		var list = document.getElementById(types[i] + "list");
+		//console.log(list.id);
+		button.addEventListener("click", function() {
+			var list1 = document.getElementById(list.id);
+			if(list1.style.display == "none"){
+				list1.style.display = "block";
+			}
+			else{
+				list1.style.display = "none";
+			}
+		});
 	}
+	
+	//test
+//	var p = document.createElement("P");
+//	p.innerHTML = "Look ma, this is a new paragraph!";
+//	p.id = "newParagraph";
+//
+//	// make element part of the DOM
+//	document.getElementsByTagName("BODY")[0].appendChild(p);
+//
+//	// get element by ID
+//	var test = document.getElementById("newParagraph");
+//	alert(test.innerHTML);
+	
 	//console.log(type_tmp+"list");
 	//document.getElementById(type_tmp+'list').innerHTML = "<li class ='type-list-element'>"+name_column[0][0]+"</li>";
 	
-	document.getElementById('type_list').innerHTML = string_list;
+	//document.getElementById('type_list').innerHTML = string_list;
 	
 //	document.getElementById('select-derivative-order').onchange = function() {
 //		var idOfScf = document.getElementById('select-primal-scfs').value;
