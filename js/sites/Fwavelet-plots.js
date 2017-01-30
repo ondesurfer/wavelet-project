@@ -10,22 +10,6 @@
 
 function setHtmlFunctions() {
 
-	// updates the List if any condition is changed
-	document.getElementById('select-orthogonal-translates').onchange = updateLists;
-	document.getElementById('select-symmetry').onchange = updateLists;
-	document.getElementById('input-exactness-poly-approx').onchange = updateLists;
-	document.getElementById('select-critical-hoelder-exponent').onchange = updateLists;
-	document.getElementById('select-critical-sobolev-exponent').onchange = updateLists;
-	document.getElementById('select-spline-order').onchange = updateLists;
-
-	// cleans the info field and the function plot if the choosen
-	// scalingfunction is changed
-	document.getElementById('select-primal-scfs').onchange = function() {
-		cleanPlotAndInfo();
-		updateDualScfList(this.value);
-
-	};
-
 	// adds the showInformation function to the showInformation button
 	document.getElementById('button-show-scfs-info').onclick = function() {
 		showInformation(document.getElementById('select-primal-scfs').value);

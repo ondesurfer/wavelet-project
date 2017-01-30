@@ -14,6 +14,7 @@ function setHtmlFunctions() {
 	
 	var type_list = document.getElementById("type_list");
 	
+	// same types have to be neighbors 
 	for (var i = 0; i < type_column.length; i++) {
 		if(type_tmp != type_column[i][0]){
 			types.push(type_column[i][0]);
@@ -28,17 +29,42 @@ function setHtmlFunctions() {
 			
 			var type_list_entry = document.createElement("u1");
 			type_list_entry.id = type_column[i][0] + "list";
-			type_list_entry.style.display = "none";
+			type_list_entry.style.display = "block";
+			
+			// seperate lists
 			var br = document.createElement("br");
-			//type_list_entry.style = "hidden";
+			//type_list_entry.style.display = "none";
 			type_list.appendChild(button); 
 			type_list.appendChild(type_list_entry);
 			type_list.appendChild(br);
 		}
 		
 		var list_item = document.createElement("li");
-		var list_item_text = document.createTextNode(name_column[i][0]);
-		list_item.appendChild(list_item_text);
+		
+		var list_item_form = document.createElement("form");
+		list_item_form.action = "Ftemplate3.html";
+		list_item_form.method = "GET";
+		list_item.appendChild(list_item_form);
+		var list_item_input = document.createElement("input");
+		list_item_input.type = "submit";
+		list_item_input.name = "name";
+		list_item_input.value = name_column[i][0];
+		
+		// generate two hidden input fields to send multiple values via query
+		var list_item_input_hidden = document.createElement("input");
+		list_item_input_hidden.type = "hidden";
+		list_item_input_hidden.name = "id";
+		list_item_input_hidden.value = i + 1;
+		list_item_input.appendChild(list_item_input_hidden);
+		
+		var list_item_input_hidden1 = document.createElement("input");
+		list_item_input_hidden1.type = "hidden";
+		list_item_input_hidden1.name = "table";
+		list_item_input_hidden1.value = "OMRA";
+		list_item_input.appendChild(list_item_input_hidden1);
+		
+		list_item_form.appendChild(list_item_input);
+		
 		var list = document.getElementById(type_column[i][0] + "list");
 		list.appendChild(list_item);
 	}
