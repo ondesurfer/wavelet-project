@@ -33,6 +33,7 @@ function setHtmlFunctions() {
 			
 			// seperate lists
 			var br = document.createElement("br");
+			
 			//type_list_entry.style.display = "none";
 			type_list.appendChild(button); 
 			type_list.appendChild(type_list_entry);
