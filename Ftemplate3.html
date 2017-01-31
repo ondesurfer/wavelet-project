@@ -58,61 +58,48 @@
 		</nav>
 		<div id="content">
 			<div id="middle">
-				The scaling function you choosed is:
+				<!-- 1.Abschnitt (Name) -->
+				<div id="name"> Name
 					<div id ="function_name"></div>
-					
-				<form id="form-scf" action="" method="post">
-					<div>
-						<p>
-							<b> Possible dual scaling-functions:</b>
-						</p>
-					</div>
-					<div>
-						<select id="select-dual-scfs">
-						</select>
-					</div>
-
-					<div>
-						<p>
-							<input id="button-show-scfs-info" type="button"
-								value="show information" /> <input id="button-plot-scfs"
-								type="button" value="plot scaling function" /> <input
-								id="button-plot-wavelet" type="button" value="plot wavelet" />
-						</p>
-					</div>
-				</form>
-				<p>
-					<b>Infomation about the choosen scaling function:</b>
-				</p>
-				<div>
-					<textarea id="textarea-scfs-info" readonly rows="10" cols="50"> </textarea>
 				</div>
-				<p></p>
-				<div>
-					Reference: <a href="" id="link-reference"></a>
-				</div>
-
-				<p>
-					<b>Plot of the choosen scaling function:</b>
-				</p>
-				<div id="plot-scf"></div>
-
-
-				<p>
-					Show derivative: <input type="checkbox" id="check-show-derivative">
-				</p>
-
-				<div id="area-plot-derivative" style="display: none">
+				
+				<!-- 2.Abschnitt (Skalierungsfunktion(-en)) -->
+				<div id="scf">
 					<p>
-						Enter derivative order: <input name="derivative_order="
-							type="text" value="" id="select-derivative-order" min="0"
-							max="100" />
+						<b>Plot of the choosen scaling function(s):</b>
 					</p>
-					<b>Plot of the choosen derivative:</b>
-					<div id="plot-derivative"></div>
+					<div id="plot-scf"></div>
+				</div>
+				
+				<!-- 3.Abschnitt (Database-Information) -->
+				<div id="data-info">
+					<p>
+						<b>Infomation about the function:</b>
+					</p>
+					<div>
+						<textarea id="info" readonly rows="10" cols="50"> </textarea>
+					</div>
+						Reference: <a href="" id="link-reference"></a>
+				</div>
+				
+				
+				<!-- 4.Abschnitt (Duale Skalierungsfunktion (en)) -->
+				<div id="dscf">
+
+					<p>
+						<b> Possible dual scaling-functions:</b>
+					</p>
+					Hier dynamisch erstellte Liste mit moeglichen dualen Skalierungsfunktionen
+					<p>
+						<b>Plot of the choosen dual scaling function(s):</b>
+					</p>
+					<div id="plot-dscf"></div>
+						
 				</div>
 
-				<div id="area-plot-wavelet">
+				
+				<!-- 5.Abschnitt  (Wavelet) -->
+				<div id="wavelet">
 					<b>Plot of wavelet:</b>
 					<div id="plot-wavelet"></div>
 				</div>
@@ -125,7 +112,7 @@
 		</div>
 
 		<script>
-			//global variables containing the points of the ScalingFunctionPlot, Derivate-Plot and Wavelet-Plot
+			//global variables containing the points of the ScalingFunctionPlot, Dual-Scf-Plot and Wavelet-Plot
 			valuesScf = [];
 			valuesDer = [];
 			valuesWav = [];
@@ -133,15 +120,17 @@
 			//loads the database. (See dbMethods.js)
 			loadWaveletDB1();
 
-			//links the Html elements to their functions. (See htmlElementFunctions.js)
-			setTimeout(setHtmlFunctions, 30);
+			//links the Html elements to their functions. (See FTamplate3.js)
+			$(document).ready(function(){
+				setHtmlFunctions();
+			});
 
 			//build the first function plot object into 'plot-scf' area
 			plotInstance1 = buildPlot('#plot-scf');
 			plotInstance1.on("during:draw", zoomFilterScf);
 
 			//build the second function plot object into 'plot-derivative' area
-			plotInstance2 = buildPlot('#plot-derivative');
+			plotInstance2 = buildPlot('#plot-dscf');
 			plotInstance2.on("during:draw", zoomFilterDer);
 
 			//build the third function plot object into 'plot-wavelet' area
