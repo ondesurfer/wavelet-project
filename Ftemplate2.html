@@ -14,9 +14,13 @@
 <link rel="stylesheet" href="Ftemplate2.css">
 </head>
 
+<script src="http://code.jquery.com/jquery-3.1.1.min.js"
+			  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+			  crossorigin="anonymous"></script>
 <script src="js/ext_libs/sql.js"></script>
 <script src="js/libs/dbMethods.js"></script>
 <script src="js/sites/Ftemplate2.js"></script>
+
 
 <body>
 	<div id="wrapper">
@@ -61,8 +65,13 @@
 		//loads the database. (See dbMethods.js)
 		loadWaveletDB1();
 		
+		$(document).ready(function(){
+				setHtmlFunctions();
+			});
+		
+		
 		//problematic time out
-		setTimeout(setHtmlFunctions, 30);
+		//setTimeout(setHtmlFunctions, 1);
 		//document.body.onload = setHtmlFunctions;
 		
 		//links the Html elements to their functions. (See Ftemplate2.js)
