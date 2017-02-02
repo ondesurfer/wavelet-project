@@ -27,8 +27,8 @@
 <script src="js/libs/math2.js"></script>
 <script src="js/libs/mask.js"></script>
 <script src="js/libs/matrixOperations.js"></script>
-<script src="js/libs/pointEvaluation.js"></script>
-<script src="js/libs/pointEvaluation2.js"></script>
+<script src="js/libs/refinement.js"></script>
+<!--<script src="js/libs/pointEvaluation2.js"></script>-->
 <script src="js/libs/gauss2.js"></script>
 <script src="js/libs/dbMethods.js"></script>
 
@@ -85,12 +85,15 @@
 				
 				<!-- 4.Abschnitt (Duale Skalierungsfunktion (en)) -->
 				<div id="dscf">
-
-					<p>
-						<b> Possible dual scaling-functions:</b>
-					</p>
-					Hier dynamisch erstellte Liste mit moeglichen dualen Skalierungsfunktionen
-					<p>
+						<p>
+							<b> Possible dual scaling-functions:</b>
+						</p>
+						
+					<div>
+						<select id="select-dual-scfs">
+						</select>
+					</div>
+					
 						<b>Plot of the choosen dual scaling function(s):</b>
 					</p>
 					<div id="plot-dscf"></div>
