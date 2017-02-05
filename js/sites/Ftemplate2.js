@@ -33,6 +33,7 @@ function setHtmlFunctions() {
 			var type_list_entry = document.createElement("u1");
 			type_list_entry.id = type_column[i][0] + "list";
 			type_list_entry.style.display = "block";
+			type_list_entry.classList.add('type-list-entry');
 			
 			// seperate lists
 			var br = document.createElement("br");
@@ -76,18 +77,26 @@ function setHtmlFunctions() {
 	
 	// add hide/show-action to the buttons
 	for (var i = 0; i < types.length; i++) {
-		var button = document.getElementById(types[i] + "button");
-		var list = document.getElementById(types[i] + "list");
+		//var button = document.getElementById(types[i] + "button");
+		//var list = document.getElementById(types[i] + "list");
 		//console.log(list.id);
-		button.addEventListener("click", function() {
-			var list1 = document.getElementById(list.id);
-			if(list1.style.display == "none"){
-				list1.style.display = "block";
-			}
-			else{
-				list1.style.display = "none";
-			}
-		});
+//		button.addEventListener(
+//			"click", function() {
+//				var list1 = document.getElementById(list.id);
+//				if(list1.style.display == "none"){
+//					list1.style.display = "block";
+//				}
+//				else{
+//					list1.style.display = "none";
+//				}
+//			}
+//		);
+		
+		console.log("#"+types[i] + "list");
+		 $("#"+types[i] + "button").click(function(){
+			 	$(this).next(".type-list-entry").toggle();
+		    });
+		
 	}
 	
 	//test
