@@ -3,12 +3,15 @@
  * 	the Ftemplate2.html file
  * 
  * 	Dependencies:
- * 	sql.js, dbMethods.js
+ * 	sql.js, dbMethods.js, jQuerdy.js
  */
 
 function setHtmlFunctions() {
-	var type_column = db.exec("SELECT type FROM OMRA")[0].values;
-	var name_column = db.exec("SELECT name FROM OMRA")[0].values;
+	var family = getQueryVariable("family");
+	console.log("family = "+family);
+	
+	var type_column = db.exec("SELECT type FROM "+ family)[0].values;
+	var name_column = db.exec("SELECT name FROM "+family)[0].values;
 	var types = new Array();
 	var type_tmp = "";
 	
@@ -41,6 +44,7 @@ function setHtmlFunctions() {
 		}
 		
 		var list_item = document.createElement("li");
+		list_item.classList.add('listitem');
 		
 		var list_item_form = document.createElement("form");
 		list_item_form.action = "Ftemplate3.html";
