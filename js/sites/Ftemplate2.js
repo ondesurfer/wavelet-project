@@ -93,8 +93,11 @@ function setHtmlFunctions() {
 //		);
 		
 		console.log("#"+types[i] + "list");
-		 $("#"+types[i] + "button").click(function(){
-			 	$(this).next(".type-list-entry").toggle();
+		$("#"+types[i] + "button").next(".type-list-entry").hide();
+		
+		 $("#"+types[i] + "button").click(function(){		
+			 	// toggle( <milliseconds> ), fadeToggle, slideToggle
+			 	$(this).next(".type-list-entry").slideToggle();
 		    });
 		
 	}
