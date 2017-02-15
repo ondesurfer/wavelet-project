@@ -94,6 +94,7 @@ document.getElementById('select-derivative-order').value = "";
  * given in the html elements (last modification: 1.7.16 Simon)
  */
 function updateScfList() {
+	console.log("hello");
 	cleanPlotAndInfo();
 	var cond = new Array();
 	//Validation of number-inputs

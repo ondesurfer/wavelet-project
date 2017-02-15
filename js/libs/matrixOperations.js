@@ -673,3 +673,25 @@ function recol(v, m){
 	}
 	return M;
 }
+
+/**
+ *	Create a list of the form
+ *  {'entry1' : 'entry1', 
+ *   'entry2' : 'entry2',
+ *   ...}
+ *   out of an array ['entry1', 'entry2'], ...
+ *   (this method can be used for adding html-list-select-options)
+ *   
+ *   (last modification: 15.2.17 Andreas)
+ *   
+ *   @param{Array} entries_array
+ *   
+ *   @param{List} entries_list
+ */
+function createSelectionOptions(entries){
+	var entries_list = {};
+	for (var i = 0; i < entries.length; i++) {
+		entries_list[entries[i]] = entries[i]; 
+	}
+	return entries_list
+}

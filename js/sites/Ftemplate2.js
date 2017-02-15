@@ -12,7 +12,7 @@ function setHtmlFunctions() {
 	
 	var type_column = db.exec("SELECT type FROM "+ family)[0].values;
 	var name_column = db.exec("SELECT name FROM "+family)[0].values;
-	var types = new Array();
+	var types = [];
 	var type_tmp = "";
 	
 	var type_list = document.getElementById("type_list");
