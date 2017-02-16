@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--Ueberschrift des Tabs und bei Suchmachinen -->
+<title>Wavelets</title>
+<!--Name des Autors-->
+<meta name="author" content="Simon" />
+<!--Beschreibung,- wird bei Suchmachinen geliefert-->
+<meta name="description"
+	content="Wavlets are the basic principal of many mathematical applications. 
+			we present an overview of many known wavelets and their properties" />
+
+<!--Desing wird fuer die einzelnen Elemente extern geladen-->
+<link rel="stylesheet" href="stylePlain.css">
+<link rel="stylesheet" href="Fwavelet-plots.css">
+<script src="js/ext_libs/sql.js"></script>
+<script src="js/ext_libs/d3.js"></script>
+<script src="js/ext_libs/function-plot.js"></script>
+<script src="js/ext_libs/numeric-1.2.6.js"></script>
+
+<script src="js/libs/math2.js"></script>
+<script src="js/libs/mask.js"></script>
+<script src="js/libs/matrixOperations.js"></script>
+<script src="js/libs/refinement.js"></script>
+<!-- vorher pointEvaluation Dateien: <script src="js/libs/pointEvaluation2.js"></script>-->
+<script src="js/libs/gauss2.js"></script>
+<script src="js/libs/dbMethods.js"></script>
+
+
+<script src="http://code.jquery.com/jquery-3.1.1.min.js"
+			  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+			  crossorigin="anonymous"></script>
+
+<script src="js/sites/Fsearch.js"></script>
+
+</head>
+
+<body>
+	<div id="wrapper">
+		<div id="header">
+			<div id="logo">
+				<img src="./pictures/waveletLogo1.jpg" height="151px">
+			</div>
+			<div id="title">Wavelet Database</div>
+		</div>
+
+		<nav id="topmenu">
+		<ul>
+			<li id="icon-introduction"><a href="Fintroduction.html">Introduction</a></li>
+			<li id="icon-search"><a href="Fsearch.html">Search</a></li>
+			<li id="icon-database"><a href="Fdatabase.html">Database</a></li>
+			<li id="icon-information"><a href="FmoreInformation.html">More
+					information</a></li>
+		</ul>
+		</nav>
+		<div id="content">
+			<div id="left-side-bar">
+				<p>
+					<b>Der inke Teil des Ganzen</b>
+				</p>
+			</div>
+			<div id="right-side-bar">
+				<p>
+					<b>Der rechte Teil des Ganzen</b>
+				</p>
+			</div>
+			<div id="middle">
+				<p>
+					<b>Choose your conditions:</b>
+				</p>
+				<form id="form-options" method="post">
+					
+					<div id="search-options">
+						<p>Family</p>
+						<p>
+							<select id="select-family" name="table =">
+								<option selected="selected" value="*">Show all</option>
+								<option value="'OMRA'">OMRA</option>
+								<option value="'BiMRA'">BiMRA</option>
+								<option value="'BiMRAI'">BiMRAI</option>
+							</select>
+						</p>	
+					</div>
+					<div id="advanced-search-options">
+					</div>
+					<!-- 		
+				
+					<p>Orthogonal translates</p>
+					<p>
+						<select id="select-orthogonal-translates"
+							name="orthogonal_translations =">
+							<option selected="selected" value="-2">Show all</option>
+							<option value="0">no</option>
+							<option value="1">yes</option>
+						</select>
+					</p>
+
+					<p>Symmetry</p>
+					<p>
+						<select id="select-symmetry" name="symmetry =">
+							<option selected="selected" value="-2">Show all</option>
+							<option value="'odd'">odd</option>
+							<option value="'even'">even</option>
+						</select>
+					</p>
+
+					<p>Exactness of polynomial approximation</p>
+					<p>
+						<input id="input-exactness-poly-approx"
+							name="exactness_of_polynomial_approximation &gt;=" type="number"
+							value="0" min="0" step="1" max="100" maxlength="3" />
+					</p>
+
+					<p>Critical Hölder exponent</p>
+					<p>
+						<input id="select-critical-hoelder-exponent"
+							name="critical_Hoelder_exponent &gt;=" type="number" value="0"
+							min="0" step="0.0001" max="100" maxlength="3" />
+					</p>
+
+					<p>Critical Sobolev exponent</p>
+					<p>
+						<input id="select-critical-sobolev-exponent"
+							name="critical_Sobolev_exponent &gt;=" type="number" value="0"
+							min="0" step="0.0001" max="100" maxlength="3" />
+					</p>
+
+					<p>Spline order</p>
+					<p>
+						<input id="select-spline-order" name="spline_order &gt;="
+							type="number" value="-1" min="-1" step="1" max="100"
+							maxlength="3" />
+					</p>
+					-->
+					<div>
+						<p>
+							<input id="button-search" type="button" value="Search" />
+						</p>
+					</div>
+				</form>
+				
+				<div>
+					<p>
+						<b> Scaling-functions complying the conditions:</b>
+					</p>
+				</div>
+				
+				
+			</div>
+
+
+			<div id="footer">
+				<p>© 2016 - www.wavelets.de</p>
+			</div>
+		</div>
+
+		<script>
+			
+			//loads the database. (See dbMethods.js)
+			loadWaveletDB1();
+
+			//links the Html elements to their functions. (See htmlElementFunctions.js)
+			setHtmlFunctions();
+		</script>
+</body>
+
+</html>
+
