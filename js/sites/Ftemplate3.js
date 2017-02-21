@@ -13,7 +13,7 @@ function setHtmlFunctions() {
 	
 	//to test:
 	var id = 3;
-	var table = "BiMRA";
+	var table = "BiMRAIWavelets";
 	
 	/////////////////////////////////////////
 	//  1. Abschnitt/////////////////////////
@@ -23,7 +23,7 @@ function setHtmlFunctions() {
 	
 	
 	///////////////////////////////////////////
-	//  2.Abschnitt ///////////////////////////
+	//  2.Abschnitt(Scaling-Functions) ////////
 	///////////////////////////////////////////
 	
 	
@@ -35,17 +35,26 @@ function setHtmlFunctions() {
 		
 		//fuege Funktion zu slider hinzu:
 		$("#slider1").change(function(){
-			sliderChange(valuesScf1);
+			sliderChangeOMRA(valuesScf1);
 		});
 		
 		$("#slider2").change(function(){
-			sliderChange(valuesScf1);
+			sliderChangeOMRA(valuesScf1);
+		});
+				
+	}
+	if(table=="BiMRAIWavelets"){
+		$("#slider1").change(function(){
+			sliderChangeBiMRAI();
 		});
 		
-		//fuehre Funktion einmal beim starten aus
-		$("#slider1").change();
-		
+		$("#slider2").change(function(){
+			sliderChangeBiMRAI();
+		});
 	}
+	
+	//fuehre Funktion einmal beim starten aus
+	$("#slider1").change();
 	
 	///////////////////////////////////////////
 	//   3.Abschnitt (Information) ////////////
@@ -146,10 +155,27 @@ function generateInfoString(table,scf) {
 }
 
 //is invoked if one of the sliders of scf is changed
-function sliderChange(valuesScf1){
+function sliderChangeOMRA(valuesScf1){
 	$("#levelOfSlider1").text("j="+$("#slider1").val());
 	$("#levelOfSlider2").text("k="+$("#slider2").val());
 	valuesScf=deliAndTrans($("#slider1").val(),parseFloat($("#slider2").val()),valuesScf1); 
+	plotInstance1.draw();
+}
+
+function sliderChangeBiMRAI(){
+	var d=3;
+	var j= $("#slider1").val();
+	//fit maximum of slider to number of scaling functions
+	$('#slider2').prop({
+			'min': 0,
+            'max': Math.pow(2,j)+d-2,
+        });
+	var k= $("#slider2").val();
+	
+	$("#levelOfSlider1").text("j="+j);
+	$("#levelOfSlider2").text("k="+k);
+	
+	valuesScf = valuesOfPrimalPrimbsScf(j,d,k);
 	plotInstance1.draw();
 }
 
