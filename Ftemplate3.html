@@ -71,6 +71,16 @@
 						<b>Plot of the choosen scaling function(s):</b>
 					</p>
 					<div id="plot-scf"></div>
+					<div id="scfSlider1Div"> 
+						<p> Level j: </p>
+						<input id="slider1" type="range" min="0" max="5" value="0" step="1" />
+						<div id="levelOfSlider1"></div>
+					</div>
+					<div id="scfSlider2Div"> 
+						<p> Number of Scf k: </p>
+						<input id="slider2" type="range" min="-10" max="10" value="0" step="1" />
+						<div id="levelOfSlider2"></div>
+					</div>
 				</div>
 				
 				<!-- 3.Abschnitt (Database-Information) -->
@@ -122,6 +132,8 @@
 			valuesDer = [];
 			valuesWav = [];
 
+			//console.log("val",$("input[type=range]").val());
+			
 			//loads the database. (See dbMethods.js)
 			loadWaveletDB1();
 

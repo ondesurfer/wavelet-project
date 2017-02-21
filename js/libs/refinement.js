@@ -134,3 +134,28 @@ function waveletPointEvaluation(a, a_start, a_tilde, a_tilde_start, j){
 	}
 	return values;
 }
+
+/**
+ * First delitates a function with factor 2^-j and then translates it with k (usually integer)
+ * @param {double} k translation
+ * @param {integer} j (2^-j) is delitation factor
+ * @param {Array} values already known values
+ * 
+ * @return {Array} newValues new function values 
+ */
+function deliAndTrans(j,k,values){
+	var newValues = createArray(values.length,2);
+	for(var l=0; l<values.length; l++){
+		//copies y-values
+		newValues[l][1]=values[l][1];
+		//delitates x-values
+		newValues[l][0]=Math.pow(2,-j)*values[l][0];
+	}
+	//console.log("newValues1",newValues);
+	for(var m=0; m<values.length; m++){
+		//console.log("k",k);
+		//translates x-values
+		newValues[m][0]=newValues[m][0]+k;
+	}
+	return newValues;
+}

@@ -12,7 +12,7 @@ function setHtmlFunctions() {
 	//var table = getQueryVariable("table");
 	
 	//to test:
-	var id = 6;
+	var id = 3;
 	var table = "BiMRA";
 	
 	/////////////////////////////////////////
@@ -26,19 +26,32 @@ function setHtmlFunctions() {
 	//  2.Abschnitt ///////////////////////////
 	///////////////////////////////////////////
 	
+	
 	if(table=="OMRA"||table=="BiMRA"){
 		var mask = JSON.parse(db.exec("SELECT mask FROM " + table + " WHERE id = " + id)[0].values[0][0]);
 		var a_start = db.exec("SELECT a_start FROM " + table + " WHERE id = " + id)[0].values[0][0];
-		console.log('mask',  mask, 'astart', a_start);
-		valuesScf=iterativePointEvaluation2(mask, a_start, 8, 0); 
-		plotInstance1.draw();
+		//console.log('mask',  mask, 'astart', a_start);
+		var valuesScf1=iterativePointEvaluation2(mask, a_start, 8, 0);
+		
+		//fuege Funktion zu slider hinzu:
+		$("#slider1").change(function(){
+			sliderChange(valuesScf1);
+		});
+		
+		$("#slider2").change(function(){
+			sliderChange(valuesScf1);
+		});
+		
+		//fuehre Funktion einmal beim starten aus
+		$("#slider1").change();
+		
 	}
 	
 	///////////////////////////////////////////
 	//   3.Abschnitt (Information) ////////////
 	///////////////////////////////////////////
 	var scf = db.exec("SELECT * FROM " + table + " WHERE id = " + id)[0];
-	console.log ('scf', scf);
+	//console.log ('scf', scf);
 	
 	var str = generateInfoString(table,scf);
 	$(info).val(str);
@@ -50,7 +63,6 @@ function setHtmlFunctions() {
 	if(table=="BiMRA"){
 		var dualIds = JSON.parse(db.exec("SELECT ID_of_dual_function FROM " + table + " WHERE id = " + id)[0].values[0][0]);
 		
-		
 		//adding all possible dual functions to select menue
 		if(dualIds.constructor === Array){
 			for(var j=0; j< dualIds.length; j++){			
@@ -60,6 +72,7 @@ function setHtmlFunctions() {
 				}));
 			}
 		}
+		//if it is just one id (not an array stored in the database)
 		else{$('#select-dual-scfs').append($('<option>', {
 	   				value: db.exec("SELECT ID FROM " + table + " WHERE id = " + dualIds)[0].values[0][0],
 	    			text: db.exec("SELECT name FROM " + table + " WHERE id = " + dualIds)[0].values[0][0]
@@ -83,6 +96,8 @@ function setHtmlFunctions() {
 			plotInstance2.draw();
 		}
 	});
+	
+	
 	
 	///////////////////////////////////////////
 	//  5.Abschnitt (Wavelet-Plot) ////////////
@@ -111,6 +126,8 @@ function setHtmlFunctions() {
 				plotInstance3.draw();
 			}
 		});
+		
+		$('#select-dual-scfs').change();
 	
 }
 
@@ -124,8 +141,16 @@ function generateInfoString(table,scf) {
 			info += ": ";
 			info += scf.values[0][column] + "\n";
 		}
-		console.log('info', info);
+		//console.log('info', info);
 		return info;	
+}
+
+//is invoked if one of the sliders of scf is changed
+function sliderChange(valuesScf1){
+	$("#levelOfSlider1").text("j="+$("#slider1").val());
+	$("#levelOfSlider2").text("k="+$("#slider2").val());
+	valuesScf=deliAndTrans($("#slider1").val(),parseFloat($("#slider2").val()),valuesScf1); 
+	plotInstance1.draw();
 }
 
 function plotWavelet(){
