@@ -12,11 +12,11 @@ function setHtmlFunctions() {
 	//var table = getQueryVariable("table");
 	
 	//to test:
-	var id = 3;
-	var table = "BiMRAIWavelets";
+	var id = 5;
+	var table = "BiMRA";
 	
 	/////////////////////////////////////////
-	//  1. Abschnitt/////////////////////////
+	//  1. Abschnitt (Name) /////////////////
 	/////////////////////////////////////////
 	var funct_name = db.exec("SELECT name FROM " + table + " WHERE id = " + id)[0];
 	$("#function_name").text(funct_name.values[0][0]);
@@ -24,9 +24,7 @@ function setHtmlFunctions() {
 	
 	///////////////////////////////////////////
 	//  2.Abschnitt(Scaling-Functions) ////////
-	///////////////////////////////////////////
-	
-	
+	///////////////////////////////////////////	
 	if(table=="OMRA"||table=="BiMRA"){
 		var mask = JSON.parse(db.exec("SELECT mask FROM " + table + " WHERE id = " + id)[0].values[0][0]);
 		var a_start = db.exec("SELECT a_start FROM " + table + " WHERE id = " + id)[0].values[0][0];
@@ -35,21 +33,22 @@ function setHtmlFunctions() {
 		
 		//fuege Funktion zu slider hinzu:
 		$("#slider1").change(function(){
-			sliderChangeOMRA(valuesScf1);
+			sliderChangeOMRA(plot1,valuesScf1,1);
 		});
 		
 		$("#slider2").change(function(){
-			sliderChangeOMRA(valuesScf1);
+			sliderChangeOMRA(plot1,valuesScf1,1);
 		});
 				
 	}
 	if(table=="BiMRAIWavelets"){
+		var d= db.exec("SELECT d FROM " + table + " WHERE id = " + id)[0].values[0][0];
 		$("#slider1").change(function(){
-			sliderChangeBiMRAI();
+			sliderChangeBiMRAI(d);
 		});
 		
 		$("#slider2").change(function(){
-			sliderChangeBiMRAI();
+			sliderChangeBiMRAI(d);
 		});
 	}
 	
@@ -86,8 +85,7 @@ function setHtmlFunctions() {
 	   				value: db.exec("SELECT ID FROM " + table + " WHERE id = " + dualIds)[0].values[0][0],
 	    			text: db.exec("SELECT name FROM " + table + " WHERE id = " + dualIds)[0].values[0][0]
 			}));
-		}
-		
+		}		
 	}
 	else{
 		$(dscf).hide();
@@ -96,13 +94,19 @@ function setHtmlFunctions() {
 	
 	$('#select-dual-scfs').change(function(){
 		if(table=="BiMRA"){
-		
 			var dualID = $('#select-dual-scfs').val();
 			var dualMask = JSON.parse(db.exec("SELECT mask FROM " + table + " WHERE id = " + dualID)[0].values[0][0]);
 			console.log('dualMask',dualMask);
 			var a_tilde_start=db.exec("SELECT a_start FROM " + table + " WHERE id = " + dualID)[0].values[0][0];
-			valuesDer=iterativePointEvaluation2(dualMask, a_tilde_start, 8, 0);  
-			plotInstance2.draw();
+			var valuesDscf=iterativePointEvaluation2(dualMask, a_tilde_start, 8, 0);  
+			//fuege Funktion zu slider hinzu:
+			$("#slider3").change(function(){
+				sliderChangeOMRA(plot2,valuesDscf,2);
+			});
+			$("#slider4").change(function(){
+				sliderChangeOMRA(plot2,valuesDscf,2);
+			});
+			$("#slider4").change();
 		}
 	});
 	
@@ -131,8 +135,15 @@ function setHtmlFunctions() {
 				}
 				
 				console.log('mask',  mask, 'astart', a_start);
-				valuesWav=waveletPointEvaluation(mask, a_start, dualMask, a_tilde_start, 8); 
-				plotInstance3.draw();
+				var valuesWav=waveletPointEvaluation(mask, a_start, dualMask, a_tilde_start, 8); 
+				
+				$("#slider5").change(function(){
+					sliderChangeOMRA(plot3,valuesWav,3);
+				});
+				$("#slider6").change(function(){
+					sliderChangeOMRA(plot3,valuesWav,3);
+				});
+				$("#slider6").change();
 			}
 		});
 		
@@ -155,15 +166,30 @@ function generateInfoString(table,scf) {
 }
 
 //is invoked if one of the sliders of scf is changed
-function sliderChangeOMRA(valuesScf1){
-	$("#levelOfSlider1").text("j="+$("#slider1").val());
-	$("#levelOfSlider2").text("k="+$("#slider2").val());
-	valuesScf=deliAndTrans($("#slider1").val(),parseFloat($("#slider2").val()),valuesScf1); 
-	plotInstance1.draw();
+function sliderChangeOMRA(plot,valuesOld,mode){
+	if(mode==1){
+		j=$("#slider1").val();
+		k=$("#slider2").val();
+		$("#levelOfSlider1").text("j="+j);
+		$("#levelOfSlider2").text("k="+k);
+	}
+	else if(mode==2){
+		j=$("#slider3").val();
+		k=$("#slider4").val();
+		$("#levelOfSlider3").text("j="+j);
+		$("#levelOfSlider4").text("k="+k); //irgendwie wird hier k zu string umgewandelt
+	}
+	else if(mode==3){
+		j=$("#slider5").val();
+		k=$("#slider6").val();
+		$("#levelOfSlider5").text("j="+j);
+		$("#levelOfSlider6").text("k="+k); //irgendwie wird hier k zu string umgewandelt
+	}
+	var valuesNew=deliAndTrans(j,parseInt(k),valuesOld); 
+	plot.drawValues(valuesNew);
 }
 
-function sliderChangeBiMRAI(){
-	var d=3;
+function sliderChangeBiMRAI(d){
 	var j= $("#slider1").val();
 	//fit maximum of slider to number of scaling functions
 	$('#slider2').prop({
@@ -175,8 +201,8 @@ function sliderChangeBiMRAI(){
 	$("#levelOfSlider1").text("j="+j);
 	$("#levelOfSlider2").text("k="+k);
 	
-	valuesScf = valuesOfPrimalPrimbsScf(j,d,k);
-	plotInstance1.draw();
+	var valuesScf = valuesOfPrimalPrimbsScf(j,d,k);
+	plot1.drawValues(valuesScf);
 }
 
 function plotWavelet(){

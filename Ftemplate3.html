@@ -75,12 +75,12 @@
 						<b>Plot of the choosen scaling function(s):</b>
 					</p>
 					<div id="plot-scf"></div>
-					<div id="scfSlider1Div"> 
+					<div id="Slider1Div"> 
 						<p> Level j: </p>
 						<input id="slider1" type="range" min="0" max="5" value="0" step="1" />
 						<div id="levelOfSlider1"></div>
 					</div>
-					<div id="scfSlider2Div"> 
+					<div id="Slider2Div"> 
 						<p> Number of Scf k: </p>
 						<input id="slider2" type="range" min="-10" max="10" value="0" step="1" />
 						<div id="levelOfSlider2"></div>
@@ -113,6 +113,16 @@
 						<b>Plot of the choosen dual scaling function(s):</b>
 					</p>
 					<div id="plot-dscf"></div>
+					<div id="dScfSlider1Div"> 
+						<p> Level j: </p>
+						<input id="slider3" type="range" min="0" max="5" value="0" step="1" />
+						<div id="levelOfSlider3"></div>
+					</div>
+					<div id="dDcfSlider2Div"> 
+						<p> Number of Scf k: </p>
+						<input id="slider4" type="range" min="-10" max="10" value="0" step="1" />
+						<div id="levelOfSlider4"></div>
+					</div>
 						
 				</div>
 
@@ -121,8 +131,17 @@
 				<div id="wavelet">
 					<b>Plot of wavelet:</b>
 					<div id="plot-wavelet"></div>
+					<div id="WavSlider1Div"> 
+						<p> Level j: </p>
+						<input id="slider5" type="range" min="0" max="5" value="0" step="1" />
+						<div id="levelOfSlider5"></div>
+					</div>
+					<div id="WavSlider2Div"> 
+						<p> Number of Scf k: </p>
+						<input id="slider6" type="range" min="-10" max="10" value="0" step="1" />
+						<div id="levelOfSlider6"></div>
+					</div>
 				</div>
-
 			</div>
 
 			<div id="footer">
@@ -131,32 +150,26 @@
 		</div>
 
 		<script>
-			//global variables containing the points of the ScalingFunctionPlot, Dual-Scf-Plot and Wavelet-Plot
-			valuesScf = [];
-			valuesDer = [];
-			valuesWav = [];
 
-			//console.log("val",$("input[type=range]").val());
 			
 			//loads the database. (See dbMethods.js)
 			loadWaveletDB1();
 
+			//build the first plot object into 'plot-scf' area
+			plot1 = buildPlot('#plot-scf');
+
+			//build the second plot object into 'plot-derivative' area
+			plot2 = buildPlot('#plot-dscf');
+
+			//build the third plot object into 'plot-wavelet' area
+			plot3 = buildPlot('#plot-wavelet');
+			
 			//links the Html elements to their functions. (See FTamplate3.js)
 			$(document).ready(function(){
 				setHtmlFunctions();
 			});
 
-			//build the first function plot object into 'plot-scf' area
-			plotInstance1 = buildPlot('#plot-scf');
-			plotInstance1.on("during:draw", zoomFilterScf);
 
-			//build the second function plot object into 'plot-derivative' area
-			plotInstance2 = buildPlot('#plot-dscf');
-			plotInstance2.on("during:draw", zoomFilterDer);
-
-			//build the third function plot object into 'plot-wavelet' area
-			plotInstance3 = buildPlot('#plot-wavelet');
-			plotInstance3.on("during:draw", zoomFilterWav);
 		</script>
 </body>
 

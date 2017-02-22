@@ -1,14 +1,15 @@
 /**
- * builds an functionPlot object without values! (last modification: 15.7.16
- * Simon)
+ * builds an Plot object which consists of the plot, all available values.
+ * The plot and the values are connected with an filter. So for a plot not 
+ * all values are used.
+ * (last modification: 22.2.17 Simon)
  * 
  * @param{string} target name of the html-area where the plot object should
  *                appear
- * @return{functionPlot} object instance of an functionPlot object
+ * @return{functionPlot} object instance of an plot object
  */
 function buildPlot(target) {
 	try {
-
 		var plotInst = functionPlot({
 			target : target,
 			data : [ {
@@ -18,50 +19,34 @@ function buildPlot(target) {
 				graphType : 'polyline',
 			} ]
 		});
-
-		// return the wavelet plot as object
-		return plotInst;
-
+		
+		function bigPlot( plot1, allValues1 ) {
+   			return { 
+       			 	plot : plot1,
+       			 	allValues : allValues1,
+       			 	drawValues : function(values){this.allValues=values; this.plot.draw(); },
+   			 }; 			
+		};
+				
+		var bigPlotObj = new bigPlot(plotInst,[[0,0]]);
+		
+		function zoomFilter() {
+			var xDomain = this.options.xDomain;
+			var newPoints = filter(xDomain[0], xDomain[1],bigPlotObj.allValues, 1000);
+			if (newPoints == undefined) {
+				// console.log("No more detailled points available. Please zoom out.");
+				alert("No more detailled points available. Please zoom out.");
+			} else {
+				this.options.data[0].points = newPoints;
+			}
+		} 
+		console.log(bigPlotObj);	
+		bigPlotObj.plot.on("during:draw", zoomFilter);
+		return bigPlotObj;
+			
 	} catch (err) {
 		console.log(err);
 		alert(err);
-	}
-}
-
-// this functions must be invoked by a FunctionPlot object
-// the idea is to invoke it during a zoom (e.g. plotInstance.on("during:draw",
-// zoomFilter) )
-// so that not a few necessary points must be plotted
-// zoomFilterScf refers to the !!!!STATIC!!!! values 'valuesScf' and zoomFilterDer refers to
-// 'valuesDer'
-function zoomFilterScf() {
-	var xDomain = this.options.xDomain;
-	var newPoints = filter(xDomain[0], xDomain[1], valuesScf, 1000);
-	if (newPoints == undefined) {
-		// console.log("No more detailled points available. Please zoom out.");
-		alert("No more detailled points available. Please zoom out.");
-	} else {
-		this.options.data[0].points = newPoints;
-	}
-}
-function zoomFilterDer() {
-	var xDomain = this.options.xDomain;
-	var newPoints = filter(xDomain[0], xDomain[1], valuesDer, 1000);
-	if (newPoints == undefined) {
-		// console.log("No more detailled points available. Please zoom out.");
-		alert("No more detailled points available. Please zoom out.");
-	} else {
-		this.options.data[0].points = newPoints;
-	}
-}
-function zoomFilterWav() {
-	var xDomain = this.options.xDomain;
-	var newPoints = filter(xDomain[0], xDomain[1], valuesWav, 1000);
-	if (newPoints == undefined) {
-		// console.log("No more detailled points available. Please zoom out.");
-		alert("No more detailled points available. Please zoom out.");
-	} else {
-		this.options.data[0].points = newPoints;
 	}
 }
 
@@ -131,17 +116,12 @@ function filter(leftXvalue, rightXvalue, allValues, wantedNumOfValues){
 	else{
 		endIndex=Math.ceil((rightXvalue-funcXleft)/gridDist);
 	}
-	
-	
-	
+		
 	/*Following should not happen:	
 	//if the indices are out of border
 	if(leftXindex<0){leftXindex=0;}
 	if(rightXindex>=allValues.length){rightXindex=allValues.length-1;}
 	*/
-		
-	//values in the allvalues array between right and left xValue
-
 		
 	//values in the allvalues array between right and left xValue
 	var newNumOfValues= Math.ceil((endIndex-startIndex)/step)+1;			
@@ -169,3 +149,74 @@ function filter(leftXvalue, rightXvalue, allValues, wantedNumOfValues){
 	
 	return newValues;
 }
+
+
+//following code is outdated
+
+/**
+ * builds an functionPlot object without values! (last modification: 15.7.16
+ * Simon)
+ * 
+ * @param{string} target name of the html-area where the plot object should
+ *                appear
+ * @return{functionPlot} object instance of an functionPlot object
+ */
+/*function buildPlot(target) {
+	try {
+
+		var plotInst = functionPlot({
+			target : target,
+			data : [ {
+				// uses the filter function from pointEvaluation.js
+				points : [ [ 0 ], [ 0 ] ],
+				fnType : 'points',
+				graphType : 'polyline',
+			} ]
+		});
+
+		// return the wavelet plot as object
+		return plotInst;
+
+	} catch (err) {
+		console.log(err);
+		alert(err);
+	}
+}
+
+// this functions must be invoked by a FunctionPlot object
+// the idea is to invoke it during a zoom (e.g. plotInstance.on("during:draw",
+// zoomFilter) )
+// so that not a few necessary points must be plotted
+// zoomFilterScf refers to the !!!!STATIC!!!! values 'valuesScf' and zoomFilterDer refers to
+// 'valuesDer'
+function zoomFilterScf() {
+	var xDomain = this.options.xDomain;
+	var newPoints = filter(xDomain[0], xDomain[1], valuesScf, 1000);
+	if (newPoints == undefined) {
+		// console.log("No more detailled points available. Please zoom out.");
+		alert("No more detailled points available. Please zoom out.");
+	} else {
+		this.options.data[0].points = newPoints;
+	}
+}
+function zoomFilterDer() {
+	var xDomain = this.options.xDomain;
+	var newPoints = filter(xDomain[0], xDomain[1], valuesDer, 1000);
+	if (newPoints == undefined) {
+		// console.log("No more detailled points available. Please zoom out.");
+		alert("No more detailled points available. Please zoom out.");
+	} else {
+		this.options.data[0].points = newPoints;
+	}
+}
+function zoomFilterWav() {
+	var xDomain = this.options.xDomain;
+	var newPoints = filter(xDomain[0], xDomain[1], valuesWav, 1000);
+	if (newPoints == undefined) {
+		// console.log("No more detailled points available. Please zoom out.");
+		alert("No more detailled points available. Please zoom out.");
+	} else {
+		this.options.data[0].points = newPoints;
+	}
+}*/
+
