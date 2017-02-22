@@ -16,7 +16,8 @@
 
 <!--Desing wird fuer die einzelnen Elemente extern geladen-->
 <link rel="stylesheet" href="stylePlain.css">
-<link rel="stylesheet" href="Fwavelet-plots.css">
+<!-- <link rel="stylesheet" href="Fwavelet-plots.css"> -->
+<link rel="stylesheet" href="Fsearch.css">
 <script src="js/ext_libs/sql.js"></script>
 <script src="js/ext_libs/d3.js"></script>
 <script src="js/ext_libs/function-plot.js"></script>
@@ -29,7 +30,6 @@
 <!-- vorher pointEvaluation Dateien: <script src="js/libs/pointEvaluation2.js"></script>-->
 <script src="js/libs/gauss2.js"></script>
 <script src="js/libs/dbMethods.js"></script>
-
 
 <script src="http://code.jquery.com/jquery-3.1.1.min.js"
 			  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
@@ -148,6 +148,11 @@
 						<b> Scaling-functions complying the conditions:</b>
 					</p>
 				</div>
+				<br><br>
+				<div>
+					<u1  id="search_result_list">
+					</u1>
+				</div>
 				
 				
 			</div>
@@ -164,7 +169,9 @@
 			loadWaveletDB1();
 
 			//links the Html elements to their functions. (See htmlElementFunctions.js)
-			setHtmlFunctions();
+			$(document).ready(function(){
+				setHtmlFunctions();
+			});
 		</script>
 </body>
 
