@@ -246,7 +246,7 @@ function stringToNoArray(coeffsAsString) {
  * create list with search results
  */
 
-function createResultList(parent, name_column){
+function createResultList(parent, name_column, id_column, table_name){
 	for (var i = 0; i < name_column.length; i++) {
 		var list_item = document.createElement("li");
 		list_item.classList.add('listitem');
@@ -262,17 +262,17 @@ function createResultList(parent, name_column){
 		list_item_input.value = name_column[i][0];
 		
 		// generate two hidden input fields to send multiple values via query
-//		var list_item_input_hidden = document.createElement("input");
-//		list_item_input_hidden.type = "hidden";
-//		list_item_input_hidden.name = "id";
-//		list_item_input_hidden.value = i + 1;
-//		list_item_input.appendChild(list_item_input_hidden);
+		var list_item_input_hidden = document.createElement("input");
+		list_item_input_hidden.type = "hidden";
+		list_item_input_hidden.name = "id";
+		list_item_input_hidden.value = id_column[i];
+		list_item_input.appendChild(list_item_input_hidden);
 		
-//		var list_item_input_hidden1 = document.createElement("input");
-//		list_item_input_hidden1.type = "hidden";
-//		list_item_input_hidden1.name = "table";
-//		list_item_input_hidden1.value = "OMRA";
-//		list_item_input.appendChild(list_item_input_hidden1);
+		var list_item_input_hidden1 = document.createElement("input");
+		list_item_input_hidden1.type = "hidden";
+		list_item_input_hidden1.name = "table";
+		list_item_input_hidden1.value = table_name;
+		list_item_input.appendChild(list_item_input_hidden1);
 		
 		list_item_form.appendChild(list_item_input);
 		
@@ -374,8 +374,12 @@ function search(){
 		console.log("family: Show all");
 		for (var i = 0; i < families.length; i++) {
 			var name_column = db.exec("SELECT name FROM "+families[i]);
+			var id_column = db.exec("SELECT ID FROM "+families[i]);
+			
 			name_column = name_column[0].values;
-			createResultList(result_list_dom, name_column);
+			id_column = id_column[0].values
+			createResultList(result_list_dom, name_column, id_column, 
+				families[i].substring(1, families[i].length - 1)); // cut the singe quotes out
 		}	
 	}
 	else{
@@ -392,6 +396,12 @@ function search(){
 					"\n spline_order="+spline_order+
 					"\n symmetry="+symmetry+
 					"\n type="+type)
+			
+			var id_column = db.exec("SELECT ID FROM BiMRA WHERE "+
+			"critical_Sobolev_exponent >= " + critical_sobolev_exponent + 
+			" AND critical_Hoelder_exponent >= " + critical_hoelder_exponent + 
+			" AND exactness_of_polynomial_approximation >= " + polynomial_exactness + 
+			" AND spline_order >= " + spline_order);
 					
 			var name_column = db.exec("SELECT name FROM BiMRA WHERE "+
 			"critical_Sobolev_exponent >= " + critical_sobolev_exponent + 
@@ -408,9 +418,11 @@ function search(){
 					"\n border_conditions="+border_condition+
 					"\n type="+type);
 			if(j_0 == "*"){
+				var id_column = db.exec("SELECT ID FROM BiMRAIWavelets");
 				var name_column = db.exec("SELECT name FROM BiMRAIWavelets");
 			}
 			else{
+				var id_column = db.exec("SELECT ID FROM BiMRAIWavelets WHERE j_0 = " + j_0);
 				var name_column = db.exec("SELECT name FROM BiMRAIWavelets WHERE j_0 = " + j_0);
 			}
 		}
@@ -421,30 +433,42 @@ function search(){
 			var symmetry = document.getElementById("select-symmetry").value;
 			var type = document.getElementById("select-type").value;
 			console.log("critical_sobolev_exponent="+critical_sobolev_exponent+
-					"\n critical_hoelder_exponent="+ critical_hoelder_exponent+
+					"\n critical_hoelder_exponent="+critical_hoelder_exponent+
 					"\n polynomial_exactness="+polynomial_exactness+
 					"\n symmetry="+symmetry+
 					"\n type="+type)
 			
-			var sql_string = "SELECT name FROM OMRA WHERE "+
+			var sql_id_string = "SELECT ID FROM OMRA WHERE "+
+			"critical_Sobolev_exponent >= " + critical_sobolev_exponent + 
+			" AND critical_Hoelder_exponent >= " + critical_hoelder_exponent + 
+			" AND exactness_of_polynomial_approximation >= " + polynomial_exactness;
+			
+			var sql_name_string = "SELECT name FROM OMRA WHERE "+
 			"critical_Sobolev_exponent >= " + critical_sobolev_exponent + 
 			" AND critical_Hoelder_exponent >= " + critical_hoelder_exponent + 
 			" AND exactness_of_polynomial_approximation >= " + polynomial_exactness;
 			if(type != "*"){
-				sql_string += " AND type = '"+ type +"'";
+				sql_name_string += " AND type = '"+ type +"'";
+				sql_id_string += " AND type = '"+ type +"'";
 			}
 			if(symmetry != "*"){
-				sql_string += " AND symmetry = '"+ symmetry +"'";
+				sql_name_string += " AND symmetry = '"+ symmetry +"'";
+				sql_id_string += " AND symmetry = '"+ symmetry +"'";
 			}
-			var name_column = db.exec(sql_string);		
+			var id_column = db.exec(sql_id_string);
+			var name_column = db.exec(sql_name_string);
 		}
 		
 		if(name_column.length == 0){
 			console.log("no matching results.");
+			var no_result_text_node = document.createTextNode("No matching results.");
+			result_list_dom.appendChild(no_result_text_node);
 		}
 		else{
 			name_column = name_column[0].values;
-			createResultList(result_list_dom, name_column);	
+			id_column = id_column[0].values;
+			createResultList(result_list_dom, name_column, id_column, 
+					family.substring(1, family.length - 1)); // cut the singe quotes out	
 		}
 	}
 }
