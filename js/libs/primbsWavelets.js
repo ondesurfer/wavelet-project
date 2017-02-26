@@ -50,11 +50,128 @@
 	}
 	
 	
+/////////////////////////////////////////////
+//// primal wavelet /////////////////////////
+/////////////////////////////////////////////
+	function evaluateSIWaveletInX(j,k,scf,Mj1,x){
+		var PsiInX=0;
+		
+		if(scf.length!=Mj1.length){
+			console.log("scf-length",scf.length,"Mj1-length",Mj1.length);
+			console.log("Matrix-vector dimension does not fit.");
+			return null;
+		}
+		for(var i=0; i<scf.length; i++){
+			PsiInX=PsiInX + Mj1[i][k]*scf[i].eval(x); 
+		}
+		return PsiInX;
+	}
+	
+	/**calculates the values of a primal Primbs Wavelet without border conditions
+	 *  (last modification 26.2.2017)
+	 *	@param{int} j0 smallest j which is possible
+	 *  @param{int} j level of wavelet
+ 	 *  @param{int} d order of B-splines used for scf
+	 * 	@param{int} k number of wavelet (started at 0, counted from left to right)
+	 *  @param{dTilde} dTilde dual-order
+	 * 
+	 * 	@return{double[][]} values calculated values
+	 * 
+	 */	
+	function valuesOfPrimalPrimbsWav(j0,j,d,dTilde,Mj1,k){
+		//console.log("starte funktion valuesOfPrimalPrimbsWav mit:");
+		//console.log("j0=",j0,"j",j,"d",d,"dTilde",dTilde,"k",k);
+		
+		var scf=buildPrimalPrimbsScf(j+1,d); 
+		console.log("Hier in values OfPrimalPrimbsWav gilt j0=",j0,"j=",j,"d=",d,"dTilde=",dTilde,"k=",k);
+		var Mj1b = extendMj1(j,d,dTilde,Mj1,j0);	
+		
+		var params1 = [j,k,scf,Mj1b];
+		var values1 = evaluateFunctionInGrid(evaluateSIWaveletInX,params1,0,1,1000);
+		return values1;
+		
+	}
+	
+/** extendes the Mj1 Matrix of Primbs wavelets without border conditions
+ *  (last modification: 24.2.17 Simon)
+ * 
+ *   @param{int} j wanted level of wavelets
+ *   @param{int} d order of B-splines used for scf
+ *   @param{int} dTilde dual order
+ * 	@param{double[][]} Mj1 original matrix Mj1
+ *  @param{int} j0 smallest possible level for this wavelt
+ * 
+ *   @return{double[][]} Mj1New extended Mj1-matrix
+ */
+	function extendMj1(j,d,dTilde,Mj1,j0){
+		var linesOld = Math.pow(2,j0+1)+d-1;
+		var columnsOld = Math.pow(2,j0);
+		
+		if(Mj1.length!=linesOld||Mj1[0].length!=columnsOld){
+			console.log("wrong matrix dimensions");
+			return undefined;
+		}
+		if(j0>j){
+			console.log("j cannot be smaller than j0!");
+			return undefined;
+		}
+		
+		var linesNew = Math.pow(2,j+1)+d-1;
+		var columnsNew = Math.pow(2,j);
+		
+		var Mj1New= createArray(linesNew,columnsNew);
+		
+		var Mj1Left= numeric.getBlock(Mj1,[0,0],[linesOld-1,columnsOld/2-1]);
+		var Mj1Right = numeric.getBlock(Mj1,[0,columnsOld/2],[linesOld-1,columnsOld-1]);
+		
+		setBlock(Mj1New, Mj1Left, 0, 0);
+		setBlock(Mj1New, Mj1Right, linesNew-linesOld, columnsNew-columnsOld/2);
+		
+		var leftColumn = numeric.getBlock(Mj1,[0,columnsOld/2-1],[linesOld-1,columnsOld/2-1]);
+		var rightColumn = numeric.getBlock(Mj1,[0,columnsOld/2],[linesOld-1,columnsOld/2]);
+
+		// insert column of left part into left part of new Matrix
+		for(var k=0; k<(Math.pow(2,j)-Math.pow(2,j0))/2; k++){
+			setBlock(Mj1New,leftColumn,2*(k+1),columnsOld/2+k);
+		}
+		// insert column of right part into right part of new Matrix
+		for(var k=(Math.pow(2,j)-Math.pow(2,j0))/2; k<(Math.pow(2,j)-Math.pow(2,j0)); k++){
+			setBlock(Mj1New,rightColumn,2*(k),columnsOld/2+k);
+		}
+		
+		//fill up rest with zeros:
+		for(var l=0; l<linesNew; l++){
+			for(var k=0; k<columnsNew; k++){
+				if(Mj1New[l][k]==undefined){
+					Mj1New[l][k]=0;
+				}
+			}
+		}
+		
+		//printMatrix("Mj1New",Mj1New);
+		return Mj1New;		
+	}
 	
 	
 	
 	
-	
+	// test of a general evaluation in grid function
+	/*  Evaluate a function on grid points specified by [start, end, count]
+		(last modification: 17.10.16 Andreas)
+	*/
+	function evaluateFunctionInGrid(funct,params,start,end,count){
+		var x = makeGrid(start,end,count);
+		var points = new Array(x.length);
+		
+		var params2 = deepCopyVector(params);
+		params2.push(0); 
+		
+		for(var i=0; i< x.length; i++){
+			params2[params2.length -1 ] = x[i];
+			points[i]=[x[i], funct.apply(this, params2)];
+		}
+		return points;
+	}
 	
 	
 	
