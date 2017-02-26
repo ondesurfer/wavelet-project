@@ -66,7 +66,7 @@ function setHtmlFunctions() {
 		var list_item_input_hidden1 = document.createElement("input");
 		list_item_input_hidden1.type = "hidden";
 		list_item_input_hidden1.name = "table";
-		list_item_input_hidden1.value = "OMRA";
+		list_item_input_hidden1.value = family;
 		list_item_input.appendChild(list_item_input_hidden1);
 		
 		list_item_form.appendChild(list_item_input);

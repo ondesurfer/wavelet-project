@@ -8,12 +8,12 @@
 
 function setHtmlFunctions() {
 	//load given Data from page before. (Ftemplate2)
-	//var id = getQueryVariable("id");
-	//var table = getQueryVariable("table");
+	var id = getQueryVariable("id");
+	var table = getQueryVariable("table");
 	
 	//to test:
-	var id = 5;
-	var table = "BiMRA";
+	//var id = 6;
+	//var table = "BiMRAIWavelets";
 	
 	/////////////////////////////////////////
 	//  1. Abschnitt (Name) /////////////////
@@ -42,7 +42,7 @@ function setHtmlFunctions() {
 				
 	}
 	if(table=="BiMRAIWavelets"){
-		var d= db.exec("SELECT d FROM " + table + " WHERE id = " + id)[0].values[0][0];
+		var d = getParameter(JSON.parse(db.exec("SELECT parameters FROM " + table + " WHERE id = " + id)[0].values[0][0]),"d");
 		$("#slider1").change(function(){
 			sliderChangeBiMRAI(d);
 		});
@@ -117,6 +117,7 @@ function setHtmlFunctions() {
 	///////////////////////////////////////////
 	$('#select-dual-scfs').change(function(){
 		if(table=="OMRA"||table=="BiMRA"){
+			//haben wir die mask nicht schon von vorher?
 				var mask = JSON.parse(db.exec("SELECT mask FROM " + table + " WHERE id = " + id)[0].values[0][0]);
 				var a_start = db.exec("SELECT a_start FROM " + table + " WHERE id = " + id)[0].values[0][0];
 				var dualMask;
@@ -145,11 +146,37 @@ function setHtmlFunctions() {
 				});
 				$("#slider6").change();
 			}
+			
+			if(table=="BiMRAIWavelets"){
+				
+				var Mj1 = JSON.parse(db.exec("SELECT Mj1 FROM " + table + " WHERE id = " + id)[0].values[0][0]);
+				var j0 = JSON.parse(db.exec("SELECT j_0 FROM " + table + " WHERE id = " + id)[0].values[0][0]);
+				var param = JSON.parse(db.exec("SELECT parameters FROM " + table + " WHERE id = " + id)[0].values[0][0]);
+				var d = getParameter(param,"d");
+				var dTilde = getParameter(param,"d_tilde");
+					
+				
+				$('#slider5').prop({
+					'min': j0,
+            		'max': j0+2,
+     		   });
+				
+				$("#slider5").change(function(){
+					sliderChangeBiMRAIWav(d,dTilde,Mj1,j0);
+				});
+				$("#slider6").change(function(){
+					console.log("d",d,"Mj1",Mj1,"j0",j0);
+					sliderChangeBiMRAIWav(d,dTilde,Mj1,j0);
+				});
+				$("#slider6").change();
+				
+			}
 		});
 		
 		$('#select-dual-scfs').change();
 	
 }
+
 
 // generates an string containing all information given in one database line
 // input: scf - object containing line and columns of the choosen funktion in Database
@@ -205,6 +232,20 @@ function sliderChangeBiMRAI(d){
 	plot1.drawValues(valuesScf);
 }
 
-function plotWavelet(){
+function sliderChangeBiMRAIWav(d,dTilde,Mj1,j0){
+	var j=$("#slider5").val();
+	$('#slider6').prop({
+					'min': 0,
+            		'max': Math.pow(2,j)-1,
+     		   });
 	
+	var k=$("#slider6").val();
+	$("#levelOfSlider5").text("j="+j);
+	$("#levelOfSlider6").text("k="+k); //irgendwie wird hier k zu string umgewandelt, deswegen wandeln wir es gleich zurueck
+	
+	
+	console.log("j0",j0,"j",j,"dTilde",dTilde,"d",d,"Mj1",Mj1,"k",k);
+
+	var valuesNew=valuesOfPrimalPrimbsWav(j0,parseInt(j),d,dTilde,Mj1,parseInt(k));
+	plot3.drawValues(valuesNew); 
 }

@@ -169,27 +169,19 @@ function getQueryVariable(variable) {
     console.log('Query variable %s not found', variable);
 }
 
-/**
- *	Get a list of all differing column-entries of a table in the db.
- *
- *	@param{string} colname.
- *  @param{string} tablename.
- *
- *  @return{Array} entries.
- *  
- *  (last modification: 15.2.17 Andreas)
-*/
-function getDifferingColEntries(colname, tablename){
-	var entries = [];
-	var column = db.exec("SELECT "+colname+" FROM "+ tablename)[0].values;
-	var entry_tmp = "";
-	
-	for (var i = 0; i < column.length; i++) {
-		if(entry_tmp != column[i][0]){
-			entries.push(column[i][0]);
-			entry_tmp = column[i][0];
+/** to extract information from the database entry 'parameters'
+ * 
+ * @param {Object} array  Array containing the information.
+ * @param {Object} name  name of the searched entry
+ * 
+ * @return{Object} array[x] value of the searched parameter.
+ */
+function getParameter(array,name){
+	for(var j=0; j<array.length-1; j+=2){
+		if(name==array[j]){
+			return array[j+1];
 		}
 	}
-	
-	return entries
+	console.log("Error: parameters do not contain " + name);
+	return undefined;
 }
