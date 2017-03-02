@@ -181,7 +181,7 @@ function coeffsToMatrix2(akk, mu) {
  * 
  * @return{undefined}
  */
-function printMatrix(Mat) {
+function printMatrix1(Mat) {
 	for ( z = 0; z < Mat.length; z++) {
 		var asString = new String(" ");
 		//attach all numbers of a row to one string
@@ -190,6 +190,36 @@ function printMatrix(Mat) {
 		}
 		//return the string together with a blank
 		console.log(asString);
+		console.log(" ");
+	}
+}
+
+/** Display a 2dim mxn array on the console.
+ * (last modification: 24.2.17 Simon)
+ * 
+ * @param{Array} Mat matrix to be displayed.
+ * 
+ * @return{undefined}
+ */
+function printMatrix(text,Mat) {
+	console.log(text);
+	var digit = 3; // usually as input
+	for (var z = 0; z < Mat.length; z++) {
+		var lineAsString = new String(" ");
+		//attach all numbers of a row to one string
+		for (var s = 0; s < Mat[0].length; s++) {
+			var str = (Math.round(Mat[z][s]*Math.pow(10,digit))/Math.pow(10,digit)).toString();
+			//var str = num2.toString();
+			
+			var space=" ";
+			for(var j=0; j<digit+4-str.length; j++){
+				space=space+" ";
+			}
+			
+			lineAsString = lineAsString + space + str;
+		}
+		//return the string together with a blank
+		console.log(lineAsString);
 		console.log(" ");
 	}
 }

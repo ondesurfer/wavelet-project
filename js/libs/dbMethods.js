@@ -185,3 +185,28 @@ function getParameter(array,name){
 	console.log("Error: parameters do not contain " + name);
 	return undefined;
 }
+
+/**
+*	Get a list of all differing column-entries of a table in the db.
+ *
+ *	@param{string} colname.
+ *  @param{string} tablename.
+ *
+ *  @return{Array} entries.
+ *  
+ *  (last modification: 15.2.17 Andreas)
+*/
+function getDifferingColEntries(colname, tablename){
+	var entries = [];
+	var column = db.exec("SELECT "+colname+" FROM "+ tablename)[0].values;
+	var entry_tmp = "";
+	
+	for (var i = 0; i < column.length; i++) {
+		if(entry_tmp != column[i][0]){
+			entries.push(column[i][0]);
+			entry_tmp = column[i][0];
+		}
+	}
+	
+	return entries;
+} 
