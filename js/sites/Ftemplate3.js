@@ -8,12 +8,12 @@
 
 function setHtmlFunctions() {
 	//load given Data from page before. (Ftemplate2)
-	var id = getQueryVariable("id");
-	var table = getQueryVariable("table");
+	//var id = getQueryVariable("id");
+	//var table = getQueryVariable("table");
 	
 	//to test:
-	//var id = 6;
-	//var table = "BiMRAIWavelets";
+	var id = 7;
+	var table = "BiMRAIWavelets";
 	
 	/////////////////////////////////////////
 	//  1. Abschnitt (Name) /////////////////
@@ -87,6 +87,18 @@ function setHtmlFunctions() {
 			}));
 		}		
 	}
+	else if(table=="BiMRAIWavelets"){
+		var d = getParameter(JSON.parse(db.exec("SELECT parameters FROM " + table + " WHERE id = " + id)[0].values[0][0]),"d");
+		var dTilde = getParameter(JSON.parse(db.exec("SELECT parameters FROM " + table + " WHERE id = " + id)[0].values[0][0]),"d_tilde");
+		$("#slider3").change(function(){
+			sliderChangeScfBiMRAI(d,dTilde);
+		});
+		
+		$("#slider4").change(function(){
+			sliderChangeScfBiMRAI(d,dTilde);
+		});
+		$("#slider4").change();
+	}
 	else{
 		$(dscf).hide();
 	}
@@ -149,7 +161,7 @@ function setHtmlFunctions() {
 			
 			if(table=="BiMRAIWavelets"){
 				
-				var Mj1 = JSON.parse(db.exec("SELECT Mj1 FROM " + table + " WHERE id = " + id)[0].values[0][0]);
+				var Mj1 = JSON.parse(db.exec("SELECT M_j1 FROM " + table + " WHERE id = " + id)[0].values[0][0]);
 				var j0 = JSON.parse(db.exec("SELECT j_0 FROM " + table + " WHERE id = " + id)[0].values[0][0]);
 				var param = JSON.parse(db.exec("SELECT parameters FROM " + table + " WHERE id = " + id)[0].values[0][0]);
 				var d = getParameter(param,"d");
@@ -194,6 +206,8 @@ function generateInfoString(table,scf) {
 
 //is invoked if one of the sliders of scf is changed
 function sliderChangeOMRA(plot,valuesOld,mode){
+	var j;
+	var k;
 	if(mode==1){
 		j=$("#slider1").val();
 		k=$("#slider2").val();
@@ -230,6 +244,24 @@ function sliderChangeBiMRAI(d){
 	
 	var valuesScf = valuesOfPrimalPrimbsScf(j,d,k);
 	plot1.drawValues(valuesScf);
+}
+
+function sliderChangeScfBiMRAI(d,dTilde){
+	var j= $("#slider3").val();
+	//fit maximum of slider to number of scaling functions
+	$('#slider4').prop({
+			'min': 0,
+            'max': Math.pow(2,j)+d-2,
+        });
+	var k= $("#slider4").val();
+	
+	$("#levelOfSlider3").text("j="+j);
+	$("#levelOfSlider4").text("k="+k);
+	
+	console.log("j",j,"d",d,"dTilde",dTilde,"k",k);
+	var valuesDscf = valuesOfDualPrimbsScf(d,dTilde,j,parseInt(k));
+	console.log("valuesDscf",valuesDscf);
+	plot2.drawValues(valuesDscf);
 }
 
 function sliderChangeBiMRAIWav(d,dTilde,Mj1,j0){
