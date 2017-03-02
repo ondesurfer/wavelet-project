@@ -8,12 +8,12 @@
 
 function setHtmlFunctions() {
 	//load given Data from page before. (Ftemplate2)
-	//var id = getQueryVariable("id");
-	//var table = getQueryVariable("table");
+	var id = getQueryVariable("id");
+	var table = getQueryVariable("table");
 	
 	//to test:
-	var id = 7;
-	var table = "BiMRAIWavelets";
+	//var id = 7;
+	//var table = "BiMRAIWavelets";
 	
 	/////////////////////////////////////////
 	//  1. Abschnitt (Name) /////////////////
@@ -68,6 +68,8 @@ function setHtmlFunctions() {
 	// 4. Abschnitt (duale scf) ///////////////
 	///////////////////////////////////////////
 	
+	
+	
 	if(table=="BiMRA"){
 		var dualIds = JSON.parse(db.exec("SELECT ID_of_dual_function FROM " + table + " WHERE id = " + id)[0].values[0][0]);
 		
@@ -98,9 +100,10 @@ function setHtmlFunctions() {
 			sliderChangeScfBiMRAI(d,dTilde);
 		});
 		$("#slider4").change();
+		$("#dscfList").hide();
 	}
 	else{
-		$(dscf).hide();
+		$("#dscf").hide();
 	}
 	
 	
