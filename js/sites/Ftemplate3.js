@@ -7,6 +7,16 @@
  */
 
 function setHtmlFunctions() {
+	
+	//build the first plot object into 'plot-scf' area
+	plot1 = buildPlot('#plot-scf');
+
+	//build the second plot object into 'plot-derivative' area
+	plot2 = buildPlot('#plot-dscf');
+
+	//build the third plot object into 'plot-wavelet' area
+	plot3 = buildPlot('#plot-wavelet');
+	
 	//load given Data from page before. (Ftemplate2)
 	var id = getQueryVariable("id");
 	var table = getQueryVariable("table");
@@ -189,7 +199,6 @@ function setHtmlFunctions() {
 		});
 		
 		$('#select-dual-scfs').change();
-	
 }
 
 

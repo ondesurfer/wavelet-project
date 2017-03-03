@@ -21,8 +21,8 @@
 <script src="js/ext_libs/function-plot.js"></script>
 <script src="js/ext_libs/numeric-1.2.6.js"></script>
 <script src="http://code.jquery.com/jquery-3.1.1.min.js"
-			  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-			  crossorigin="anonymous"></script>
+	integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+	crossorigin="anonymous"></script>
 
 <script src="js/libs/math2.js"></script>
 <script src="js/libs/mask.js"></script>
@@ -65,83 +65,110 @@
 		<div id="content">
 			<div id="middle">
 				<!-- 1.Abschnitt (Name) -->
-				<div id="name"> Name
-					<div id ="function_name"></div>
+				<div id="name">
+					<div id="function_name"></div>
 				</div>
-				
+
 				<!-- 2.Abschnitt (Skalierungsfunktion(-en)) -->
 				<div id="scf">
 					<p>
 						<b>Plot of the choosen scaling function(s):</b>
 					</p>
 					<div id="plot-scf"></div>
-					<div id="Slider1Div"> 
-						<p> Level j: </p>
-						<input id="slider1" type="range" min="0" max="5" value="0" step="1" />
-						<div id="levelOfSlider1"></div>
-					</div>
-					<div id="Slider2Div"> 
-						<p> Number of Scf k: </p>
-						<input id="slider2" type="range" min="-10" max="10" value="0" step="1" />
-						<div id="levelOfSlider2"></div>
-					</div>
+					<table class="slider-table1" style="width: 100%">
+						<tr>
+							<td>
+								<div id="Slider1Div">
+									<p>Level j:</p>
+									<input id="slider1" type="range" min="0" max="5" value="0"
+										step="1" />
+									<div id="levelOfSlider1"></div>
+								</div>
+							</td>
+
+							<td>
+								<div id="Slider2Div">
+									<p>Number of Scf k:</p>
+									<input id="slider2" type="range" min="-10" max="10" value="0"
+										step="1" />
+									<div id="levelOfSlider2"></div>
+								</div>
+							</td>
+						</tr>
+					</table>
 				</div>
-				
+
 				<!-- 3.Abschnitt (Database-Information) -->
 				<div id="data-info">
 					<p>
 						<b>Infomation about the function:</b>
 					</p>
 					<div>
-						<textarea id="info" readonly rows="10" cols="50"> </textarea>
+						<textarea id="info" readonly rows="15" cols="50"> </textarea>
 					</div>
-						Reference: <a href="" id="link-reference"></a>
+					Reference: <a href="" id="link-reference"></a>
 				</div>
-				
-				
+
+
 				<!-- 4.Abschnitt (Duale Skalierungsfunktion (en)) -->
 				<div id="dscf">
 					<div id="dscfList">
 						<p>
 							<b> Possible dual scaling-functions:</b>
 						</p>
-						
-					
 						<select id="select-dual-scfs">
 						</select>
 					</div>
-					
-						<b>Plot of the choosen dual scaling function(s):</b>
-					
+
+					<b>Plot of the choosen dual scaling function(s):</b>
+
 					<div id="plot-dscf"></div>
-					<div id="dScfSlider1Div"> 
-						<p> Level j: </p>
-						<input id="slider3" type="range" min="0" max="5" value="0" step="1" />
-						<div id="levelOfSlider3"></div>
-					</div>
-					<div id="dDcfSlider2Div"> 
-						<p> Number of Scf k: </p>
-						<input id="slider4" type="range" min="-10" max="10" value="0" step="1" />
-						<div id="levelOfSlider4"></div>
-					</div>
-						
+					<table class="slider-table1" style="width: 100%">
+						<tr>
+							<td>
+								<div id="dScfSlider1Div">
+									<p>Level j:</p>
+									<input id="slider3" type="range" min="0" max="5" value="0"
+										step="1" />
+									<div id="levelOfSlider3"></div>
+								</div>
+							</td>
+							<td>
+								<div id="dDcfSlider2Div">
+									<p>Number of Scf k:</p>
+									<input id="slider4" type="range" min="-10" max="10" value="0"
+										step="1" />
+									<div id="levelOfSlider4"></div>
+								</div>
+							</td>
+						</tr>
+					</table>
 				</div>
 
-				
 				<!-- 5.Abschnitt  (Wavelet) -->
 				<div id="wavelet">
 					<b>Plot of wavelet:</b>
 					<div id="plot-wavelet"></div>
-					<div id="WavSlider1Div"> 
-						<p> Level j: </p>
-						<input id="slider5" type="range" min="0" max="5" value="0" step="1" />
-						<div id="levelOfSlider5"></div>
-					</div>
-					<div id="WavSlider2Div"> 
-						<p> Number of Scf k: </p>
-						<input id="slider6" type="range" min="0" max="10" value="0" step="1" />
-						<div id="levelOfSlider6"></div>
-					</div>
+					<table class="slider-table1" style="width: 100%">
+						<tr>
+							<td>
+								<div id="WavSlider1Div">
+									<p>Level j:</p>
+									<input id="slider5" type="range" min="0" max="5" value="0"
+										step="1" />
+									<div id="levelOfSlider5"></div>
+								</div>
+							</td>
+							<td>
+								<div id="WavSlider2Div">
+									<p>Number of Scf k:</p>
+									<input id="slider6" type="range" min="0" max="10" value="0"
+										step="1" />
+									<div id="levelOfSlider6"></div>
+								</div>
+							</td>
+						</tr>
+					</table>
 				</div>
 			</div>
 
@@ -151,26 +178,9 @@
 		</div>
 
 		<script>
-
-			
 			//loads the database. (See dbMethods.js)
-			loadWaveletDB1();
-
-			//build the first plot object into 'plot-scf' area
-			plot1 = buildPlot('#plot-scf');
-
-			//build the second plot object into 'plot-derivative' area
-			plot2 = buildPlot('#plot-dscf');
-
-			//build the third plot object into 'plot-wavelet' area
-			plot3 = buildPlot('#plot-wavelet');
-			
-			//links the Html elements to their functions. (See FTamplate3.js)
-			$(document).ready(function(){
-				setHtmlFunctions();
-			});
-
-
+			//and sets up the html-functionalities
+			loadWaveletDB2();
 		</script>
 </body>
 

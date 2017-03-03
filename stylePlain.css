@@ -69,6 +69,13 @@ footer {
 	
 }
 
+svg.function-plot {
+	border-style: solid;
+    border-color: red;
+    /* background-color: #E6E6FF; */
+    /*background-color: #ccffff;*/
+}
+
 /*setting of distinct elements*/
 #content {
 	width: 760px;
@@ -155,4 +162,9 @@ footer {
 
 #form-scf {
 	float: left;
+}
+
+#name{
+	font-size: 20pt;
+	font-weight:bold;
 }
