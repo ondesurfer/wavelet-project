@@ -370,6 +370,7 @@
  
 	function m_LTilde(d,dTilde){
 		
+		//for d=2 there are no border-functions which need the refinement matrix
 		if(d==3 && dTilde==5){
 			return [[0,0,0,0,0,0],[7,0.0625,0,0,0,0],[-1,0.1875,0.125,0,0,0],[0.166666667,0.125,0.4375,0.25,0,0],[0,-0.0625,0.4375,1,0.5,0],[0,-0.0234375,0,1.3125,2.25,1],[0,0.05859375,-0.14453125,0.58203125,1.73046875,1.01953125],[0,-0.01953125,-0.00390625,0.00390625,1.30859375,0.94140625],[0,0,0.05859375,-0.203125,0.78515625,0.9453125],[0,0,-0.01953125,0.015625,-0.01171875,1.3203125],[0,0,0,0.05859375,-0.26171875,1.046875],[0,0,0,-0.01953125,0.03515625,-0.046875],[0,0,0,0,0.05859375,-0.3203125],[0,0,0,0,-0.01953125,0.0546875],[0,0,0,0,0,0.05859375],[0,0,0,0,0,-0.01953125]];
 		}
@@ -421,32 +422,37 @@
  *   @return{double[][]} points points of the function as [[x0,f(x0)],[x1,f(y1)],...]
  */
 	function valuesOfDualPrimbsScf(d,dTilde,j,k){
-		console.log("d,dTilde",d,dTilde);
-		var grid = makeGrid(0,8,1024);
+		
 		//fuer die ganz linken Skalierungsfunktionen:
 		if(k<d-2){
+			var grid = makeGrid(0,(d+dTilde)/2+k,2048); //see Satz 4.12
 			console.log("links links k=",k);
 			var dscfI=buildLeftDualPrimbsScfII(d,dTilde);
-			return evaluateObjectInGrid(dscfI[k],grid);
+			var values=evaluateObjectInGrid(dscfI[k],grid);
+			var valuesNew = deliAndTrans(j,0,values);
+			//console.log("valuesNew",valuesNew);
+			return valuesNew;
 		}
 		//fuer die linken Skalierungsfunktionen neben der Mitte
 		if(k<d+dTilde-2){
 			console.log("links k=",k);
-			//var dscfII=buildLeftDualPrimbsScfI(d,dTilde);
-			return valuesOfLeftDualPrimbsScfI(d, dTilde,k+1);
+			return deliAndTrans(j,0,valuesOfLeftDualPrimbsScfI(d, dTilde,k+1));
 		}
 		//fuer die mittleren Skalierungsfunktionen
 		if(k < Math.pow(2,j)-dTilde+1 ){
 			return valuesOfMiddleDualPrimbsScf(d,dTilde,k-d-dTilde+2,j);
 		}
 		if(k < Math.pow(2,j)+1){
-			console.log("rechts k=",k);
-			return mirrorValues((valuesOfLeftDualPrimbsScfI(d, dTilde,Math.pow(2,j)+d-1-k)));
+			var values = deliAndTrans(j,0,valuesOfLeftDualPrimbsScfI(d, dTilde,Math.pow(2,j)+d-1-k));
+			return mirrorValues(values);
 		}
 		if(k < Math.pow(2,j)+d-1) {
 			console.log("rechts-rechts k=", k);
+			var grid = makeGrid(0,(d+dTilde)/2+(Math.pow(2,j)+d-3)-k,2048); //see Satz 4.12
 			var dscf5=buildLeftDualPrimbsScfII(d,dTilde);
-			return mirrorValues(evaluateObjectInGrid(dscf5[Math.pow(2,j)+d-2-k],grid));
+			var values = evaluateObjectInGrid(dscf5[Math.pow(2,j)+d-2-k],grid);
+			var valuesNew = deliAndTrans(j,0,values); 
+			return mirrorValues(valuesNew);
 		}
 		else{
 			console.log("k=",k ," ist ungueltig");

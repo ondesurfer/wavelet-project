@@ -54,11 +54,11 @@ function setHtmlFunctions() {
 	if(table=="BiMRAIWavelets"){
 		var d = getParameter(JSON.parse(db.exec("SELECT parameters FROM " + table + " WHERE id = " + id)[0].values[0][0]),"d");
 		$("#slider1").change(function(){
-			sliderChangeBiMRAI(d);
+			sliderChangeScfBiMRAI(d);
 		});
 		
 		$("#slider2").change(function(){
-			sliderChangeBiMRAI(d);
+			sliderChangeScfBiMRAI(d);
 		});
 	}
 	
@@ -74,11 +74,25 @@ function setHtmlFunctions() {
 	var str = generateInfoString(table,scf);
 	$(info).val(str);
 	
+	var link = db.exec("SELECT DOI FROM " + table + " WHERE id = " + id)[0].values[0][0];
+	console.log("link",link);
+	
+	//if link is an DOI
+	if(link.startsWith("10")){
+		$(linkReference).prop("href", "http://www.dx.doi.org/"+link);
+		$(linkReference).text(link);
+	}
+	//if link is an link
+	else{
+		$(linkReference).prop("href",link);
+		$(linkReference).text(link);
+	}
+	
+	
+	
 	///////////////////////////////////////////
 	// 4. Abschnitt (duale scf) ///////////////
 	///////////////////////////////////////////
-	
-	
 	
 	if(table=="BiMRA"){
 		var dualIds = JSON.parse(db.exec("SELECT ID_of_dual_function FROM " + table + " WHERE id = " + id)[0].values[0][0]);
@@ -103,11 +117,11 @@ function setHtmlFunctions() {
 		var d = getParameter(JSON.parse(db.exec("SELECT parameters FROM " + table + " WHERE id = " + id)[0].values[0][0]),"d");
 		var dTilde = getParameter(JSON.parse(db.exec("SELECT parameters FROM " + table + " WHERE id = " + id)[0].values[0][0]),"d_tilde");
 		$("#slider3").change(function(){
-			sliderChangeScfBiMRAI(d,dTilde);
+			sliderChangeDScfBiMRAI(d,dTilde);
 		});
 		
 		$("#slider4").change(function(){
-			sliderChangeScfBiMRAI(d,dTilde);
+			sliderChangeDScfBiMRAI(d,dTilde);
 		});
 		$("#slider4").change();
 		$("#dscfList").hide();
@@ -238,11 +252,11 @@ function sliderChangeOMRA(plot,valuesOld,mode){
 		$("#levelOfSlider5").text("j="+j);
 		$("#levelOfSlider6").text("k="+k); //irgendwie wird hier k zu string umgewandelt
 	}
-	var valuesNew=deliAndTrans(j,parseInt(k),valuesOld); 
+	var valuesNew=deliAndTrans(j,Math.pow(2,-j)*parseInt(k),valuesOld); 
 	plot.drawValues(valuesNew);
 }
 
-function sliderChangeBiMRAI(d){
+function sliderChangeScfBiMRAI(d){
 	var j= $("#slider1").val();
 	//fit maximum of slider to number of scaling functions
 	$('#slider2').prop({
@@ -258,14 +272,14 @@ function sliderChangeBiMRAI(d){
 	plot1.drawValues(valuesScf);
 }
 
-function sliderChangeScfBiMRAI(d,dTilde){
-	var j= $("#slider3").val();
+function sliderChangeDScfBiMRAI(d,dTilde){
+	var j= parseInt($("#slider3").val());
 	//fit maximum of slider to number of scaling functions
 	$('#slider4').prop({
 			'min': 0,
             'max': Math.pow(2,j)+d-2,
         });
-	var k= $("#slider4").val();
+	var k= parseInt($("#slider4").val());
 	
 	$("#levelOfSlider3").text("j="+j);
 	$("#levelOfSlider4").text("k="+k);
