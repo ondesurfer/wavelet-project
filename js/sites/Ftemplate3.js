@@ -10,7 +10,8 @@ function setHtmlFunctions() {
 	
 	//build the first plot object into 'plot-scf' area
 	plot1 = buildPlot('#plot-scf');
-
+	//plot1.plot.options.xDomain[0] = -100;
+	
 	//build the second plot object into 'plot-derivative' area
 	plot2 = buildPlot('#plot-dscf');
 
@@ -18,18 +19,25 @@ function setHtmlFunctions() {
 	plot3 = buildPlot('#plot-wavelet');
 	
 	//load given Data from page before. (Ftemplate2)
-	var id = getQueryVariable("id");
-	var table = getQueryVariable("table");
+	//var id = getQueryVariable("id");
+	//var table = getQueryVariable("table");
 	
 	//to test:
-	//var id = 7;
-	//var table = "BiMRAIWavelets";
+	var id = 7;
+	var table = "BiMRAIWavelets";
 	
 	/////////////////////////////////////////
 	//  1. Abschnitt (Name) /////////////////
 	/////////////////////////////////////////
 	var funct_name = db.exec("SELECT name FROM " + table + " WHERE id = " + id)[0];
+	var funct_type = db.exec("SELECT type FROM " + table + " WHERE id = " + id)[0];
 	$("#function_name").text(funct_name.values[0][0]);
+	
+	$("#top-line").prop("href", "Ftemplate2.html?family="+table);
+	$("#top-line").text(table);
+	
+	//$("#top-line1").prop("href", "Ftemplate2.html?family="+table);
+	$("#top-line1").text(funct_type.values[0][0]);
 	
 	
 	///////////////////////////////////////////
@@ -213,6 +221,9 @@ function setHtmlFunctions() {
 		});
 		
 		$('#select-dual-scfs').change();
+		//plot1.plot.draw();
+		console.log(plot1.plot);
+		//plot1.plot.xAxis = {domain: [-100, 100]};
 }
 
 

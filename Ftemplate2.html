@@ -45,15 +45,17 @@
 		<div id="content">
 			<div id="left-side-bar">
 				<p>
-					<b>Der linke Teil des Ganzen</b>
+					<b><!-- Der linke Teil des Ganzen --></b>
 				</p>
 			</div>
 			<div id="right-side-bar">
 				<p>
-					<b>Der rechte Teil des Ganzen</b>
+					<b><!-- Der rechte Teil des Ganzen --></b>
 				</p>
 			</div>
 			<div id="middle">
+				Family: <text id="top-line"></text>
+				<br><br>
 				Function Types	
 				<br><br>
 				<div id="type_list">
@@ -66,7 +68,7 @@
 	<script>
 		//loads the database. (See dbMethods.js)
 		//and sets up the html-functionalities
-		loadWaveletDB2();
+		$( document ).ready(loadWaveletDB2);
 	</script>
 	
 </body>

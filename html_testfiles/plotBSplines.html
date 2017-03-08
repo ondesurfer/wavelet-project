@@ -22,7 +22,7 @@ test-File
 <script src="../js/libs/pointEvaluation.js"></script>
 <script src="../js/libs/gauss2.js"></script>
 <!-- load http://maurizzzio.github.io/function-plot/ -->
-<script src="../js/ext_libs/function-plot.js"></script>
+<script src="../js/ext_libs/function-plot-1-17-3.js"></script>
 <script src="../js/ext_libs/numeric-1.2.6.js"></script>
 
 <body>
@@ -228,10 +228,14 @@ test-File
 		try{ 
 			plotInst = functionPlot({
 			target : target,
+			yAxis: {domain: [-1, 1]},
+  			xAxis: {domain: [8, 24]},
 			data : [{
-				points : values,
-				fnType : 'points',
-				graphType : 'polyline',
+				//points : values,
+				fn:'x^2',
+				//fnType : 'points',
+				//graphType : 'polyline',
+				color: 'green'
 			}]
 		});
 	

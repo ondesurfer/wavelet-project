@@ -142,6 +142,9 @@ function loadWaveletDB2(){
         		if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
             		callback(xmlHttp.response);
     			}
+    			else{
+    				console.log("database could not be loaded");
+    			}
     		};
     		xmlHttp.open("GET", theUrl, true); // true bedeutet, dass onreadystate in neuem thread aufgerufen wird
     		xmlHttp.send(null);

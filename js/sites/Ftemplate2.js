@@ -17,6 +17,9 @@ function setHtmlFunctions() {
 	
 	var type_list = document.getElementById("type_list");
 	
+	//$("#top-line").prop("href", "Ftemplate1.html");
+	$("#top-line").text(family);
+	
 	// same types have to be neighbors 
 	for (var i = 0; i < type_column.length; i++) {
 		if(type_tmp != type_column[i][0]){

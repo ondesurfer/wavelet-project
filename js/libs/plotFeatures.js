@@ -12,12 +12,18 @@ function buildPlot(target) {
 	try {
 		var plotInst = functionPlot({
 			target : target,
+			//yAxis: {domain: [-1, 1]},
+  			//xAxis: {domain: [8, 24]},
 			data : [ {
-				// uses the filter function from pointEvaluation.js
+				
+				//needs computed points as [[x1,y1],[x2,y2],...] where x1<x2<...
 				points : [ [ 0 ], [ 0 ] ],
 				fnType : 'points',
 				graphType : 'polyline',
+				color: 'pink'
 			} ]
+			
+				
 		});
 		
 		function bigPlot( plot1, allValues1 ) {
@@ -31,7 +37,7 @@ function buildPlot(target) {
 		var bigPlotObj = new bigPlot(plotInst,[[0,0]]);
 		
 		function zoomFilter() {
-			var xDomain = this.options.xDomain;
+			var xDomain = this.options.xAxis.domain;
 			var newPoints = filter(xDomain[0], xDomain[1],bigPlotObj.allValues, 1000);
 			if (newPoints == undefined) {
 				// console.log("No more detailled points available. Please zoom out.");
