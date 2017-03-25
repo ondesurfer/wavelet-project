@@ -8,7 +8,7 @@
  *                appear
  * @return{functionPlot} object instance of an plot object
  */
-function buildPlot(target) {
+function buildPlot(target,values) {
 	try {
 		var plotInst = functionPlot({
 			target : target,
@@ -48,6 +48,10 @@ function buildPlot(target) {
 		} 
 		console.log(bigPlotObj);	
 		bigPlotObj.plot.on("during:draw", zoomFilter);
+		if(values!=undefined){
+			bigPlotObj.allValues=values;
+			bigPlotObj.plot.draw();
+		}
 		return bigPlotObj;
 			
 	} catch (err) {
