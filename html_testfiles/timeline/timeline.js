@@ -287,27 +287,30 @@ function timeline(domElement) {
         function getHtml(element, d) {
             var html;
             if (element.attr("class") == "interval") {
-                html = d.label + "<br>" + toYear(d.start) + " - " + toYear(d.end);
+                //html = d.label + "<br>" + toYear(d.start);// + " - " + toYear(d.end);
+                html = d.link;
             } else {
-                html = d.label + "<br>" + toYear(d.start);
+                //html = d.label + "<br>" + toYear(d.start);
+            	html = d.link;
             }
             return html;
         }
 
         function showTooltip (d) {
 
-            var x = event.pageX < band.x + band.w / 2
-                    ? event.pageX + 10
-                    : event.pageX - 110,
-                y = event.pageY < band.y + band.h / 2
-                    ? event.pageY + 30
-                    : event.pageY - 30;
+            var x = d3.event.pageX < band.x + band.w / 2
+                    ? d3.event.pageX + 10
+                    : d3.event.pageX - 110,
+                y = d3.event.pageY < band.y + band.h / 2
+                    ? d3.event.pageY + 30
+                    : d3.event.pageY - 30;
 
             tooltip
                 .html(getHtml(d3.select(this), d))
                 .style("top", y + "px")
                 .style("left", x + "px")
                 .style("visibility", "visible");
+//        	console.log(getHtml(d3.select(this), d));
         }
 
         function hideTooltip () {
