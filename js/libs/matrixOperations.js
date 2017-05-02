@@ -23,52 +23,6 @@ function deepCopyVector(vector) {
 	return newVector;
 }
 
-/** Sort the coefficients of a wavelet into a matrix.
- *  Only works for more than 3 coefficients!!!
- * 
- * @param{Array} a refinement coefficients
- * 
- * @return{Array} mat the matrix with the sorted coefficients
- */
-function coeffsToMatrix(a) {
-	var c = new Array();
-	//copy a to c
-	for (var i = 0; i < a.length; i++) {
-		c[i] = a[i];
-	}
-	var N = c.length;
-	//number of coefficients
-	
-	//the boundary-coefficients have to be different from 0
-	//check this if necessary
-	//attach N-4 zeros in front of and behind the coefficient vector
-	for ( i = 0; i < N - 4; i++) {
-		c.push(0);
-	}
-	for ( i = 0; i < N - 4; i++) {
-		c.unshift(0);
-	}
-
-	var mat = createArray(N - 2, N - 2);
-	
-	//firstIndex is the index from which (going right to left) the
-	//elements get included in the row;
-	var firstIndex = 1 + N - 4;
-	for ( z = 0; z < N - 2; z++) {
-		var marker = firstIndex;
-		for ( s = 0; s < N - 2; s++) {
-			mat[z][s] = c[marker];
-			marker--;
-		}
-		firstIndex += 2;
-	}
-	
-	//subtract 1 from the diagonal
-	for (var i = 0; i < N - 2; i++) {
-		mat[i][i] = mat [i][i] - 1;
-	}
-	return mat;
-}
 
 /** Second possibility to sort the coefficients of a wavelet into a matrix. 
  *  (Also works for wavelets with only 3 coefficients! e.g. hat-function)
@@ -656,5 +610,5 @@ function createSelectionOptions(entries){
 	for (var i = 0; i < entries.length; i++) {
 		entries_list[entries[i]] = entries[i]; 
 	}
-	return entries_list
+	return entries_list;
 }

@@ -119,7 +119,8 @@ function loadWaveletDB1(){
 				// do not use a 'var' here! So the database is saved as an global document. attribute
   				db = new SQL.Database(uInt8Array);
 			};
-			httpGetAsync('./wavelet_database.sqlite', callback);				
+			httpGetAsync('./wavelet_database.sqlite', callback);
+			console.log("database loaded");				
 		}
 		
 		start();

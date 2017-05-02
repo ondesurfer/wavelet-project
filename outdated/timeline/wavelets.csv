@@ -1,0 +1,7 @@
+start,end,label,link
+1910,1914,Haar,a
+1988,1998,Daubechies,b
+1992,1995,CDF,c
+1993,1998,Coiflet,d
+1993,1998,Symlet,e
+2006,2010,Primbs,f

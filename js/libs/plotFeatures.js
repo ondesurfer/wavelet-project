@@ -2,25 +2,26 @@
  * builds an Plot object which consists of the plot, all available values.
  * The plot and the values are connected with an filter. So for a plot not 
  * all values are used.
- * (last modification: 22.2.17 Simon)
+ * (last modification: 02.05.17 Simon)
  * 
  * @param{string} target name of the html-area where the plot object should
  *                appear
- * @return{functionPlot} object instance of an plot object
+ * @param{double[][]} values - values which are hold in background of the resultObject
+ * 								(We plot so many of them how are necessary to get a beautiful plot)
+ * 
+ * @return{object} bigPlot - instance of an bigPlot object
  */
 function buildPlot(target,values) {
 	try {
 		var plotInst = functionPlot({
 			target : target,
-			//yAxis: {domain: [-1, 1]},
-  			//xAxis: {domain: [8, 24]},
 			data : [ {
 				
 				//needs computed points as [[x1,y1],[x2,y2],...] where x1<x2<...
 				points : [ [ 0 ], [ 0 ] ],
 				fnType : 'points',
 				graphType : 'polyline',
-				color: 'pink'
+				color: 'blue'
 			} ]
 			
 				
@@ -46,12 +47,26 @@ function buildPlot(target,values) {
 				this.options.data[0].points = newPoints;
 			}
 		} 
-		console.log(bigPlotObj);	
 		bigPlotObj.plot.on("during:draw", zoomFilter);
 		if(values!=undefined){
-			bigPlotObj.allValues=values;
-			bigPlotObj.plot.draw();
+			bigPlotObj.drawValues(values);
 		}
+   		
+  		/*var sliderId = target+'slider';	
+  		$(target).append('<div><input type="range" id="testID" name="mytext[]" />');
+  		
+		$('#testID').change(function(){
+			bigPlotObj.plot.options.xAxis.domain = [-8, 24];
+			bigPlotObj.plot.meta.xDomain=[-8,24];
+			console.log(bigPlotObj.plot.options.xAxis.domain);
+			//bigPlotObj.plot=functionPlot(bigPlotObj.plot.options); //wird so ein neues plot objekt erstellt?
+			// das alte bigPlotObj ist dann nicht mehr dargestellt?
+			//eig . besser: bigPlotObj.plot.draw() - funktioniert aber nicht, weil die Achsen anders benutzt werden.
+			//bigPlotObj.plot.draw();
+			bigPlotObj.plot.buildContent();
+			console.log(bigPlotObj);
+		});*/
+				
 		return bigPlotObj;
 			
 	} catch (err) {

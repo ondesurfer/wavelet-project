@@ -516,7 +516,7 @@ function waveletPointEvaluation(a, a_start, a_tilde, a_tilde_start, j){
 }
 
 /**
- * First delitates function-values with factor 2^-j and then translates it with k (usually integer)
+ * First delitates function-values with factor 2^-j and then translates it with k 
  * @param {integer} j (2^-j) is delitation factor
  * @param {double} k translation
  * @param {Array} values already known values
