@@ -3,12 +3,12 @@
 <head>
 	<title>Timeline | Templates</title>
 
-	<script src="../../js/ext_libs/sql.js"></script>
-	<script src="../../js/sites/timeline.js"></script>
-	<script src="../../js/ext_libs/timeline_dist/vis.min.js"></script>
-	<script src="../../js/libs/dbMethods.js"></script>
+	<script src="../js/ext_libs/sql.js"></script>
+	<script src="../js/sites/timeline.js"></script>
+	<script src="../js/ext_libs/timeline_dist/vis.min.js"></script>
+	<script src="../js/libs/dbMethods.js"></script>
 	<!-- load extern stylesheet-->
-	<link href="../../js/ext_libs/timeline_dist/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+	<link href="../js/ext_libs/timeline_dist/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
 
 	<!--modify style of timeline-->
 	<style type="text/css">
@@ -47,7 +47,7 @@
 		// A $( document ).ready() block - waits until the page is loaded
 		//$(document).ready(function() {
 			//loads database end executes the buildTimeline() function with the following parameter
-			checkDB(buildTimeline, "visualization");
+			checkDB('wavelet-systems.sqlite', buildTimeline, "visualization");
 		//});
 
 	</script>
