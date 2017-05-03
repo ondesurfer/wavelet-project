@@ -1,31 +1,53 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 
-
 <script src="../../js/ext_libs/d3.js"></script>
+<script src="../../js/ext_libs/sql.js"></script>
 <script src="../../js/ext_libs/function-plot-1-17-3.js"></script>
 <script src="../../js/ext_libs/numeric-1.2.6.js"></script>
-
+<script src="../../js/ext_libs/jquery-3.1.0.min.js"></script>
 
 <script src="../../js/libs/matrixOperations.js"></script>
 <script src="../../js/libs/math2.js"></script>
 <script src="../../js/libs/plotFeatures.js"></script>
 <script src="../../js/libs/functionTypes/daubechiesWavelets.js"></script>
-
-
+<script src="../../js/libs/dbMethods.js"></script>
 
 <body>
-	<h3>Plot of Daubechies Wavelet</h3>
-	<div id="plot1"> </div>
+	<h2>Plot of Daubechies Wavelet</h2>
+	<h4>Select your wavelet-system</h4>
+	<select id="select-wavelet-system"></select>
+	<input id="button-plot" type="submit" value="PLOT">
+	<div id="plot7"></div>
 
 </body>
 
-<script>	
-	var mask = [(1+Math.sqrt(3))/4,(3+Math.sqrt(3))/4,(3-Math.sqrt(3))/4,
-        		  (1-Math.sqrt(3))/4];
-	var values = valuesOfDaubechiesWav(mask,1,1,0,18);
-	
-	var plot=buildPlot("#plot1",values);
-	
+<script>
+	//checks if database is loaded (and loads it if necessary). Than invokes the function 'buildFunctions'.
+	checkDB(buildFunctions);
+
+	function buildFunctions() {
+		var infos = (db.exec("SELECT name, mask FROM DAUBECHIES")[0].values);
+		console.log(infos);
+		console.log("parsed", JSON.parse(infos[0][1]));
+		//	var dualMask = JSON.parse(db.exec("SELECT mask FROM " + table + " WHERE id = " + dualID)[0].values[0][0])
+		//adding all possible wavelet-systems to select menue
+		for (var j = 0; j < infos.length; j++) {
+			$('#select-wavelet-system').append($('<option>', {
+				text : infos[j][0],
+				value : infos[j][1],
+
+			}));
+		}
+		//adding plot-function to submit-button
+		$("#button-plot").on("click", function() {
+			console.log("val", $('#select-wavelet-system').val());
+			var mask = JSON.parse($('#select-wavelet-system').val());
+			var values = valuesOfDaubechiesWav(mask, 0, 0, 0, 14);
+			console.log("values",values);
+			buildPlot("#plot7", values);
+		});
+
+	}
 
 </script>

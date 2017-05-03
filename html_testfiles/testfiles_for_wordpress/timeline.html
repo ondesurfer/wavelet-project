@@ -6,6 +6,7 @@
 	<script src="../../js/ext_libs/sql.js"></script>
 	<script src="../../js/sites/timeline.js"></script>
 	<script src="../../js/ext_libs/timeline_dist/vis.min.js"></script>
+	<script src="../../js/libs/dbMethods.js"></script>
 	<!-- load extern stylesheet-->
 	<link href="../../js/ext_libs/timeline_dist/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
 
@@ -41,11 +42,13 @@
 	<div id="visualization"></div>
 
 	<script type="text/javascript">
-		//loads database (in loadWaveletDBforTimeline we execute the buildTimeline() function.)
-		loadWaveletDBforTimeline("visualization");
+		
 
-		//tests of splitter-function
-		//console.log(splitter("Das <p>ist</p> ein Testsatz, der an einigen 1234567890123456789 getrennt werden soll und dann sollen html-Tags hinzugefuegt werden, sodass absaetze erstellt werden.",20));
-		//console.log(splitter("   Da5s 5i7st ein 88Testsatz, der an e i ni g e n  Le e rz  eichen getrennt werden soll und dann sollen html-Tags hinzugefuegt werden, sodass absaetze erstellt werden.",30));
+		// A $( document ).ready() block - waits until the page is loaded
+		//$(document).ready(function() {
+			//loads database end executes the buildTimeline() function with the following parameter
+			checkDB(buildTimeline, "visualization");
+		//});
+
 	</script>
 </body>
