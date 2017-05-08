@@ -36,16 +36,16 @@
 			$('#select-wavelet-system').append($('<option>', {
 				text : infos[j][0],
 				value : infos[j][1],
-
 			}));
 		}
 		//adding plot-function to submit-button
 		$("#button-plot").on("click", function() {
-			console.log("val", $('#select-wavelet-system').val());
-			var mask = JSON.parse($('#select-wavelet-system').val());
-			var values = valuesOfDaubechiesWav(mask, 0, 0, 0, 14);
-			console.log("values",values);
-			buildPlot("#plot7", values);
+			var mask = JSON.parse($('#select-wavelet-system').val());		
+			//deliTrans= [deli,trans] - non-fix parameters for calculating values. Can be changed by user
+			var deliTrans = [0,0];
+			//params=mask, deriv, acc - fix parameters for calculating values of wavelet
+			var params = [mask,0,14];
+			buildPlot2("#plot7",valuesOfDaubechiesWav2,params,[0,4],[-5,5]);
 		});
 
 	}

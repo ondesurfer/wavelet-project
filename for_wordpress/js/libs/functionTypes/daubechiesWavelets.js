@@ -24,6 +24,21 @@ function valuesOfDaubechiesWav(mask,a_start,deli,trans,acc){
 	return deliAndTrans(deli,trans,values1);
 }
 
+//same function as above, but different input-parameters
+//deliTrans are just for delitation and translatation - can be changed by user in the browser
+//params are mask, a_start and accurancy - are not supposed to be changed by the user
+function valuesOfDaubechiesWav2(deliTrans, params){
+	
+	var deli = deliTrans[0];
+	var trans = deliTrans[1];
+	
+	var mask= params[0];
+	var a_start = params[1];
+	var acc = params[2];
+	
+	var values1 = waveletPointEvaluation(mask, a_start, mask, a_start, acc); 
+	return deliAndTrans(deli,Math.pow(2,-1*deli)*trans,values1);
+}
 
 /** calculates values of daubechies scf 
  *

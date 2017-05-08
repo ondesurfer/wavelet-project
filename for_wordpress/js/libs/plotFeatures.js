@@ -165,3 +165,146 @@ function filter(leftXvalue, rightXvalue, allValues, wantedNumOfValues){
 		
 	return newValues;
 }
+
+/**
+ * builds an Plot object which consists of the plot, all available values.
+ * The plot and the values are connected with an filter. So for a plot not 
+ * all values are used.
+ * (last modification: 02.05.17 Simon)
+ * 
+ * @param{string} target name of the html-area where the plot object should
+ *                appear
+ * @param{double[][]} values - values which are hold in background of the resultObject
+ * 								(We plot so many of them how are necessary to get a beautiful plot)
+ * 
+ * @return{object} bigPlot - instance of an bigPlot object
+ */
+function buildPlot2(target,calcValFunc,params,slider1Range,slider2Range) {
+	$(target).empty();
+	try {
+		var plotInst = functionPlot({
+			target : target,
+			data : [ {
+				
+				//needs computed points as [[x1,y1],[x2,y2],...] where x1<x2<...
+				points : [ [ 0 ], [ 0 ] ],
+				fnType : 'points',
+				graphType : 'polyline',
+				color: 'blue'
+			} ]
+			
+				
+		});
+		
+		function bigPlot( plot1, allValues1 ) {
+   			return { 
+       			 	plot : plot1,
+       			 	allValues : allValues1,
+       			 	drawValues : function(values){this.allValues=values; this.plot.draw(); },
+   			 }; 			
+		};
+				
+		var bigPlotObj = new bigPlot(plotInst,[[0,0]]);
+		
+		//build a zoomFilter-function 
+		function zoomFilter2() {
+			var xDomain = this.options.xAxis.domain;
+			var newPoints = filter(xDomain[0], xDomain[1],bigPlotObj.allValues, 1000);
+			if (newPoints == undefined) {
+				// console.log("No more detailled points available. Please zoom out.");
+				alert("No more detailled points available. Please zoom out.");
+			} else {
+				this.options.data[0].points = newPoints;
+			}
+		} 
+		//adds zoomFilter to plot
+		bigPlotObj.plot.on("during:draw", zoomFilter2);
+		
+		//draws the values given at the beginning of the whole function
+		/*if(values!=undefined){
+			bigPlotObj.drawValues(values);
+		}*/
+   		
+  		//builds sliders and small textfields next to the function-plot
+  		$(target).append('<div><input type="range" id="slider1" name="mytext[]"/> j= <input type="text" id="slider1Text" size="3"/>  <input type="range" id="slider2" name="mytext[]" /> k= <input type="text" id="slider2Text" size="3"/>');
+
+		//setting the slider-ranges
+		$('#slider1').prop({
+			'min': slider1Range[0],
+            'max': slider1Range[1],
+        });
+        $('#slider2').prop({
+			'min': slider2Range[0],
+            'max': slider2Range[1],
+        });
+        
+		//connects sliders with text-fields, so that they update each-other
+		$('#slider1').change(function(){
+			$('#slider1Text').val($('#slider1').val());
+			newValues();
+		});
+		$('#slider1Text').change(function(){
+			$('#slider1').val($('#slider1Text').val());
+			newValues();	
+		});
+		$('#slider2').change(function(){
+			$('#slider2Text').val($('#slider2').val());
+			newValues();
+		});
+		$('#slider2Text').change(function(){
+			$('#slider2').val($('#slider2Text').val());
+			newValues();
+		});
+		
+		//sets start-values for the sliders and calculates values
+		$('#slider1').val(slider1Range[0]);
+		$('#slider2').val(slider2Range[0]);
+		$('#slider1Text').val(slider1Range[0]);
+		$('#slider2Text').val(slider2Range[0]);
+		newValues();
+		
+		//calculates new values of the wavelet to plot.
+		//For the delitation,translatation or better said level the values from the slider1,2 are used
+		//The other parameters and the function (calcValFunc) is given from the head of this function.
+		function newValues(){
+			var j=parseInt($('#slider1').val());
+			var k=parseInt($('#slider2').val());
+			var values = calcValFunc([j,k],params);
+			bigPlotObj.drawValues(values);
+		}
+		
+		//adding slider to change scale of y-axis of function plot:
+		$(target).append('<div><input type="range" id="scale" min="0.1" max="1.9" step="0.1" />');
+		
+		
+		$('#scale').change(function(){			
+			var xDist=bigPlotObj.plot.options.xAxis.domain[1]-bigPlotObj.plot.options.xAxis.domain[0];
+			var factor = parseFloat($('#scale').val());
+			/*the slider range is from 0.1 to 2; 0.1 will bring a stretch of factor 10, but 2 just a 
+			compression of factor 2. So, if factor is higher than 1 we multiply it by 5.*/
+			if(factor>1){factor=((factor-1)+0.1)*10;}
+			console.log(factor);
+			var newYdomain = bigPlotObj.plot.options.yAxis.domain;
+			
+			//old middle of y-Axis will stay middle of y-Axis
+			var middle = (newYdomain[1]+newYdomain[0])/2;	
+			
+			//calculating nex y-axis-domain
+			newYdomain[0]= middle - factor*xDist/2;
+			newYdomain[1]= middle + factor*xDist/2;			
+		
+			bigPlotObj.plot.options.yAxis.domain = newYdomain ;
+			//building a new plot-content with the options e.g.values from before
+			bigPlotObj.plot=functionPlot(bigPlotObj.plot.options); //wird so ein neues plot objekt erstellt?
+			//eig . besser: bigPlotObj.plot.draw() - funktioniert aber nicht, weil die Achsen anders benutzt werden.
+			//bigPlotObj.plot.draw();
+			bigPlotObj.plot.buildContent();
+		});
+				
+		return bigPlotObj;
+			
+	} catch (err) {
+		console.log(err);
+		alert(err);
+	}
+}
