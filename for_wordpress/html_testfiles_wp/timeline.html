@@ -10,6 +10,14 @@
 	<!-- load extern stylesheet-->
 	<link href="../js/ext_libs/timeline_dist/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
 
+	
+
+</head>
+
+<body>
+	<div id="visualization"></div>
+	<div id="doi"></div>
+	
 	<!--modify style of timeline-->
 	<style type="text/css">
 		.vis.timeline.item {
@@ -35,19 +43,14 @@
 		}
 
 	</style>
-
-</head>
-
-<body>
-	<div id="visualization"></div>
-
+	
 	<script type="text/javascript">
 		
 
 		// A $( document ).ready() block - waits until the page is loaded
 		//$(document).ready(function() {
 			//loads database end executes the buildTimeline() function with the following parameter
-			checkDB('wavelet-systems.sqlite', buildTimeline, "visualization");
+			checkDB('wavelet-systems.sqlite', buildTimeline, ["visualization","doi"]);
 		//});
 
 	</script>
