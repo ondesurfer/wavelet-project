@@ -32,16 +32,19 @@
 	}
 	
 /** Calculates the values of a primal Primbs scalingfunction without Border conditions
- *  (last modification: 21.2.17 Simon)
+ *  (last modification: 03.6.17 Simon)
  * 
- *   @param{int} j level of scf
- *   @param{int} d order of B-splines used for scf
- * 	@param{int} k number of scf (started at 0, counted from left to right)
+ * 	@param{int[]} [j,k] j level of scf, k number of scf (started at 0, counted from left to right)
+ *   @param{int} params - [d] order of B-splines used for scf
  * 
  *   @return{double[][]} points points of the function as [[x0,f(x0)],[x1,f(y1)],...]
  */
 	
-	function valuesOfPrimalPrimbsScf(j,d,k){
+	function valuesOfPrimalPrimbsScf(deliTrans,params){
+		var j=deliTrans[0];
+		var k=deliTrans[1];
+		var d= params[0];
+		//console.log("j",j,"k",k,"d",d);
 		var scf=buildPrimalPrimbsScf(j,d);
 		var grid = makeGrid(0,1,1000);
 		var values = evaluateObjectInGrid(scf[k],grid);
@@ -69,16 +72,27 @@
 	
 	/**calculates the values of a primal Primbs Wavelet without border conditions
 	 *  (last modification 26.2.2017)
-	 *	@param{int} j0 smallest j which is possible
-	 *  @param{int} j level of wavelet
- 	 *  @param{int} d order of B-splines used for scf
-	 * 	@param{int} k number of wavelet (started at 0, counted from left to right)
-	 *  @param{dTilde} dTilde dual-order
+	 *	@param{double []} deliTrans [j,k] j level of wavelet - k number of wavelet (started at 0, counted from left to right)
+	 *  @param{double []} params [j0,d,dTilde,Mj1]
+	 * 								j0 smallest j which is possible
+	 *								d order of B-splines used for scf	
+	 *								dTilde dual-order
+	 * 								Mj1 refinement matrix
 	 * 
-	 * 	@return{double[][]} values calculated values
+	 * 	@return{double[][]} values  calculated values
 	 * 
 	 */	
-	function valuesOfPrimalPrimbsWav(j0,j,d,dTilde,Mj1,k){
+	function valuesOfPrimalPrimbsWav(deliTrans, params){
+		
+		
+		var j=deliTrans[0];
+		var k=deliTrans[1];
+		
+		var j0=params[0];
+		var d=params[1];
+		var dTilde=params[2];
+		var Mj1=params[3];
+		
 		//console.log("starte funktion valuesOfPrimalPrimbsWav mit:");
 		//console.log("j0=",j0,"j",j,"d",d,"dTilde",dTilde,"k",k);
 		
@@ -88,8 +102,7 @@
 		
 		var params1 = [j,k,scf,Mj1b];
 		var values1 = evaluateFunctionInGrid(evaluateSIWaveletInX,params1,0,1,1000);
-		return values1;
-		
+		return values1;		
 	}
 	
 /** extendes the Mj1 Matrix of Primbs wavelets without border conditions
@@ -428,7 +441,6 @@
  *   @return{double[][]} points points of the function as [[x0,f(x0)],[x1,f(y1)],...]
  */
 	function valuesOfDualPrimbsScf(d,dTilde,j,k){
-		
 		//fuer die ganz linken Skalierungsfunktionen:
 		if(k<d-2){
 			var grid = makeGrid(0,(d+dTilde)/2+k,2048); //see Satz 4.12
@@ -539,11 +551,7 @@ function findValue(values,x){
 		return points;
 	}
 	
-	
-	
-	
-	
-	
+
 	
 	/** Evaluates a function, given as an object with the function 'eval', in a grid
  *  (last modification: 22.12.16 Simon)

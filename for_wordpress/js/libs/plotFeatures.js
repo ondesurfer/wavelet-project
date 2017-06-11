@@ -1,4 +1,6 @@
-/**
+/**dependecies: jQuery, functionPlot
+ * 
+ *
  * builds an Plot object which consists of the plot, all available values.
  * The plot and the values are connected with an filter. So for a plot not 
  * all values are used.
@@ -179,7 +181,7 @@ function filter(leftXvalue, rightXvalue, allValues, wantedNumOfValues){
  * 
  * @return{object} bigPlot - instance of an bigPlot object
  */
-function buildPlot2(target,calcValFunc,params,slider1Range,slider2Range) {
+function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,params2) {
 	$(target).empty();
 	try {
 		var plotInst = functionPlot({
@@ -220,66 +222,30 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2Range) {
 		//adds zoomFilter to plot
 		bigPlotObj.plot.on("during:draw", zoomFilter2);
 		
-		//draws the values given at the beginning of the whole function
-		/*if(values!=undefined){
-			bigPlotObj.drawValues(values);
-		}*/
-   		
-  		//builds sliders and small textfields next to the function-plot
-  		$(target).append('<div><input type="range" id="slider1" name="mytext[]"/> j= <input type="text" id="slider1Text" size="3"/>  <input type="range" id="slider2" name="mytext[]" /> k= <input type="text" id="slider2Text" size="3"/>');
-
-		//setting the slider-ranges
-		$('#slider1').prop({
-			'min': slider1Range[0],
-            'max': slider1Range[1],
-        });
-        $('#slider2').prop({
-			'min': slider2Range[0],
-            'max': slider2Range[1],
-        });
-        
-		//connects sliders with text-fields, so that they update each-other
-		$('#slider1').change(function(){
-			$('#slider1Text').val($('#slider1').val());
-			newValues();
-		});
-		$('#slider1Text').change(function(){
-			$('#slider1').val($('#slider1Text').val());
-			newValues();	
-		});
-		$('#slider2').change(function(){
-			$('#slider2Text').val($('#slider2').val());
-			newValues();
-		});
-		$('#slider2Text').change(function(){
-			$('#slider2').val($('#slider2Text').val());
-			newValues();
-		});
 		
-		//sets start-values for the sliders and calculates values
-		$('#slider1').val(slider1Range[0]);
-		$('#slider2').val(slider2Range[0]);
-		$('#slider1Text').val(slider1Range[0]);
-		$('#slider2Text').val(slider2Range[0]);
-		newValues();
-		
-		//calculates new values of the wavelet to plot.
-		//For the delitation,translatation or better said level the values from the slider1,2 are used
-		//The other parameters and the function (calcValFunc) is given from the head of this function.
-		function newValues(){
-			var j=parseInt($('#slider1').val());
-			var k=parseInt($('#slider2').val());
-			var values = calcValFunc([j,k],params);
-			bigPlotObj.drawValues(values);
-		}
-		
+			//$(target).append('<div><input type="range" id="scale" min="0.1" max="1.9" step="0.1" />');
 		//adding slider to change scale of y-axis of function plot:
-		$(target).append('<div><input type="range" id="scale" min="0.1" max="1.9" step="0.1" />');
+		var scale = document.createElement("input");
+		var deg = 90;
+		//scale.style.webkitTransform = 'rotate('+deg+'deg)';
+		//scale.style.mozTransform    = 'rotate('+deg+'deg)'; 
+    	//scale.style.msTransform     = 'rotate('+deg+'deg)'; 
+  		//scale.style.oTransform      = 'rotate('+deg+'deg)'; 
+ 	   	scale.style.transform       = 'rotate('+deg+'deg)';
+ 	   	console.log(bigPlotObj);
+		
+		scale.type = "range";
+		scale.min = "0.1";
+		scale.max = "1.9";
+		scale.step = "0.1";
+		$(target).append(scale);
+		//$(bigPlotObj.plot).append(scale);
+
 		
 		
-		$('#scale').change(function(){			
+		$(scale).change(function(){			
 			var xDist=bigPlotObj.plot.options.xAxis.domain[1]-bigPlotObj.plot.options.xAxis.domain[0];
-			var factor = parseFloat($('#scale').val());
+			var factor = parseFloat($(scale).val());
 			/*the slider range is from 0.1 to 2; 0.1 will bring a stretch of factor 10, but 2 just a 
 			compression of factor 2. So, if factor is higher than 1 we multiply it by 5.*/
 			if(factor>1){factor=((factor-1)+0.1)*10;}
@@ -300,6 +266,96 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2Range) {
 			//bigPlotObj.plot.draw();
 			bigPlotObj.plot.buildContent();
 		});
+   		
+   		$(target).append("<p></p>");
+  		//builds sliders and small textfields next to the function-plot:
+		var slider1 = document.createElement("input");
+		slider1.type = "range";
+		//input.className = "css-class-name"; // set the CSS class
+		$(target).append(slider1); // put it into the DOM
+		
+		var slider1Text = document.createElement("input");
+		slider1Text.type = "text";
+		slider1Text.style.width = "35px";
+		$(target).append(slider1Text); // put it into the DOM
+		
+		var slider2 = document.createElement("input");
+		slider2.type = "range";
+		$(target).append(slider2); // put it into the DOM
+		
+		var slider2Text = document.createElement("input");
+		slider2Text.type = "text";
+		slider2Text.style.width = "35px";
+		$(target).append(slider2Text); // put it into the DOM
+		
+		//setting the slider-range of slider1 (the range of slider2 will be calculated in dependecy of slider1 and more parameters.)
+		$(slider1).prop({
+			'min': slider1Range[0],
+            'max': slider1Range[1],
+        });
+               
+		//connects sliders with text-fields, so that they update each-other
+		$(slider1).change(function(){
+			$(slider1Text).val($(slider1).val());
+			changeRangeSlider2();
+			newValues();
+		});
+		$(slider1Text).change(function(){
+			var value = parseInt($(slider1Text).val());
+			//tests if the users input value is valid
+			if(Number.isInteger(value) && value>=slider1Range[0] && value<=slider1Range[1]){
+				$(slider1Text).val(value);
+				changeRangeSlider2();
+				$(slider1).val(value);
+				newValues();
+			}else{
+				$(slider1Text).val($(slider1).val());
+			}	
+		});
+		$(slider2).change(function(){
+			$(slider2Text).val($(slider2).val());
+			newValues();
+		});
+		$(slider2Text).change(function(){
+			var value = parseInt($(slider2Text).val());
+			var slider2Range = [parseInt($(slider2)[0].min),parseInt($(slider2)[0].max)];
+			//tests if the users input value is valid
+			if(Number.isInteger(value) && value>=slider2Range[0] && value<=slider2Range[1]){
+				$(slider2Text).val(value);
+				$(slider2).val($(slider2Text).val());
+				newValues();
+			}else{
+				$(slider2Text).val($(slider2).val());
+			}
+		});
+		
+		//sets start-values for slider1, updates corresponding text-field, calculates range of slider2 and new values
+		$(slider1).val(slider1Range[0]);
+		$(slider1Text).val(slider1Range[0]);
+		changeRangeSlider2();
+		newValues();
+		
+		//calculates new values of the wavelet to plot.
+		//For the delitation,translatation the values from the slider1 and slider2 are used
+		//The other parameters and the function (calcValFunc) is given by the head of this function.
+		function newValues(){
+			var j=parseInt($(slider1).val());
+			var k=parseInt($(slider2).val());
+			var values = calcValFunc([j,k],params);
+			bigPlotObj.drawValues(values);
+		}
+		
+		//is invoked when slider1 changes - then the range of slider2 must be changed too!
+		function changeRangeSlider2(){
+			var slider2Range = slider2RangeFunct($(slider1).val(),params2);
+			$(slider2).prop({
+				'min': slider2Range[0],
+           		'max': slider2Range[1],
+        	});
+        	$(slider2Text).val($(slider2).val());
+		}
+		
+	
 				
 		return bigPlotObj;
 			

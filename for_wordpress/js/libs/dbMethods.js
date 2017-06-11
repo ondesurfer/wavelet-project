@@ -50,3 +50,20 @@ function checkDB(path,callback2,params) {
 		start();
 	}
 }
+
+/** to extract information from the database entry 'parameters'
+ *
+ * @param {Object} array  Array containing the information.
+ * @param {Object} name  name of the searched entry
+ *
+ * @return{Object} array[x] value of the searched parameter.
+ */
+function getParameter(array, name) {
+	for (var j = 0; j < array.length - 1; j += 2) {
+		if (name == array[j]) {
+			return array[j + 1];
+		}
+	}
+	console.log("Error: parameters do not contain " + name);
+	return undefined;
+}
