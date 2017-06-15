@@ -46,7 +46,7 @@
 		var d= params[0];
 		//console.log("j",j,"k",k,"d",d);
 		var scf=buildPrimalPrimbsScf(j,d);
-		var grid = makeGrid(0,1,1000);
+		var grid = makeGrid(0,1,8192);
 		var values = evaluateObjectInGrid(scf[k],grid);
 		
 		return values;
@@ -93,15 +93,11 @@
 		var dTilde=params[2];
 		var Mj1=params[3];
 		
-		//console.log("starte funktion valuesOfPrimalPrimbsWav mit:");
-		//console.log("j0=",j0,"j",j,"d",d,"dTilde",dTilde,"k",k);
-		
 		var scf=buildPrimalPrimbsScf(j+1,d); 
-		console.log("Hier in values OfPrimalPrimbsWav gilt j0=",j0,"j=",j,"d=",d,"dTilde=",dTilde,"k=",k);
 		var Mj1b = extendMj1(j,d,dTilde,Mj1,j0);	
 		
 		var params1 = [j,k,scf,Mj1b];
-		var values1 = evaluateFunctionInGrid(evaluateSIWaveletInX,params1,0,1,1000);
+		var values1 = evaluateFunctionInGrid(evaluateSIWaveletInX,params1,0,1,5000);
 		return values1;		
 	}
 	
@@ -424,12 +420,12 @@
 		}
 	}
 	
-	/** Calculates the values of a primal Primbs scalingfunction without Border conditions
- *  (last modification: 21.2.17 Simon)
+	/** Calculates the values of a dual Primbs scalingfunction without Border conditions
+ *  (last modification: 15.6.17 Simon)
  * 
- *   @param{int} j level of scf
- *   @param{int} d order of B-splines used for scf
- * 	@param{int} k number of scf (started at 0, counted from left to right)
+ *   @param{int[]} deliTrans j level of scf k number of scf (started at 0, counted from left to right)
+ *   @param{int[]} params params[0]=d order of B-splines used for scf
+ * 							params[1]= dTilde
  * 
  *  left-left scf: k=0...d-3
  *  left scf	 : k=d-2...d+dTilde-3 //Anzahl: dTilde
@@ -440,13 +436,22 @@
  * 
  *   @return{double[][]} points points of the function as [[x0,f(x0)],[x1,f(y1)],...]
  */
-	function valuesOfDualPrimbsScf(d,dTilde,j,k){
+	function valuesOfDualPrimbsScf(deliTrans,params){
+		
+		var j=deliTrans[0];
+		var k=deliTrans[1];
+		var d=params[0];
+		var dTilde=params[1];
+		//console.log("d",d,"dTilde",dTilde,"k",k);
 		//fuer die ganz linken Skalierungsfunktionen:
 		if(k<d-2){
-			var grid = makeGrid(0,(d+dTilde)/2+k,2048); //see Satz 4.12
+			var grid = makeGrid(0,(d+dTilde)/2+k,8192); //see Satz 4.12
 			console.log("links links k=",k);
 			var dscfI=buildLeftDualPrimbsScfII(d,dTilde);
+			console.log("dscfI",dscfI);
+			console.log("k",k,"dscfI",dscfI[k]);
 			var values=evaluateObjectInGrid(dscfI[k],grid);
+			
 			var valuesNew = deliAndTrans(j,0,values);
 			//console.log("valuesNew",valuesNew);
 			return valuesNew;
@@ -466,7 +471,7 @@
 		}
 		if(k < Math.pow(2,j)+d-1) {
 			console.log("rechts-rechts k=", k);
-			var grid = makeGrid(0,(d+dTilde)/2+(Math.pow(2,j)+d-3)-k,2048); //see Satz 4.12
+			var grid = makeGrid(0,(d+dTilde)/2+(Math.pow(2,j)+d-3)-k,8192); //see Satz 4.12
 			var dscf5=buildLeftDualPrimbsScfII(d,dTilde);
 			var values = evaluateObjectInGrid(dscf5[Math.pow(2,j)+d-2-k],grid);
 			var valuesNew = deliAndTrans(j,0,values); 
@@ -523,20 +528,21 @@ function findValue(values,x){
 			return 0;
 		}
 	}
+		
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	// test of a general evaluation in grid function
-	/*  Evaluate a function on grid points specified by [start, end, count]
-		(last modification: 17.10.16 Andreas)
-	*/
+	/** Evaluates a function in a Grid 
+ * 
+ *  (last modification: 15.6.16 Simon)
+ * 
+ *  @param{object}	func  function which will be evaluated
+ *  @param{object[]} params params of the function
+ *  @param{double}	start  start value of grid
+ * 	@param{double}	end end-value of grid
+ *  @param{int}		count number of grid-points
+ * 
+ * 	@return{double[]} 	points x and y-values
+ * 										
+ */
 	function evaluateFunctionInGrid(funct,params,start,end,count){
 		var x = makeGrid(start,end,count);
 		var points = new Array(x.length);

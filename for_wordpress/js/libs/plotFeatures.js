@@ -222,8 +222,6 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 		//adds zoomFilter to plot
 		bigPlotObj.plot.on("during:draw", zoomFilter2);
 		
-		
-			//$(target).append('<div><input type="range" id="scale" min="0.1" max="1.9" step="0.1" />');
 		//adding slider to change scale of y-axis of function plot:
 		var scale = document.createElement("input");
 		var deg = 90;
@@ -238,8 +236,10 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 		scale.min = "0.1";
 		scale.max = "1.9";
 		scale.step = "0.1";
+
+		//console.log($(target)[0].children[0]);
+		//$(target)[0].children[0].append(scale);
 		$(target).append(scale);
-		//$(bigPlotObj.plot).append(scale);
 
 		
 		
@@ -274,6 +274,8 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 		//input.className = "css-class-name"; // set the CSS class
 		$(target).append(slider1); // put it into the DOM
 		
+		$(target).append("level j=");
+		
 		var slider1Text = document.createElement("input");
 		slider1Text.type = "text";
 		slider1Text.style.width = "35px";
@@ -282,6 +284,8 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 		var slider2 = document.createElement("input");
 		slider2.type = "range";
 		$(target).append(slider2); // put it into the DOM
+		
+		$(target).append("k=");
 		
 		var slider2Text = document.createElement("input");
 		slider2Text.type = "text";
@@ -353,10 +357,7 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
            		'max': slider2Range[1],
         	});
         	$(slider2Text).val($(slider2).val());
-		}
-		
-	
-				
+		}			
 		return bigPlotObj;
 			
 	} catch (err) {

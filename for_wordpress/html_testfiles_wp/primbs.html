@@ -9,6 +9,7 @@
 
 <script src="../js/libs/matrixOperations.js"></script>
 <script src="../js/libs/math2.js"></script>
+<script src="../js/libs/mask.js"></script>
 <script src="../js/libs/plotFeatures.js"></script>
 <script src="../js/libs/functionTypes/primbsWavelets.js"></script>
 <script src="../js/libs/functionTypes/bSplines.js"></script>
@@ -56,17 +57,22 @@
 			var Mj1 = JSON.parse(db.exec("SELECT M_j1 FROM PRIMBS WHERE id = " + id)[0].values[0][0]);
 			var j0 = JSON.parse(db.exec("SELECT j_0 FROM PRIMBS WHERE id = " + id)[0].values[0][0]);
 			//plotting primal scf
-			buildPlot2("#plotPrimScf",valuesOfPrimalPrimbsScf,[d],[1,5],calcScfRangeOfK,[d]);
+			buildPlot2("#plotPrimScf",valuesOfPrimalPrimbsScf,[d],[1,5],calcPrimalScfRangeOfK,[d]);
 			//plotting primal wavelet
-			buildPlot2("#plotPrimWav",valuesOfPrimalPrimbsWav,[j0,d,dTilde,Mj1],[j0,j0+4],calcWavRangeOfK,undefined);
+			buildPlot2("#plotPrimWav",valuesOfPrimalPrimbsWav,[j0,d,dTilde,Mj1],[j0,j0+4],calcPrimalWavRangeOfK,undefined);
+			//plotting dual scf
+			buildPlot2("#plotDualScf",valuesOfDualPrimbsScf,[d,dTilde],[j0,j0+4],calcDualScfRangeOfK,[d]);
 			
 		});
 		
-		function calcScfRangeOfK(j,params2){
+		function calcPrimalScfRangeOfK(j,params2){
 			return [0,Math.pow(2,j)+params2[0]-2];
 		}
-		function calcWavRangeOfK(j,params2){
+		function calcPrimalWavRangeOfK(j,params2){
 			return [0,Math.pow(2,j)-1];
+		}
+		function calcDualScfRangeOfK(j,params2){
+			return[0,Math.pow(2,j)+params2[0]-2];
 		}
 		
 	}
