@@ -54,7 +54,7 @@
  */	
 	function evaluateBSplineInPointX(d,t,k,x){
 		if(d==1){
-			if(t[k-1]<=x&& x<t[k]){
+			if(t[k-1]<=x&& x<=t[k]){
 				return 1;
 			}else{
 				return 0;
