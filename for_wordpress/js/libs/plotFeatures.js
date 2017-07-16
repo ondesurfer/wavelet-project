@@ -1,5 +1,6 @@
 /**dependecies: jQuery, functionPlot
  * 
+ * Do not use any of the both methods of non-aequidistant grids!!!
  *
  * builds an Plot object which consists of the plot, all available values.
  * The plot and the values are connected with an filter. So for a plot not 
@@ -14,6 +15,7 @@
  * @return{object} bigPlot - instance of an bigPlot object
  */
 function buildPlot(target,values) {
+	$(target).empty();
 	try {
 		var plotInst = functionPlot({
 			target : target,
@@ -50,7 +52,20 @@ function buildPlot(target,values) {
 			}
 		} 
 		bigPlotObj.plot.on("during:draw", zoomFilter);
+		
+		//adding a message-div for warnings etc. like function is not continous etc.
+		var msg=document.createElement( "div" );
+		$(target).prepend(msg);
+		
 		if(values!=undefined){
+			if(!checkContinuity(values,1000)){
+				$(msg).empty();
+				$(msg).css({'color':'red'}); 
+				$(msg).text('Caution: Function seems to be not continous!');
+			}
+			else{
+				$(msg).empty();
+			}
 			bigPlotObj.drawValues(values);
 		}
    		
@@ -68,7 +83,6 @@ function buildPlot(target,values) {
 			bigPlotObj.plot.buildContent();
 			console.log(bigPlotObj);
 		});*/
-				
 		return bigPlotObj;
 			
 	} catch (err) {
@@ -76,7 +90,27 @@ function buildPlot(target,values) {
 		alert(err);
 	}
 }
+/** This method checks if the grade between two points is bigger than tol
+ *	we use it to check, if the plot is realistic.
+ *  @param{Array} values - values which will be checked
+ * 	@param{int} tol  - maximal tolerated grade
+ */
 
+function checkContinuity(values,tol){
+	console.log(values);
+	if(values.length>1){
+		var dx = values[1][0]-values[0][0];
+		console.log('dx',dx);
+		var dxTol = dx * tol;
+		for(var j=0; j<values.length-1; j++){
+			if(Math.abs(values[j][1]-values[j+1][1])> dxTol){
+				console.log('Function seems to be not continous!');
+				return false;
+			}
+		}
+	}
+	return true;	
+}
 /** This method searches only a few nessecary values of a function in a
  *  equally spaced grid.  This makes the plot a lot faster.
  *
@@ -222,26 +256,28 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 		//adds zoomFilter to plot
 		bigPlotObj.plot.on("during:draw", zoomFilter2);
 		
+		//adding a message-div for warnings etc. like function is not continous etc.
+		var msg=document.createElement( "div" );
+		$(target).prepend(msg);
+		
 		//adding slider to change scale of y-axis of function plot:
 		var scale = document.createElement("input");
-		var deg = 90;
+		//var deg = 90;
 		//scale.style.webkitTransform = 'rotate('+deg+'deg)';
 		//scale.style.mozTransform    = 'rotate('+deg+'deg)'; 
     	//scale.style.msTransform     = 'rotate('+deg+'deg)'; 
   		//scale.style.oTransform      = 'rotate('+deg+'deg)'; 
- 	   	scale.style.transform       = 'rotate('+deg+'deg)';
- 	   	console.log(bigPlotObj);
+ 	   	//scale.style.transform       = 'rotate('+deg+'deg)';
+ 	   	//console.log(bigPlotObj);
 		
 		scale.type = "range";
 		scale.min = "0.1";
 		scale.max = "1.9";
 		scale.step = "0.1";
-
-		//console.log($(target)[0].children[0]);
-		//$(target)[0].children[0].append(scale);
-		$(target).append(scale);
-
 		
+		var divScale = document.createElement("div");
+		$(divScale).append(scale);
+		$(target).append(divScale);
 		
 		$(scale).change(function(){			
 			var xDist=bigPlotObj.plot.options.xAxis.domain[1]-bigPlotObj.plot.options.xAxis.domain[0];
@@ -267,30 +303,33 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 			bigPlotObj.plot.buildContent();
 		});
    		
-   		$(target).append("<p></p>");
-  		//builds sliders and small textfields next to the function-plot:
+   		var divSliders = document.createElement("div");
+		
+		//builds sliders and small textfields next to the function-plot:
 		var slider1 = document.createElement("input");
 		slider1.type = "range";
 		//input.className = "css-class-name"; // set the CSS class
-		$(target).append(slider1); // put it into the DOM
+		$(divSliders).append(slider1); // put it into the DOM
 		
-		$(target).append("level j=");
+		$(divSliders).append("level j=");
 		
 		var slider1Text = document.createElement("input");
 		slider1Text.type = "text";
 		slider1Text.style.width = "35px";
-		$(target).append(slider1Text); // put it into the DOM
+		$(divSliders).append(slider1Text); // put it into the DOM
 		
 		var slider2 = document.createElement("input");
 		slider2.type = "range";
-		$(target).append(slider2); // put it into the DOM
+		$(divSliders).append(slider2); // put it into the DOM
 		
-		$(target).append("k=");
+		$(divSliders).append("k=");
 		
 		var slider2Text = document.createElement("input");
 		slider2Text.type = "text";
 		slider2Text.style.width = "35px";
-		$(target).append(slider2Text); // put it into the DOM
+		$(divSliders).append(slider2Text); // put it into the DOM
+		
+		$(target).append(divSliders);
 		
 		//setting the slider-range of slider1 (the range of slider2 will be calculated in dependecy of slider1 and more parameters.)
 		$(slider1).prop({
@@ -333,6 +372,7 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 			}
 		});
 		
+		
 		//sets start-values for slider1, updates corresponding text-field, calculates range of slider2 and new values
 		$(slider1).val(slider1Range[0]);
 		$(slider1Text).val(slider1Range[0]);
@@ -346,6 +386,14 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 			var j=parseInt($(slider1).val());
 			var k=parseInt($(slider2).val());
 			var values = calcValFunc([j,k],params);
+			if(!checkContinuity(values,1000*Math.pow(2,j-1))){
+				$(msg).empty();
+				$(msg).css({'color':'red'}); 
+				$(msg).text('Caution: Function seems to be not continous!');
+			}
+			else{
+				$(msg).empty();
+			}
 			bigPlotObj.drawValues(values);
 		}
 		
