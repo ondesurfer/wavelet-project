@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<script src="../js/ext_libs/d3.js"></script>
+<script src="../js/libs/math2.js"></script>
+<script src="../js/libs/mask.js"></script>
+<script src="../js/libs/matrixOperations.js"></script>
+<script src="../js/ext_libs/function-plot-1-17-3.js"></script>
+<script src="../js/ext_libs/numeric-1.2.6.js"></script>
+<script src="../js/sites/trendOfDaubWav.js"></script>
+
+
+<body>
+	<div id="plot"> </div>
+	<p> <input id="button1" type="button" value="run"> </p>
+</body>
+
+<script>
+
+	
+	//Functionallity of Button
+	document.getElementById('button1').onclick = function() {
+		if(document.getElementById('button1').value=='run'){
+			document.getElementById("button1").value="stop";		}
+		else if(document.getElementById('button1').value=='stop'){
+			document.getElementById('button1').value='run';
+		}
+	};
+	
+	//global gespeicherte Werte und Plot-Instance
+	values=[[0,0]];
+	var plotInst = functionPlot({
+							target : '#plot',
+							data : [{
+								points : values,
+								fnType : 'points',
+								graphType : 'polyline',
+							}]
+						});		
+
+	plotDaubTrend(undefined,1,document.getElementById('button1'),plotInst);
+	
+</script>
