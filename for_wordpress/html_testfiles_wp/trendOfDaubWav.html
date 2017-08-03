@@ -12,7 +12,8 @@
 
 <body>
 	<div id="plot"> </div>
-	<p> <input id="button1" type="button" value="run"> </p>
+	<p> <input id="button1" type="button" value="run"> <input id="buttonReset" type="button" value="reset"> </p>
+	
 </body>
 
 <script>
@@ -37,7 +38,7 @@
 								graphType : 'polyline',
 							}]
 						});		
-
-	plotDaubTrend(undefined,1,document.getElementById('button1'),plotInst);
+	
+	plotDaubTrend(undefined,2,document.getElementById('button1'),document.getElementById('buttonReset'),plotInst,0.002);
 	
 </script>

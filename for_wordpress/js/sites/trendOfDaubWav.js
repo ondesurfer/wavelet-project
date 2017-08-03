@@ -1,7 +1,11 @@
 
-	//berechnet in Abhaengigkeit des letzten Koeffizienten zl alle 4 neuen Koeffizienten,
-	//und daraus die neue Werte, fuegt diese dem Plot hinzu und aktualisiert den Plot
-	console.log('loaded');
+/** calculates all mask-coefficients in dependency of the last coefficient. 
+ * then calculates all values and plots them. 
+ *
+ *  @param{double} zl - last coefficient 
+ * 	@param{int} mode - number of solution branch
+ * 	@param{plot} plotInst - plot instance where new values are plotted
+ */
 	function newValuesToPlot(zl,mode,plotInst){
 		var z = zl;
 		var sigma = 0.5*Math.sqrt(-4*zl*zl+4*zl+1);
@@ -17,7 +21,6 @@
 			var y = sigma + 0.5;
 		}
 		var coeffs=[w,x,y,z];
-		console.log("aktuelle Koeffizienten", coeffs);
 		values = iterativePointEvaluation2(coeffs, 0, 11, 0);
 		plotInst.options.data[0].points=values;
 		plotInst.draw();
@@ -25,25 +28,36 @@
 	}
 	
 	
-		
-	//zl is the value of the fourth coefficient. 
-	function plotDaubTrend(zl,mode,button,plotInst) {
 
+/** generates a small video of the trend of all refinable-functions with am mask of 4 coefficients.
+ * they solve the non-linear system for refinable, orthonormal functions
+ *  @param{double} zl - last coefficient 
+ * 	@param{int} mode - number of solution branch
+ * 	@button{button} button - button with values "run" and  "stop"
+ *  @button{button} button - button with values "run" and  "stop"
+ * 	@param{plot} plotInst - plot instance where new values are plotted
+ */
+	function plotDaubTrend(zl,mode,button,buttonReset,plotInst,step) {
+		buttonReset.onclick = function() {
+			zl=0.5-Math.sqrt(2)/2;
+			newValuesToPlot(zl+step,mode,plotInst);
+		};
+		//initializing in first call
+		if (zl == undefined) {
+    		buttonReset.click();
+  		}
+  		//if button shows 'run' - video is paused
 		if(button.value=="run"){
-			var timeout=window.setTimeout(function(){plotDaubTrend(zl,mode,button,plotInst);}, 100);
+			var timeout=window.setTimeout(function(){plotDaubTrend(zl,mode,button,buttonReset,plotInst,step);}, 100);
 			return undefined;
 		}
-  		if (zl == undefined) {
-    	// Startwert
-    		zl = 0.5-Math.sqrt(2)/2;
-  		}
-  		
+  		  		
   		newValuesToPlot(zl,mode,plotInst);
 	
-		//Fortsetzungsbedingung-Bediungung
-  		if (zl < (0.5+Math.sqrt(2)/2)) {
-    		zl=zl+0.002;
-   		 // Funktion um 100ms verzoegert aufrufen
-    		var timeout = window.setTimeout(function(){plotDaubTrend(zl,mode,button,plotInst);}, 100);
+		//requirement to continue
+  		if (zl < (0.5+Math.sqrt(2)/2-step)) {
+    		zl=zl+step;
+   		//invoke function 100ms later
+    		var timeout = window.setTimeout(function(){plotDaubTrend(zl,mode,button,buttonReset,plotInst,step);}, 100);
     	}
 	}
