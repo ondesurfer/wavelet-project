@@ -6,7 +6,7 @@
  */
 
 /** build a bubble chart with the package chart.js
-	 *	xAxis is stability - yAxis is symmetrie
+	 *	xAxis is stability - yAxis is domain
 	 * 	can be used for other bubble charts in a modified way.
 	 * @param{Array} targets - targets[0] = canvas where the chart will be built, and div where the doi is shown
 	 * 						- targets[1] = possible values for x-Axis (as Strings)
@@ -14,8 +14,8 @@
 	 * 						- targets[3] = factor which regulates distance between same positioned items 
 	 * 						- targets[4] = radius of circles
 	 */	
-	function buildStabSymChart(targets){
-		var types = db.exec("SELECT type,doi,symmetry,stability,logo,description,url,abbr FROM TYPES")[0].values;
+	function buildStabDomChart(targets){
+		var types = db.exec("SELECT type,doi,domain,stability,logo,description,url,abbr FROM TYPES")[0].values;
 		//console.log(types);
 	
 		//all possible symmetrie types
@@ -193,7 +193,7 @@
 		        	yAxes: [{ 
 		          		scaleLabel: {
 		            		display: true,
-		            		labelString: "Symmetry"
+		            		labelString: "Domain"
 		          		},
 		          		ticks: {
 		          			suggestedMin: -0.5,
