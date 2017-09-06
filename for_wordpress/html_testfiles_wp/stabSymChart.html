@@ -8,13 +8,13 @@
 	<script src="../js/libs/dbMethods.js"></script>
 	<script src="../js/libs/stringMethods.js"></script>
 	<script src="../js/ext_libs/Chart2.6.0.min.js"></script>
-	<script src="../js/sites/stabSymChart.js"></script>
-	<script src="../js/sites/stabDomChart.js"></script>
+	<script src="../js/sites/stabSymChart2.js"></script>
+	<script src="../js/sites/stabDomChart2.js"></script>
 	
 
 
 	<style>
-		#chartjs-tooltip{
+		.tooltip{
 		position: absolute;
 		background: rgba(240, 240, 240, 1);
 		color: black;
@@ -23,12 +23,12 @@
 		/*border-color: black;*/
 		/*-webkit-transition: all .1s ease;*/
 		transition: all .1s ease;
-		pointer-events: none;
 		/*-webkit-transform: translate(-50%, 0);*/
 		transform: translate(-50%, 0);
 		border: 1px solid #777777;
 		line-height: 30%; 
 		padding: 2px 2px 2px 2px;	
+		z-index: 10;
 	}
 	</style>
 
@@ -39,16 +39,16 @@
 	<div class="chart-container" style="position: relative;"> <!-- height:40vh; width:80vw"-->
     	<canvas id="canvasChart"></canvas>	
 	</div>
-	<div id="chartDoi"></div>
+	<div id="tooltip1" class="tooltip"></div>
 	<div class="chart-container2" style="position: relative;"> <!-- height:40vh; width:80vw"-->
     	<canvas id="canvasChart2"></canvas>	
 	</div>
-	<div id="chartDoi2"></div>
+	<div id="tooltip2" class="tooltip"></div>
 </body>
 
 	
 <script type="text/javascript">
 	
-	checkDB('wavelet-systems.sqlite', buildStabSymChart, [["canvasChart","chartDoi"],["ONB","Riez","Frame"],["none","nearly","yes"],0.2,25]);
-	checkDB('wavelet-systems.sqlite', buildStabDomChart, [["canvasChart2","chartDoi2"],["ONB","Riez","Frame"],["real line","unit interval","sphere"],0.2,25]);
+	checkDB('wavelet-systems.sqlite', buildStabSymChart, [["canvasChart","tooltip1"],["ONB","Riez","Frame"],["none","nearly","yes"],0.2,25]);
+	checkDB('wavelet-systems.sqlite', buildStabDomChart, [["canvasChart2","tooltip2"],["ONB","Riez","Frame"],["real line","unit interval","sphere"],0.2,25]);
 </script>

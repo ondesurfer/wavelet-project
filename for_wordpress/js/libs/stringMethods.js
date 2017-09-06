@@ -55,7 +55,7 @@ function splitter(str, num) {
 	}
 }
 
-/**
+/** !Outdated!
  *  builds a html-string to build the tooltip content for the timeline
  *  (last modification: 17.5.17 Simon)
  * 
@@ -63,8 +63,8 @@ function splitter(str, num) {
  *  @param{String} description - description for the tooltip
  *  @param{String} picLink - Link where to load the logo from
  */
-function buildTooltipContent(name, description, picLink){
-	var htmlString = "<h3>" + name + "</h3>" ;	
+/*function buildTooltipContent(name, description, picLink){
+	var htmlString = "<p></p><h3>" + name + "</h3>" + "<p></p>";	
 	if(description!=undefined){
 		htmlString += splitter(description, 30);
 	}
@@ -73,8 +73,32 @@ function buildTooltipContent(name, description, picLink){
 		htmlString += "<p ><img src='" + picLink + "' width='100' max-height='50'>" + "</p>";
 	}
 	return htmlString;		 
-}
+}*/
 
+/**
+ *  builds a html-string to build the tooltip content for the timeline
+ *  (last modification: 31.8.17 Simon)
+ * 
+ *  @param{String} name - name of the wavelet-system-type
+ *  @param{String} description - description for the tooltip
+ *  @param{String} picLink - Link where to load the logo from
+ */
+function buildTooltipContent2(name, description, picLink, doi, url){
+	var htmlString = "<p></p>" + "<a href='"+url+"' ><h3>"+name+ "</h3></a>" + "<p></p>";	
+	if(description!=undefined){
+		htmlString += splitter(description, 30);
+	}
+			 
+	if(picLink!=undefined){
+		htmlString += "<p ><img src='" + picLink + "' width='100' max-height='50'>" + "</p>";
+	}
+	if(doi!=undefined && doi!=''){
+		console.log('doi',doi);
+		htmlString += buildReferenceLink(name,doi);
+	}
+	console.log(htmlString);
+	return htmlString;		 
+}
 
 /**
  *  builds a html-string to place a link of a doi in a div in the html-page
@@ -103,6 +127,7 @@ function buildReferenceLink(name, doi){
 		link = "http://www.dx.doi.org/"+doi;		
 	}
 	
-	var htmlString = "<p> Reference of "+name+": " + "<a href='"+link+"' >"+link+ "</a>"; 
+	var htmlString = "<p> Reference of "+name+": </p> " + "<a href='"+link+"' >"+link+ "</a>"; 
 	return htmlString;
 }
+

@@ -8,12 +8,12 @@
 	<script src="../js/libs/dbMethods.js"></script>
 	<script src="../js/libs/stringMethods.js"></script>
 	<script src="../js/ext_libs/Chart2.6.0.min.js"></script>
-	<script src="../js/sites/stabDomChart.js"></script>
+	<script src="../js/sites/stabDomChart2.js"></script>
 	
 
 
 	<style>
-		#chartjs-tooltip{
+		.tooltip{
 		position: absolute;
 		background: rgba(240, 240, 240, 1);
 		color: black;
@@ -22,7 +22,6 @@
 		/*border-color: black;*/
 		/*-webkit-transition: all .1s ease;*/
 		transition: all .1s ease;
-		pointer-events: none;
 		/*-webkit-transform: translate(-50%, 0);*/
 		transform: translate(-50%, 0);
 		border: 1px solid #777777;
@@ -38,12 +37,10 @@
 	<div class="chart-container" style="position: relative;"> <!-- height:40vh; width:80vw"-->
     	<canvas id="canvasChart"></canvas>	
 	</div>
-	<div id="chartDoi"></div>
+	<div id="tooltip3" class="tooltip"></div>
 </body>
 
 	
 <script type="text/javascript">
-	
-	checkDB('wavelet-systems.sqlite', buildStabDomChart, [["canvasChart","chartDoi"],["ONB","Riez","Frame"],["real line","unit interval","sphere"],0.2,25]);
-	
+	checkDB('wavelet-systems.sqlite', buildStabDomChart, [["canvasChart","tooltip3"],["ONB","Riez","Frame"],["real line","unit interval","sphere"],0.2,25]);
 </script>

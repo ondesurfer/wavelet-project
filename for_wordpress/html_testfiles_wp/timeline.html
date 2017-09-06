@@ -4,7 +4,8 @@
 	<title>Timeline | Templates</title>
 
 	<script src="../js/ext_libs/sql.js"></script>
-	<script src="../js/sites/timeline.js"></script>
+		<script src="../js/ext_libs/jquery-3.1.0.min.js"></script>
+	<script src="../js/sites/timeline2.js"></script>
 	<script src="../js/ext_libs/timeline_dist/vis.min.js"></script>
 	<script src="../js/libs/dbMethods.js"></script>
 	<script src="../js/libs/stringMethods.js"></script>
@@ -12,11 +13,7 @@
 	<link href="../js/ext_libs/timeline_dist/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
 </head>
 
-<body>
-	<div id="visualization"></div>
-	<div id="doi"></div>
-	
-	<!--modify style of timeline-->
+<!--modify style of timeline-->
 	<style type="text/css">
 		.vis.timeline.item {
 			border-color: #acacac;
@@ -40,15 +37,35 @@
 			font-size: 10pt;
 		}
 
+		.tooltip{
+			position: absolute;
+			background: rgba(240, 240, 240, 1);
+			color: black;
+			font-size: 12px;
+			border-radius: 3px;
+			/*border-color: black;*/
+			/*-webkit-transition: all .1s ease;*/
+			transition: all .1s ease;
+			/*-webkit-transform: translate(-50%, 0);*/
+			transform: translate(-50%, 0);
+			border: 1px solid #777777;
+			line-height: 30%; 
+			padding: 2px 2px 2px 2px;	
+			z-index:1000000;
+		}
 	</style>
+	
+<body>
+	<div id="visualization"></div>
+	<div id="tooltip3" class="tooltip"></div>
+	
 	
 	<script type="text/javascript">
 		
-
 		// A $( document ).ready() block - waits until the page is loaded
 		//$(document).ready(function() {
 			//loads database end executes the buildTimeline() function with the following parameter
-			checkDB('wavelet-systems.sqlite', buildTimeline, ["visualization","doi"]);
+			checkDB('wavelet-systems.sqlite', buildTimeline, ["visualization","tooltip3"]);
 		//});
 
 	</script>
