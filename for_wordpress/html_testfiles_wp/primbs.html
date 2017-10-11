@@ -14,20 +14,18 @@
 <script src="../js/libs/functionTypes/primbsWavelets.js"></script>
 <script src="../js/libs/functionTypes/bSplines.js"></script>
 <script src="../js/libs/dbMethods.js"></script>
-
+<script src="../js/libs/stringMethods.js"></script>
 <body>
-	<h2>Plot of Symmlets Wavelet</h2>
+	<h2>Plot of Primbs Wavelets</h2>
 	<h4>Select your wavelet-system</h4>
 	<select id="select-waveletSystem"></select>
 	<p>Plot of primal scaling-function:</p>
 	<div id="plotPrimScf"></div>
 	<p>Plot of primal wavelet:</p>
 	<div id="plotPrimWav"></div>
-		<p>Plot of dual scaling-function:</p>
+	<p>Plot of dual scaling-function:</p>
 	<div id="plotDualScf"></div>
-		
-		<p>Plot of dual wavelet:</p>
-	<div id="plotDualWav"></div>
+
 
 </body>
 
@@ -35,9 +33,8 @@
 	//checks if database is loaded (and loads it if necessary). Than invokes the function 'buildFunctions'.
 	checkDB('wavelet-systems.sqlite',buildFunctions);
 
-	//!!Achtung - a_start wird im Moment nicht beruecksichtigt!
 	function buildFunctions() {
-		var infos = (db.exec("SELECT id,name FROM Primbs")[0].values);
+		var infos = (db.exec("SELECT id,name FROM PRIMBS")[0].values);
 		
 		//adding all possible wavelet systems to select menue
 		for (var j = 0; j < infos.length; j++) {
@@ -56,12 +53,14 @@
 			var dTilde = getParameter(JSON.parse(db.exec("SELECT parameters FROM PRIMBS WHERE id = " + id)[0].values[0][0]),"d_tilde");
 			var Mj1 = JSON.parse(db.exec("SELECT M_j1 FROM PRIMBS WHERE id = " + id)[0].values[0][0]);
 			var j0 = JSON.parse(db.exec("SELECT j_0 FROM PRIMBS WHERE id = " + id)[0].values[0][0]);
+			var critExp = (db.exec("SELECT critical_Sobolev_exponent FROM PRIMBS WHERE id = " + id)[0].values[0][0]);
+			critExp=(parseExpArray(critExp));
 			//plotting primal scf
-			buildPlot2("#plotPrimScf",valuesOfPrimalPrimbsScf,[d],[1,5],calcPrimalScfRangeOfK,[d]);
+			buildPlot2("#plotPrimScf",valuesOfPrimalPrimbsScf,[d],[1,5],calcPrimalScfRangeOfK,[d],critExp[0]);
 			//plotting primal wavelet
-			buildPlot2("#plotPrimWav",valuesOfPrimalPrimbsWav,[j0,d,dTilde,Mj1],[j0,j0+4],calcPrimalWavRangeOfK,undefined);
+			buildPlot2("#plotPrimWav",valuesOfPrimalPrimbsWav,[j0,d,dTilde,Mj1],[j0,j0+4],calcPrimalWavRangeOfK,undefined,critExp[0]);
 			//plotting dual scf
-			buildPlot2("#plotDualScf",valuesOfDualPrimbsScf,[d,dTilde],[j0,j0+4],calcDualScfRangeOfK,[d]);
+			buildPlot2("#plotDualScf",valuesOfDualPrimbsScf,[d,dTilde],[j0,j0+4],calcDualScfRangeOfK,[d],critExp[1]);
 			
 		});
 		
@@ -73,7 +72,6 @@
 		}
 		function calcDualScfRangeOfK(j,params2){
 			return[0,Math.pow(2,j)+params2[0]-2];
-		}
-		
+		}	
 	}
 </script>

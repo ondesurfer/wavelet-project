@@ -14,14 +14,14 @@
 <script src="../js/libs/dbMethods.js"></script>
 
 <body>
-	<h2>Plot of Symmlets Wavelet</h2>
+	<h2>Plot of Cohen-Daubechies-Feauveau Wavelets</h2>
 	<h4>Select your wavelet-system</h4>
-	<select id="select-primalScf"></select>
-	<select id="select-dualScf"></select>
-	<div id="plotPrimScf"></div>
-	<div id="plotDualScf"></div>
-	<div id="plotPrimWav"></div>
-	<div id="plotDualWav"></div>
+	<select id="select-cdf-primalScf"></select>
+	<select id="select-cdf-dualScf"></select>
+	<div id="plotCDFPrimScf"></div>
+	<div id="plotCDFDualScf"></div>
+	<div id="plotCDFPrimWav"></div>
+	<div id="plotCDFDualWav"></div>
 
 </body>
 
@@ -29,13 +29,12 @@
 	//checks if database is loaded (and loads it if necessary). Than invokes the function 'buildFunctions'.
 	checkDB('wavelet-systems.sqlite',buildFunctions);
 
-	//!!Achtung - a_start wird im Moment nicht beruecksichtigt!
 	function buildFunctions() {
 		var infos = (db.exec("SELECT id,name FROM CDF")[0].values);
 		
 		//adding all possible primal-scfs to select menue
 		for (var j = 0; j < infos.length; j++) {
-			$('#select-primalScf').append($('<option>', {
+			$('#select-cdf-primalScf').append($('<option>', {
 				text : infos[j][1],
 				//value=id
 				value : infos[j][0],
@@ -45,42 +44,45 @@
 		//necessary parameters to calculate values
 		var primMask;
 		var aStart;
+		var critExpPrim;
 		var dualMask;
 		var aTildeStart;
+		var critExpDual;
 		
 		//invoked, if the primal scf is changed
-		$("#select-primalScf").on("change", function() {
-			var id = JSON.parse($('#select-primalScf').val());
-			$("#select-dualScf").empty();
+		$("#select-cdf-primalScf").on("change", function() {
+			var id = JSON.parse($('#select-cdf-primalScf').val());
+			$("#select-cdf-dualScf").empty();
 			fillSelectDual(id);		
 			primMask =  JSON.parse(db.exec("SELECT mask FROM CDF WHERE id = " + id)[0].values[0][0]);	
 			aStart =   JSON.parse(db.exec("SELECT a_start FROM CDF WHERE id = " + id)[0].values[0][0]);
-			$("#select-dualScf").change();
+			critExpPrim = (db.exec("SELECT critical_Sobolev_exponent FROM CDF WHERE id = " + id)[0].values[0][0]);
+			$("#select-cdf-dualScf").change();
 		});
 		
 		//if the dual scf is changed in the select-menue:
-		$("#select-dualScf").on("change", function() {
+		$("#select-cdf-dualScf").on("change", function() {
 			//get id of selected dual scf
-			var dualId = $("#select-dualScf").val();
+			var dualId = $("#select-cdf-dualScf").val();
 			//load mask,aStart and calculate and draw the values
 			dualMask =  JSON.parse(db.exec("SELECT mask FROM CDF WHERE id = " + dualId)[0].values[0][0]);
 			aTildeStart =   JSON.parse(db.exec("SELECT a_start FROM CDF WHERE id = " + dualId)[0].values[0][0]);
+			critExpDual = (db.exec("SELECT critical_Sobolev_exponent FROM CDF WHERE id = " + dualId)[0].values[0][0]);
 			calcAndDrawValues();		
 		});
 		
 		
 		function calcAndDrawValues(){	
-			console.log("primMask",primMask,"aStart",aStart,"dualMask",dualMask,"aTildeStart",aTildeStart);	
+			//console.log("primMask",primMask,"aStart",aStart,"dualMask",dualMask,"aTildeStart",aTildeStart);	
 			var valuesPrimScf = valuesOfCDFScf(primMask,aStart,0,0,13);
 			var valuesDualScf = valuesOfDualCDFScf(dualMask,aTildeStart,0,0,13);
 			var valuesPrimWav = valuesOfCDFWav(primMask,dualMask,aStart,aTildeStart,0,0,13);
-			//is it right like this?
 			var valuesDualWav = valuesOfCDFWav(dualMask,primMask,aTildeStart,aStart,0,0,13);
 				
-			buildPlot("#plotPrimScf",valuesPrimScf);
-			buildPlot("#plotDualScf",valuesDualScf);
-			buildPlot("#plotPrimWav",valuesPrimWav);
-			buildPlot("#plotDualWav",valuesDualWav);
+			buildPlot("#plotCDFPrimScf",valuesPrimScf,critExpPrim);
+			buildPlot("#plotCDFDualScf",valuesDualScf,critExpDual);
+			buildPlot("#plotCDFPrimWav",valuesPrimWav,critExpPrim);
+			buildPlot("#plotCDFDualWav",valuesDualWav,critExpDual);
 		}
 		
 		//fills the dual select-html-field in 
@@ -95,7 +97,7 @@
 			}
 			//if id is just one number
 			if(!isNaN(dualIds)&&(parseInt(dualIds)-dualIds==0)){
-				$('#select-dualScf').append($('<option>', {
+				$('#select-cdf-dualScf').append($('<option>', {
 		   				value: db.exec("SELECT id FROM CDF WHERE id = " + dualIds)[0].values[0][0],
 		    			text: db.exec("SELECT name FROM CDF WHERE id = " + dualIds)[0].values[0][0]
 					}));
@@ -103,7 +105,7 @@
 			//if id is an array of numbers
 			if(dualIds.constructor === Array){
 				for(var j=0; j< dualIds.length; j++){			
-					$('#select-dualScf').append($('<option>', {
+					$('#select-cdf-dualScf').append($('<option>', {
 		   				value: db.exec("SELECT ID FROM CDF WHERE id = " + dualIds[j])[0].values[0][0],
 		    			text: db.exec("SELECT name FROM CDF WHERE id = " + dualIds[j])[0].values[0][0]
 					}));
@@ -112,6 +114,6 @@
 		}
 		
 		//execute "onChange-Function" once at loading the page
-		$("#select-primalScf").change();
+		$("#select-cdf-primalScf").change();
 	}
 </script>

@@ -27,7 +27,7 @@
 		for(var k=0; k<m; k++){	
 			scf[k] = new Obj(d,nodes,k);
 		}
-		console.log(scf);
+		//console.log(scf);
 		return scf;
 	}
 	
@@ -60,7 +60,7 @@
 		var PsiInX=0;
 		
 		if(scf.length!=Mj1.length){
-			console.log("scf-length",scf.length,"Mj1-length",Mj1.length);
+			//console.log("scf-length",scf.length,"Mj1-length",Mj1.length);
 			console.log("Matrix-vector dimension does not fit.");
 			return null;
 		}
@@ -263,7 +263,7 @@
 				}
 			}
 		}
-		console.log(values2);
+		//console.log(values2);
 		return values2;
 }	
 	
@@ -295,7 +295,6 @@
 		for(var k=0; k<m; k++){		
 			dmscf[k] = new Obj3(d,d_tilde,k,j);
 		}
-		console.log("j6",j);
 		return dmscf;
 	}
 	
@@ -318,12 +317,12 @@
 		 for(var l=0; l<values.length; l++){
 			values[l][0]=values[l][0]+k;
 		}
-		console.log(values);
+		//console.log(values);
 		//Skalierung um 2 hoch -j
 		for(var l=0; l<values.length; l++){
 			values[l][0]=1/Math.pow(2,j2)*values[l][0];
 		}
-		console.log(values);
+		//console.log(values);
 		return values;	
 	}
 			
@@ -359,9 +358,7 @@
 		//to construct the rest of the left scaling functions
 		var dscf=buildLeftDualPrimbsScfI(d,d_tilde);
 		var M = m_LTilde(d,d_tilde);
-		console.log("d1,dTilde",d,d_tilde);
 		for(var k=d-2; k>0; k--){		
-			console.log('dscf vor k=',k,"dscf",dscf);
 			dscf[k-1]=new Obj4(d,d_tilde,dscf,k,M);
 		}	
 		return dscf;	
@@ -446,10 +443,7 @@
 		//fuer die ganz linken Skalierungsfunktionen:
 		if(k<d-2){
 			var grid = makeGrid(0,(d+dTilde)/2+k,8192); //see Satz 4.12
-			console.log("links links k=",k);
 			var dscfI=buildLeftDualPrimbsScfII(d,dTilde);
-			console.log("dscfI",dscfI);
-			console.log("k",k,"dscfI",dscfI[k]);
 			var values=evaluateObjectInGrid(dscfI[k],grid);
 			
 			var valuesNew = deliAndTrans(j,0,values);
@@ -458,7 +452,6 @@
 		}
 		//fuer die linken Skalierungsfunktionen neben der Mitte
 		if(k<d+dTilde-2){
-			console.log("links k=",k);
 			return deliAndTrans(j,0,valuesOfLeftDualPrimbsScfI(d, dTilde,k+1));
 		}
 		//fuer die mittleren Skalierungsfunktionen
@@ -470,7 +463,6 @@
 			return mirrorValues(values);
 		}
 		if(k < Math.pow(2,j)+d-1) {
-			console.log("rechts-rechts k=", k);
 			var grid = makeGrid(0,(d+dTilde)/2+(Math.pow(2,j)+d-3)-k,8192); //see Satz 4.12
 			var dscf5=buildLeftDualPrimbsScfII(d,dTilde);
 			var values = evaluateObjectInGrid(dscf5[Math.pow(2,j)+d-2-k],grid);
@@ -478,7 +470,7 @@
 			return mirrorValues(valuesNew);
 		}
 		else{
-			console.log("k=",k ," ist ungueltig");
+			console.log("k=",k ," is not valid");
 			return undefined;
 		}
 		
@@ -514,7 +506,7 @@ function findValue(values,x){
 			return 0;
 		}
 		if(Math.abs(values[index][0]-x)>delta){
-			console.log("alles falsch");
+			console.log("something impossible happend - error");
 			return undefined;
 		}
 		if(Math.abs(values[index][0]-x)>0.0001){

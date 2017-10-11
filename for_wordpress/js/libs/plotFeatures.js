@@ -1,20 +1,22 @@
 /**dependecies: jQuery, functionPlot
  * 
- * Do not use any of the both methods of non-aequidistant grids!!!
+ * Do not use any of the both methods for non-aequidistant grids!!!
  *
- * builds an Plot object which consists of the plot, all available values.
+ * builds an Plot object which consists of the plot, all available values .
  * The plot and the values are connected with an filter. So for a plot not 
  * all values are used.
- * (last modification: 02.05.17 Simon)
+ * Without this trick the functionPlot-libary plots are too slow and not beautiful.
+ * (last modification: 10.10.17 Simon)
  * 
  * @param{string} target name of the html-area where the plot object should
  *                appear
+ * 				TAKE CARE: The html-area is cleared bevor the plot starts. So information can get lost.
  * @param{double[][]} values - values which are hold in background of the resultObject
  * 								(We plot so many of them how are necessary to get a beautiful plot)
  * 
  * @return{object} bigPlot - instance of an bigPlot object
  */
-function buildPlot(target,values) {
+function buildPlot(target,values,sobolevExp) {
 	$(target).empty();
 	try {
 		var plotInst = functionPlot({
@@ -27,10 +29,8 @@ function buildPlot(target,values) {
 				graphType : 'polyline',
 				color: 'blue'
 			} ]
-			
-				
-		});
-		
+	});
+		// The 'bigPlot-object' contains a plot object, many values and a fuction to draw them
 		function bigPlot( plot1, allValues1 ) {
    			return { 
        			 	plot : plot1,
@@ -38,9 +38,15 @@ function buildPlot(target,values) {
        			 	drawValues : function(values){this.allValues=values; this.plot.draw(); },
    			 }; 			
 		};
-				
+		
+		//build a bigPlot-object with the plot-Instance from before		
 		var bigPlotObj = new bigPlot(plotInst,[[0,0]]);
 		
+		/**
+		 *This function gets the current domain of the plot-instance, 
+		 * gets as many points as needed for a nice graphic in this domain,
+		 * and updates the points of the plot-instance 
+		 */
 		function zoomFilter() {
 			var xDomain = this.options.xAxis.domain;
 			var newPoints = filter(xDomain[0], xDomain[1],bigPlotObj.allValues, 1000);
@@ -51,6 +57,7 @@ function buildPlot(target,values) {
 				this.options.data[0].points = newPoints;
 			}
 		} 
+		//add the zoomFilter function to the bigPlot object.
 		bigPlotObj.plot.on("during:draw", zoomFilter);
 		
 		//adding a message-div for warnings etc. like function is not continous etc.
@@ -58,31 +65,27 @@ function buildPlot(target,values) {
 		$(target).prepend(msg);
 		
 		if(values!=undefined){
-			if(!checkContinuity(values,1000)){
+			//numeric check of continuity:
+			//var val = checkContinuity(values,1000);
+			
+			//better: check of continuity by sobolev exponent
+			var val = checkContinuity2(sobolevExp);
+			if(val==0){
 				$(msg).empty();
 				$(msg).css({'color':'red'}); 
-				$(msg).text('Caution: Function seems to be not continous!');
+				$(msg).text('Caution: Function is discontinuous!');
+			}
+			else if(val==0.5){		
+				$(msg).empty();
+				$(msg).css({'color':'red'}); 
+				$(msg).text('Caution: Function may be discontinuous!');
 			}
 			else{
 				$(msg).empty();
 			}
 			bigPlotObj.drawValues(values);
 		}
-   		
-  		/*var sliderId = target+'slider';	
-  		$(target).append('<div><input type="range" id="testID" name="mytext[]" />');
-  		
-		$('#testID').change(function(){
-			bigPlotObj.plot.options.xAxis.domain = [-8, 24];
-			bigPlotObj.plot.meta.xDomain=[-8,24];
-			console.log(bigPlotObj.plot.options.xAxis.domain);
-			//bigPlotObj.plot=functionPlot(bigPlotObj.plot.options); //wird so ein neues plot objekt erstellt?
-			// das alte bigPlotObj ist dann nicht mehr dargestellt?
-			//eig . besser: bigPlotObj.plot.draw() - funktioniert aber nicht, weil die Achsen anders benutzt werden.
-			//bigPlotObj.plot.draw();
-			bigPlotObj.plot.buildContent();
-			console.log(bigPlotObj);
-		});*/
+   	
 		return bigPlotObj;
 			
 	} catch (err) {
@@ -90,132 +93,26 @@ function buildPlot(target,values) {
 		alert(err);
 	}
 }
-/** This method checks if the grade between two points is bigger than tol
- *	we use it to check, if the plot is realistic.
- *  @param{Array} values - values which will be checked
- * 	@param{int} tol  - maximal tolerated grade
- */
 
-function checkContinuity(values,tol){
-	console.log(values);
-	if(values.length>1){
-		var dx = values[1][0]-values[0][0];
-		console.log('dx',dx);
-		var dxTol = dx * tol;
-		for(var j=0; j<values.length-1; j++){
-			if(Math.abs(values[j][1]-values[j+1][1])> dxTol){
-				console.log('Function seems to be not continous!');
-				return false;
-			}
-		}
-	}
-	return true;	
-}
-/** This method searches only a few nessecary values of a function in a
- *  equally spaced grid.  This makes the plot a lot faster.
- *
- *	(last modification: 25.7.16 Simon)
- *	@param{Array} 	allValues 		Input of all the values, which should be
- * 										filtered.
- * 	@param{float} 	leftXvalue 		left border of the function plot.
- *  @param{float}	rightXvalue		right border of the function plot.
- *  @param{int} 	wantedNumOfValues  wanted Number of values in the interval
- * 										leftXvalue..rightXvalue. (A gridwidth is calculated 
- * 										which complies that 'wantedNumOfValues' of values are choosen 
- * 										from the interval leftXvalue..rightXvalue. 
- * 										If 'allValues' does not contain the interval, less values than 
- * 										'wantedNumOfValues' are choosen, satisfying the calculated gridwidth. )
- *  
- * 	@return{Array} 	values  
- */
-
-function filter(leftXvalue, rightXvalue, allValues, wantedNumOfValues){
-	//if there is no value in the allValues-Array
-	if(allValues.length==0){
-		//console.log("kein Wert enthalten");
-		return allValues;
-	}	
-	//console.log("test");
-	//the smallest x-value contained in 'allValues'
-	var funcXleft = allValues[0][0];
-	var funcXright = allValues[allValues.length-1][0];
-	
-	//if there is no value in the window
-	if(leftXvalue>funcXright||rightXvalue<funcXleft){
-		return[];
-	}
-	
-	//distance between x-values in allValues
-	var gridDist=allValues[1][0]-allValues[0][0];
-	
-	//distance nessecary to get 'wantedNumOfValues' 
-	var wishedDist=(rightXvalue-leftXvalue)/wantedNumOfValues;
-	//step
-	var step=wishedDist/gridDist;
-	//console.log("step", step);
-	if (step<0.4){
-		console.log("Aufloesung zu niedrig");
-		return undefined;
-	}else{
-		step=Math.floor(step);
-	}		
-	if(step==0){step=1;}	
-	
-	//Indices of first and last necessary x-Value from 'allValues'
-	var startIndex;
-	var endIndex;
-	
-	if(leftXvalue<=funcXleft){
-		startIndex=0;
-	}
-	else{
-		 startIndex=Math.floor((leftXvalue-funcXleft)/gridDist);
-	}
-	if(rightXvalue>=funcXright){
-		endIndex=allValues.length-1;
-	}
-	else{
-		endIndex=Math.ceil((rightXvalue-funcXleft)/gridDist);
-	}
-		
-	/*Following should not happen:	
-	//if the indices are out of border
-	if(leftXindex<0){leftXindex=0;}
-	if(rightXindex>=allValues.length){rightXindex=allValues.length-1;}
-	*/
-		
-	//values in the allvalues array between right and left xValue
-	var newNumOfValues= Math.ceil((endIndex-startIndex)/step)+1;			
-	var newValues = createArray(newNumOfValues,2);
-			
-	var index = startIndex;
-	
-	for(var i=0;i<newValues.length-1;i++){
-		newValues[i][0]=allValues[index][0];
-		newValues[i][1]=allValues[index][1];
-		index += step;
-	}
-	
-	newValues[newValues.length-1][0]= allValues[endIndex][0];		
-	newValues[newValues.length-1][1]= allValues[endIndex][1];
-		
-	return newValues;
-}
-
+//Same function as above - just with additional sliders to plot the different primbs functions
 /**
- * builds an Plot object which consists of the plot, all available values.
+ * builds an Plot object which consists of the plot, all available values, and some additional sliders.
  * The plot and the values are connected with an filter. So for a plot not 
  * all values are used.
  * (last modification: 02.05.17 Simon)
  * 
  * @param{string} target name of the html-area where the plot object should
  *                appear
- * @param{double[][]} values - values which are hold in background of the resultObject
- * 								(We plot so many of them how are necessary to get a beautiful plot)
+ * @param{function} calcValFunc - function which calculates the values which shall be plotted
+ * @param{obj[]} params - additional parameter to function calcValFunc
+ * @param{double[]} slider1Range - Range of slider 1
+ * @param{double[]} slider2RangeFunct - Function which calculates range of slider 2 (depends on slider1)
+ * @params{obj[]} params2 - additional parameters to function slider2RangeFunct
+ * @params{double} sobolevExp - sobolev exponent of the current function. Is used to check continuaty.
  * 
  * @return{object} bigPlot - instance of an bigPlot object
  */
-function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,params2) {
+function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,params2,sobolevExp) {
 	$(target).empty();
 	try {
 		var plotInst = functionPlot({
@@ -231,7 +128,7 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 			
 				
 		});
-		
+		// The 'bigPlot-object' contains a plot object, many values and a fuction to draw them
 		function bigPlot( plot1, allValues1 ) {
    			return { 
        			 	plot : plot1,
@@ -285,7 +182,7 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 			/*the slider range is from 0.1 to 2; 0.1 will bring a stretch of factor 10, but 2 just a 
 			compression of factor 2. So, if factor is higher than 1 we multiply it by 5.*/
 			if(factor>1){factor=((factor-1)+0.1)*10;}
-			console.log(factor);
+			//console.log(factor);
 			var newYdomain = bigPlotObj.plot.options.yAxis.domain;
 			
 			//old middle of y-Axis will stay middle of y-Axis
@@ -297,9 +194,7 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 		
 			bigPlotObj.plot.options.yAxis.domain = newYdomain ;
 			//building a new plot-content with the options e.g.values from before
-			bigPlotObj.plot=functionPlot(bigPlotObj.plot.options); //wird so ein neues plot objekt erstellt?
-			//eig . besser: bigPlotObj.plot.draw() - funktioniert aber nicht, weil die Achsen anders benutzt werden.
-			//bigPlotObj.plot.draw();
+			bigPlotObj.plot=functionPlot(bigPlotObj.plot.options); 
 			bigPlotObj.plot.buildContent();
 		});
    		
@@ -347,9 +242,8 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 			var value = parseInt($(slider1Text).val());
 			//tests if the users input value is valid
 			if(Number.isInteger(value) && value>=slider1Range[0] && value<=slider1Range[1]){
-				$(slider1Text).val(value);
-				changeRangeSlider2();
 				$(slider1).val(value);
+				changeRangeSlider2();
 				newValues();
 			}else{
 				$(slider1Text).val($(slider1).val());
@@ -386,10 +280,17 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 			var j=parseInt($(slider1).val());
 			var k=parseInt($(slider2).val());
 			var values = calcValFunc([j,k],params);
-			if(!checkContinuity(values,1000*Math.pow(2,j-1))){
+			//var val=checkContinuity(values,1000*Math.pow(2,j-1))){
+			var val = checkContinuity2(sobolevExp);
+			if(val==0){
 				$(msg).empty();
 				$(msg).css({'color':'red'}); 
-				$(msg).text('Caution: Function seems to be not continous!');
+				$(msg).text('Caution: Function is discontinuous!');
+			}
+			else if(val==0.5){		
+				$(msg).empty();
+				$(msg).css({'color':'red'}); 
+				$(msg).text('Caution: Function may be discontinuous!');
 			}
 			else{
 				$(msg).empty();
@@ -412,4 +313,162 @@ function buildPlot2(target,calcValFunc,params,slider1Range,slider2RangeFunct,par
 		console.log(err);
 		alert(err);
 	}
+}
+/** This method checks if the grade between two points is bigger than tol
+ *	we use it to check, if the plot is realistic - if possible use new method 
+ * 	'checkContinuity2'!
+ *  @param{Array} values - values which will be checked
+ * 	@param{int} tol  - maximal tolerated grade
+ */
+//use checkContinuity2 if possible!
+function checkContinuity(values,tol){
+	//console.log(values);
+	if(values.length>1){
+		var dx = values[1][0]-values[0][0];
+		//console.log('dx',dx);
+		var dxTol = dx * tol;
+		for(var j=0; j<values.length-1; j++){
+			if(Math.abs(values[j][1]-values[j+1][1])> dxTol){
+				console.log('Function seems to be not continous!');
+				return 0;
+			}
+		}
+	}
+	return 1;	
+}
+
+/** This method checks continuaty on base of the given sobolev exponent
+ *  @param{Array} str - string of sobolev exponent
+ *  (can be: number (sobolev exponent), null (unknown exponent), string (like '>0.5'), 'x' (not continous) )
+ *  														
+ * 	@return{int}  - 0 discontinous, 0.5 unknown, 1 continous
+ */
+function checkContinuity2(str){
+	if (str==null||(typeof(str)=='string'&&str=='null')){
+		return 0.5;
+	}
+	if(typeof(str)=='number'){
+		if(str>0.5){
+			return 1;
+		}
+		else{
+			return 0.5;
+		}
+	}
+	if(typeof(str)=='string'){
+		if(str=='x'){
+			return 0;
+		}
+		if(str.startsWith('>')){
+			str=str.slice(1,str.length);
+			if(!isNaN(parseFloat(str))){
+				str=parseFloat(str);
+				str=str+0.001;
+			}
+		}
+		//check if is number
+		if(!isNaN(parseFloat(str))){
+			str=parseFloat(str);
+			if(str>0.5){
+				return 1;
+			}
+			else{
+				return 0.5;
+			}
+		}
+	}
+	else{
+		return undefined;
+	}	
+}
+
+/** This method searches only a few nessecary values of a function in a
+ *  equally spaced grid.  This makes the plot a lot faster.
+ *
+ *	(last modification: 25.7.16 Simon)
+ *	@param{Array} 	allValues 		Input of all the values, which should be
+ * 										filtered.
+ * 	@param{float} 	leftXvalue 		left border of the function plot.
+ *  @param{float}	rightXvalue		right border of the function plot.
+ *  @param{int} 	wantedNumOfValues  wanted Number of values in the interval
+ * 										leftXvalue..rightXvalue. (A gridwidth is calculated 
+ * 										which complies that 'wantedNumOfValues' of values are choosen 
+ * 										from the interval leftXvalue..rightXvalue. 
+ * 										If 'allValues' does not contain the interval, less values than 
+ * 										'wantedNumOfValues' are choosen, satisfying the calculated gridwidth. )
+ *  
+ * 	@return{Array} 	values  
+ */
+
+function filter(leftXvalue, rightXvalue, allValues, wantedNumOfValues){
+	//if there is no value in the allValues-Array
+	if(allValues.length==0){
+		//console.log("kein Wert enthalten");
+		return allValues;
+	}	
+	//console.log("test");
+	//the smallest x-value contained in 'allValues'
+	var funcXleft = allValues[0][0];
+	var funcXright = allValues[allValues.length-1][0];
+	
+	//if there is no value in the window
+	if(leftXvalue>funcXright||rightXvalue<funcXleft){
+		return[];
+	}
+	
+	//distance between x-values in allValues
+	var gridDist=allValues[1][0]-allValues[0][0];
+	
+	//distance nessecary to get 'wantedNumOfValues' 
+	var wishedDist=(rightXvalue-leftXvalue)/wantedNumOfValues;
+	//step
+	var step=wishedDist/gridDist;
+	//console.log("step", step);
+	if (step<0.4){
+		console.log("Too less points to use the filter method!");
+		return undefined;
+	}else{
+		step=Math.floor(step);
+	}		
+	if(step==0){step=1;}	
+	
+	//Indices of first and last necessary x-Value from 'allValues'
+	var startIndex;
+	var endIndex;
+	
+	if(leftXvalue<=funcXleft){
+		startIndex=0;
+	}
+	else{
+		 startIndex=Math.floor((leftXvalue-funcXleft)/gridDist);
+	}
+	if(rightXvalue>=funcXright){
+		endIndex=allValues.length-1;
+	}
+	else{
+		endIndex=Math.ceil((rightXvalue-funcXleft)/gridDist);
+	}
+		
+	/*Following should not happen:	
+	//if the indices are out of border
+	if(leftXindex<0){leftXindex=0;}
+	if(rightXindex>=allValues.length){rightXindex=allValues.length-1;}
+	*/
+		
+	//values in the allvalues array between right and left xValue
+	var newNumOfValues= Math.ceil((endIndex-startIndex)/step)+1;			
+	var newValues = createArray(newNumOfValues,2);
+			
+	var index = startIndex;
+	
+	for(var i=0;i<newValues.length-1;i++){
+		newValues[i][0]=allValues[index][0];
+		newValues[i][1]=allValues[index][1];
+		index += step;
+	}
+	
+	newValues[newValues.length-1][0]= allValues[endIndex][0];		
+	newValues[newValues.length-1][1]= allValues[endIndex][1];
+		
+	return newValues;
 }

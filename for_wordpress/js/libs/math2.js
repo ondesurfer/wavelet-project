@@ -320,8 +320,8 @@ function gaus2(A, x) {
         }
 
         if(Math.abs(A[i][i])<0.00000000000001){
-    		console.log('LGS nicht eindeutig loesbar');
-    		return new Error('LGS nicht eindeutig loesbar');
+    		console.log('The linear system of equations is not uniquely solvable.');
+    		return new Error('The linear system of equations is not uniquely solvable.');
     	}
         
         // Make all rows below this one 0 in current column
@@ -358,8 +358,8 @@ function gaus2(A, x) {
     for (i=columns-1; i > -1; i--) { 
     	//divide the line through A[i][i]
     	if(Math.abs(A[i][i])<0.0000000001){
-        	console.log('LGS nicht eindeutig loesbar');
-        	return new Error('LGS nicht eindeutig loesbar');
+        	console.log('The linear system of equations is not uniquely solvable.');
+        	return new Error('The linear system of equations is not uniquely solvable.');
     	}
     	
         x[i] = A[i][columns]/A[i][i];

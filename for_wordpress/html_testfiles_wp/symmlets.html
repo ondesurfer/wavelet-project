@@ -14,41 +14,42 @@
 <script src="../js/libs/dbMethods.js"></script>
 
 <body>
-	<h2>Plot of Symmlets Wavelet</h2>
-	<h4>Select your wavelet-system</h4>
-	<select id="select-wavelet-system"></select>
-	<div id="plotWav"></div>
-	<div id="plotScf"></div>
+	<h2>Symmlets</h2>
+	Select your wavelet-system:<select id="select-symmlet"></select>
+	Plot of Symmlet scaling-function:
+	<div id="plotSymmletScf"></div>
 
+	Plot of Symmlet wavelet:
+	<div id="plotSymmletWav"></div>
 </body>
 
 <script>
 	//checks if database is loaded (and loads it if necessary). Than invokes the function 'buildFunctions'.
 	checkDB('wavelet-systems.sqlite',buildFunctions);
 
-	//!!Achtung - a_start wird im Moment nicht beruecksichtigt!
 	function buildFunctions() {
-		var infos = (db.exec("SELECT name, mask FROM SYMMLETS")[0].values);
-
-		
+		var infos = (db.exec("SELECT id, name, mask, critical_sobolev_exponent FROM SYMMLETS")[0].values);	
 		//adding all possible wavelet-systems to select menue
 		for (var j = 0; j < infos.length; j++) {
-			$('#select-wavelet-system').append($('<option>', {
-				text : infos[j][0],
-				value : infos[j][1],
+			$('#select-symmlet').append($('<option>', {
+				text : infos[j][1],
+				//id stored in value
+				value : infos[j][0],
 			}));
 		}
 		//adding plot-function to submit-button
-		$("#select-wavelet-system").on("change", function() {
-			var mask = JSON.parse($('#select-wavelet-system').val());		
-			//deliTrans= [deli,trans] - non-fix parameters for calculating values. Can be changed by user
-						
+		$("#select-symmlet").on("change", function() {
+			var id = $('#select-symmlet').val();
+			var critExp =(infos[id-1][3]);
+			console.log('critExp',critExp);
+			var mask = JSON.parse(infos[id-1][2]);	
+								
 			var valuesWav = valuesOfSymmletsWav(mask,0,0,0,13);
 			var valuesScf = valuesOfSymmletsScf(mask,0,0,0,13);
-			buildPlot("#plotWav",valuesWav);
-			buildPlot("#plotScf",valuesScf);
+			buildPlot("#plotSymmletScf",valuesWav,critExp);
+			buildPlot("#plotSymmletWav",valuesScf,critExp);
 		});
-
+		$("#select-symmlet").change();
 	}
 
 </script>

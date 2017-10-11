@@ -39,7 +39,6 @@ function testRefCoeffs(a, n) {
  * 	@return{boolean} true iff the coefficients pass the test.
  */
 function testOrthoCoeffs(a, n) {
-
 	var faultTolerance = Math.pow(10, -n);
 
 	var sum1 = 0;
@@ -51,18 +50,18 @@ function testOrthoCoeffs(a, n) {
 		sum2 += (a[i] * a[i]);
 	}
 
-	//console.log(sum1);
-	//console.log(sum2);
 	if (Math.abs(sum1 - 2.0) > faultTolerance) {
+		console.log('sum wrong');
 		return false;
 	}
+	console.log(Math.abs(sum2 - 2.0));
 	if (Math.abs(sum2 - 2.0) > faultTolerance) {
+		console.log('sum of squares wrong');
 		return false;
 	}
 
 	//sum over a_l*a_(l-2k) should be 0 for all k!=0
 	var sum3;
-	
 	//the summand a_l*a_(l-2k) is != 0,
 	//if 0 <= l < a.length
 	//and 0 <= l - 2*k < a.length, thus k <= l/2,
@@ -75,8 +74,8 @@ function testOrthoCoeffs(a, n) {
 				sum3 += a[l] * a[l - 2 * k];
 			}
 		}
-		//console.log(sum3);
 		if (Math.abs(sum3) > faultTolerance) {
+			console.log('conj-sum wrong','sum3',sum3);
 			return false;
 		}
 	}

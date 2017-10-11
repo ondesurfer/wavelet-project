@@ -12,43 +12,46 @@
 <script src="../js/libs/plotFeatures.js"></script>
 <script src="../js/libs/functionTypes/coiflets.js"></script>
 <script src="../js/libs/dbMethods.js"></script>
+<script src="../js/libs/stringMethods.js"></script>
 
 <body>
-	<h2>Plot of coiflets Wavelet</h2>
-	<h4>Select your wavelet-system</h4>
-	<select id="select-wavelet-system"></select>
-	<div id="plotWav"></div>
-	<div id="plotScf"></div>
+	<h2>Coiflets</h2>
+	Select your wavelet-system:<select id="select-coiflet"></select>
+	Plot of Coiflet scaling-function:
+	<div id="plotCoifletScf"></div>
 
+	Plot of Coiflet wavelet:
+	<div id="plotCoifletWav"></div>
 </body>
 
 <script>
 	//checks if database is loaded (and loads it if necessary). Than invokes the function 'buildFunctions'.
 	checkDB('wavelet-systems.sqlite',buildFunctions);
 
-	//!!Achtung - a_start wird im Moment nicht beruecksichtigt!
 	function buildFunctions() {
-		var infos = (db.exec("SELECT name, mask FROM COIFLETS")[0].values);
-
+		var infos = (db.exec("SELECT id, name, mask, critical_sobolev_exponent FROM COIFLETS")[0].values);
 		
 		//adding all possible wavelet-systems to select menue
 		for (var j = 0; j < infos.length; j++) {
-			$('#select-wavelet-system').append($('<option>', {
-				text : infos[j][0],
-				value : infos[j][1],
+			$('#select-coiflet').append($('<option>', {
+				text : infos[j][1],
+				//id stored in value
+				value : infos[j][0],
 			}));
 		}
 		//adding plot-function to submit-button
-		$("#select-wavelet-system").on("change", function() {
-			var mask = JSON.parse($('#select-wavelet-system').val());		
-			//deliTrans= [deli,trans] - non-fix parameters for calculating values. Can be changed by user
-						
+		$("#select-coiflet").on("change", function() {
+			var id = $('#select-coiflet').val();
+			var critExp =(infos[id-1][3]);
+			var mask = JSON.parse(infos[id-1][2]);	
+								
 			var valuesWav = valuesOfCoifletsWav(mask,0,0,0,13);
 			var valuesScf = valuesOfCoifletsScf(mask,0,0,0,13);
-			buildPlot("#plotWav",valuesWav);
-			buildPlot("#plotScf",valuesScf);
+			buildPlot("#plotCoifletScf",valuesWav,critExp);
+			buildPlot("#plotCoifletWav",valuesScf,critExp);
 		});
-
+		$("#select-coiflet").change();
 	}
-
+	//str='[a,b,c]';
+	//console.log(parseExpArray(str));
 </script>

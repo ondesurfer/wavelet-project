@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<div class="chart"></div>
+test-File to calculate cdf-coeffs
+
+<script src="../js/libs/mask.js"></script>
+<script src="../js/libs/math2.js"></script>
+
+<script src="../js/libs/matrixOperations.js"></script>
+<script src="../js/libs/gauss2.js"></script>
+<!-- load ht../p://maurizzzio.github.io/function-plot/ -->
+<script src="../js/ext_libs/function-plot.js"></script>
+<script src="../js/ext_libs/numeric-1.2.6.js"></script>
+<script src="../js/libs/dbMethods.js"></script>
+<script src="../js/ext_libs/sql.js"></script>
+
+
+<body>
+	<div id="plot1"> </div>
+	<div id="plot2"> </div>
+	<div id="plot3"> </div>
+</body>
+
+<script>
+
+checkDB('wavelet-systems.sqlite',buildFunctions);
+
+for(var d=2;d<8;d++){
+	var coeffs = genBSplineCoeffs(d);
+	console.log('coeffs'+d,JSON.stringify(coeffs[0]),'astart',coeffs[1]);
+	for(var dTilde=d; dTilde<d+8; dTilde=dTilde+2){
+		var dcoeffs = genDualBSplineCoeffs(d,dTilde);
+		console.log('dcoeffs'+dTilde,JSON.stringify(dcoeffs[0]),'astart',dcoeffs[1]);
+	}
+}
+
+function buildFunctions(){
+	//test coeffs
+	var masks = (db.exec("SELECT mask FROM CDF")[0].values);
+
+	for(k=0; k<masks.length; k++){
+		var mask=JSON.parse(masks[k]);
+		console.log('id =', k+1, testRefCoeffs(mask,10));
+	}
+}
+			
+
+</script>

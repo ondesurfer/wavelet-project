@@ -131,3 +131,19 @@ function buildReferenceLink(name, doi){
 	return htmlString;
 }
 
+/** parses an array which stores the critical sobolev exponents of a wavelet system.
+ * @param{string} str string which contains the sobolev exponents
+ * 
+ * @return{array} strArr array of strings which contains one entry for every function
+ *
+ **/
+function parseExpArray(str){
+	if(str.startsWith('[')&&str.endsWith(']')){
+		str=str.slice(1,str.length-1);
+		str=str.split(',');
+		return str;
+	}
+	else{
+		return str;		
+	}
+}

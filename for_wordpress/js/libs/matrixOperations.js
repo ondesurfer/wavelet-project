@@ -180,7 +180,7 @@ function calculateIntegerPointValues(a, mu) {
 	sol.push(0);
 	sol.unshift(0);
 	
-	console.log("phi at integer points:",sol);
+	//console.log("phi at integer points:",sol);
 	return formatIntegerPointValues(sol);
 }
 

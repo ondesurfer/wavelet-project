@@ -17,7 +17,7 @@
 		for(var k=0; k<d; k++){
 			grid.push(1);
 		}
-		console.log("Das Gitter fuer die BSplines:", grid);
+		//console.log("Das Gitter fuer die BSplines:", grid);
 		return grid;
 	}
 	
