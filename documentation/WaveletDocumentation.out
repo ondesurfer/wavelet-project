@@ -1,0 +1,17 @@
+\BOOKMARK [1][-]{section.1}{Aufbau des Dateisystems}{}% 1
+\BOOKMARK [1][-]{section.2}{Aufbau der Website}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Integration von Javascript in Wordpress}{section.2}% 3
+\BOOKMARK [1][-]{section.3}{Aufbau der Datenbank}{}% 4
+\BOOKMARK [1][-]{section.4}{Bisherige Wavelettypen}{}% 5
+\BOOKMARK [2][-]{subsection.4.1}{Daubechies-Wavelets}{section.4}% 6
+\BOOKMARK [2][-]{subsection.4.2}{Coiflets}{section.4}% 7
+\BOOKMARK [2][-]{subsection.4.3}{Symmlets}{section.4}% 8
+\BOOKMARK [2][-]{subsection.4.4}{Cohen-Daubechies-Feauveau-Wavelets}{section.4}% 9
+\BOOKMARK [2][-]{subsection.4.5}{Primbs-Wavelets}{section.4}% 10
+\BOOKMARK [1][-]{section.5}{Plotten der relevanten Funktionen}{}% 11
+\BOOKMARK [2][-]{subsection.5.1}{Punktauswertung verfeinerbarer Funktionen}{section.5}% 12
+\BOOKMARK [2][-]{subsection.5.2}{Punktauswertung per Subdivison-Schema}{section.5}% 13
+\BOOKMARK [2][-]{subsection.5.3}{Punktauswertung der B-Splines}{section.5}% 14
+\BOOKMARK [1][-]{section.6}{Erkl\344rung zu bestimmten Dateien}{}% 15
+\BOOKMARK [2][-]{subsection.6.1}{PlotFeatures.js}{section.6}% 16
+\BOOKMARK [1][-]{section.7}{Aktueller Stand und m\366gliche Weiterarbeit}{}% 17
